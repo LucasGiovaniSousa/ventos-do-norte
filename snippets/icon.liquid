@@ -5,22 +5,34 @@
 
   O QUE FAZ:
   Renderiza um ícone SVG inline pelo nome, com width/height explícitos
-  (bom para acessibilidade e performance). Usa currentColor, então herda
+  (bom para acessibilidade e performance). Usa currentColor, portanto herda
   a cor do texto do elemento pai.
 
   COMO USAR:
   {% render 'icon', name: 'cart' %}
 
   PARÂMETROS:
-  - name: nome do ícone. Disponíveis:
-    search, account, cart, close, chevron, trash,
-    instagram, facebook, linkedin.
+  - name: nome do ícone.
+
+  DISPONÍVEIS:
+  Interface     search, account, cart, close, menu, chevron, chevron-right,
+                arrow-right, arrow-up-right, minus, plus, trash, filter,
+                check, star
+  Confiança     truck, shield, refresh
+  Marca         pipa, linha, acessorios, qualidade, paixao, bola, peteca
+  Redes         instagram, facebook, tiktok, linkedin, whatsapp
+
+  OS ÍCONES DE MARCA:
+  pipa/linha/acessorios/qualidade/paixao são os cinco pilares que aparecem
+  no rodapé do logótipo da Ventos do Norte. Foram desenhados a traço de 1.7px
+  para casarem entre si quando mostrados em fila na secção de pilares.
 
   OBSERVAÇÕES:
   Nome inexistente não renderiza nada (case sem when correspondente).
   Para adicionar um ícone novo, crie mais um bloco {%- when 'nome' -%}.
 {%- endcomment -%}
 {%- case name -%}
+  {%- comment -%} ---------- Interface ---------- {%- endcomment -%}
   {%- when 'search' -%}
     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false"><circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="2"/><path d="m20 20-3.5-3.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
   {%- when 'account' -%}
@@ -29,14 +41,62 @@
     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false"><path d="M6 6h15l-1.5 9h-12L6 6Zm0 0-.5-3H3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="9" cy="20" r="1.5" fill="currentColor"/><circle cx="17" cy="20" r="1.5" fill="currentColor"/></svg>
   {%- when 'close' -%}
     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false"><path d="m6 6 12 12M18 6 6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+  {%- when 'menu' -%}
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false"><path d="M3 7h18M3 12h18M3 17h12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
   {%- when 'chevron' -%}
     <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true" focusable="false"><path d="m4 6 4 4 4-4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+  {%- when 'chevron-right' -%}
+    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true" focusable="false"><path d="m6 4 4 4-4 4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+  {%- when 'arrow-right' -%}
+    <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true" focusable="false"><path d="M3 10h14m0 0-5-5m5 5-5 5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+  {%- when 'arrow-up-right' -%}
+    <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true" focusable="false"><path d="M6 14 14 6m0 0H7m7 0v7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+  {%- when 'minus' -%}
+    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true" focusable="false"><path d="M3 8h10" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+  {%- when 'plus' -%}
+    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true" focusable="false"><path d="M8 3v10M3 8h10" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
   {%- when 'trash' -%}
     <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true" focusable="false"><path d="M3 5h14M8 5V3h4v2m-6 0 1 12h6l1-12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+  {%- when 'filter' -%}
+    <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true" focusable="false"><path d="M3 5h14M6 10h8M8 15h4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+  {%- when 'check' -%}
+    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true" focusable="false"><path d="m3 8 3.5 3.5L13 5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+  {%- when 'star' -%}
+    <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true" focusable="false"><path d="M8 1.5l1.9 3.9 4.3.6-3.1 3 .7 4.3L8 11.3l-3.8 2 .7-4.3-3.1-3 4.3-.6L8 1.5Z"/></svg>
+
+  {%- comment -%} ---------- Confiança ---------- {%- endcomment -%}
+  {%- when 'truck' -%}
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false"><path d="M2 7h11v9H2V7Zm11 3h4l3 3v3h-7v-6Z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><circle cx="7" cy="18" r="2" stroke="currentColor" stroke-width="1.7"/><circle cx="17" cy="18" r="2" stroke="currentColor" stroke-width="1.7"/></svg>
+  {%- when 'shield' -%}
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false"><path d="M12 3l7 3v5c0 4.4-3 8.3-7 10-4-1.7-7-5.6-7-10V6l7-3Z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><path d="m9 12 2 2 4-4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+  {%- when 'refresh' -%}
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false"><path d="M20 12a8 8 0 1 1-2.6-5.9M20 4v4h-4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+
+  {%- comment -%} ---------- Pilares da marca ---------- {%- endcomment -%}
+  {%- when 'pipa' -%}
+    <svg width="28" height="28" viewBox="0 0 28 28" fill="none" aria-hidden="true" focusable="false"><path d="M14 3.5 23 12l-9 10.5L5 12l9-8.5Z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><path d="M14 3.5v19M5 12h18" stroke="currentColor" stroke-width="1.7"/><path d="M14 22.5c0 1.6 1.8 1.8 1.8 3.4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+  {%- when 'linha' -%}
+    <svg width="28" height="28" viewBox="0 0 28 28" fill="none" aria-hidden="true" focusable="false"><ellipse cx="14" cy="7" rx="8" ry="3" stroke="currentColor" stroke-width="1.7"/><path d="M6 7v14M22 7v14" stroke="currentColor" stroke-width="1.7"/><ellipse cx="14" cy="21" rx="8" ry="3" stroke="currentColor" stroke-width="1.7"/><path d="M6 11.5h16M6 16h16" stroke="currentColor" stroke-width="1.2" opacity=".55"/></svg>
+  {%- when 'acessorios' -%}
+    <svg width="28" height="28" viewBox="0 0 28 28" fill="none" aria-hidden="true" focusable="false"><path d="M10.5 9.5a4 4 0 1 1 4 4 4 4 0 1 0-4 4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/><path d="M14.5 13.5 22 21m-16 0 4-4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+  {%- when 'qualidade' -%}
+    <svg width="28" height="28" viewBox="0 0 28 28" fill="none" aria-hidden="true" focusable="false"><path d="M14 3.5 22 7v6c0 5.2-3.4 9.8-8 11.5-4.6-1.7-8-6.3-8-11.5V7l8-3.5Z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><path d="m10.5 14 2.5 2.5L18 11" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+  {%- when 'paixao' -%}
+    <svg width="28" height="28" viewBox="0 0 28 28" fill="none" aria-hidden="true" focusable="false"><path d="M14 23.5S4.5 17.8 4.5 11.4a5.4 5.4 0 0 1 9.5-3.5 5.4 5.4 0 0 1 9.5 3.5c0 6.4-9.5 12.1-9.5 12.1Z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></svg>
+  {%- when 'bola' -%}
+    <svg width="28" height="28" viewBox="0 0 28 28" fill="none" aria-hidden="true" focusable="false"><circle cx="14" cy="14" r="10.5" stroke="currentColor" stroke-width="1.7"/><path d="m14 8 4.2 3-1.6 5h-5.2l-1.6-5L14 8Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><path d="M14 3.5V8m7.8 3.4L18.2 11m1.4 8.6L16.6 16m-5.2 0-3 3.6M6.2 11.4 9.8 11" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+  {%- when 'peteca' -%}
+    <svg width="28" height="28" viewBox="0 0 28 28" fill="none" aria-hidden="true" focusable="false"><ellipse cx="14" cy="21.5" rx="5.5" ry="2.5" stroke="currentColor" stroke-width="1.7"/><path d="M14 19V9m0 0c-1.8-3-4.5-4.5-5.5-6.5M14 9c1.8-3 4.5-4.5 5.5-6.5M14 9V2.5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+
+  {%- comment -%} ---------- Redes sociais ---------- {%- endcomment -%}
   {%- when 'instagram' -%}
     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false"><rect x="3" y="3" width="18" height="18" rx="5" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="12" r="4" stroke="currentColor" stroke-width="2"/><circle cx="17" cy="7" r="1" fill="currentColor"/></svg>
   {%- when 'facebook' -%}
     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false"><path d="M14 8h2V5h-2c-2 0-3 1.5-3 3.5V11H9v3h2v6h3v-6h2l.5-3H14V8.5c0-.3.2-.5.5-.5Z" fill="currentColor"/></svg>
+  {%- when 'tiktok' -%}
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false"><path d="M14 3v11.5a3.5 3.5 0 1 1-3.5-3.5c.35 0 .68.05 1 .14" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M14 3c.5 2.8 2.4 4.4 5 4.6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
   {%- when 'linkedin' -%}
     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false"><rect x="3" y="3" width="18" height="18" rx="2" stroke="currentColor" stroke-width="2"/><path d="M7 10v6M7 7v.01M11 16v-3.5a1.5 1.5 0 0 1 3 0V16m-3-3.5V10" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+  {%- when 'whatsapp' -%}
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false"><path d="M3.5 20.5 5 16.2A8.2 8.2 0 1 1 7.8 19l-4.3 1.5Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M9.2 8.5c.6 2.6 2.4 4.4 5 5 .7.2 1.2-.3 1.5-.8l-1.6-1-1 .7a5.6 5.6 0 0 1-2.4-2.4l.7-1-1-1.6c-.5.3-1 .8-.8 1.5Z" fill="currentColor"/></svg>
 {%- endcase -%}

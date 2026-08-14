@@ -1,0 +1,50 @@
+{%- comment -%}
+  ============================================================
+  facet-hidden-inputs — preservar os filtros ativos noutro formulário
+  ============================================================
+
+  O QUE FAZ:
+  Emite um <input type="hidden"> por cada filtro de faceta ativo na coleção.
+
+  PORQUÊ EXISTE:
+  A ordenação e os filtros são dois formulários GET independentes. Um GET
+  substitui toda a query string, por isso submeter a ordenação sem mais nada
+  apagaria os filtros ativos (e vice-versa). Ao replicar os filtros ativos
+  dentro do formulário de ordenação, o URL final leva os dois.
+
+  COMO USAR:
+  {%- render 'facet-hidden-inputs', collection: collection -%}
+  Colocar dentro do <form> de ordenação, antes do <select>.
+
+  PARÂMETROS:
+  - collection (obrigatório): a coleção atual, de onde se leem os filtros.
+
+  NOTA SOBRE O PREÇO:
+  Os valores de preço vêm em cêntimos e têm de ser enviados na mesma unidade
+  que o Shopify espera no parâmetro — daí o money_without_currency seguido da
+  remoção do separador de milhares.
+{%- endcomment -%}
+{%- for filter in collection.filters -%}
+  {%- for value in filter.values -%}
+    {%- if value.active -%}
+      <input type="hidden" name="{{ value.param_name }}" value="{{ value.value }}">
+    {%- endif -%}
+  {%- endfor -%}
+
+  {%- if filter.type == 'price_range' -%}
+    {%- if filter.min_value.value -%}
+      <input
+        type="hidden"
+        name="{{ filter.min_value.param_name }}"
+        value="{{ filter.min_value.value | money_without_currency | replace: ',', '' }}"
+      >
+    {%- endif -%}
+    {%- if filter.max_value.value -%}
+      <input
+        type="hidden"
+        name="{{ filter.max_value.param_name }}"
+        value="{{ filter.max_value.value | money_without_currency | replace: ',', '' }}"
+      >
+    {%- endif -%}
+  {%- endif -%}
+{%- endfor -%}

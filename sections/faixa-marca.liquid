@@ -1,0 +1,142 @@
+{%- comment -%}
+  ============================================================
+  faixa-marca — faixa deslizante de marca
+  ============================================================
+
+  O QUE FAZ:
+  Uma tira horizontal com o slogan (ou os pilares) a passar em loop infinito,
+  separada por bandeiras ou pontos. Serve de respiração entre duas secções
+  grandes e reforça o discurso da marca sem ocupar um ecrã inteiro.
+
+  ONDE É USADA:
+  templates/index.json, tipicamente logo a seguir ao hero, e outra vez mais
+  abaixo com a direção invertida.
+
+  COMO FUNCIONA O LOOP:
+  O texto é renderizado duas vezes, lado a lado. A animação desloca a faixa em
+  exatamente -100% da largura de UMA cópia, por isso no instante em que ela
+  reinicia a segunda cópia já está no sítio da primeira — a emenda é invisível.
+  A segunda cópia é aria-hidden para os leitores de ecrã não lerem tudo a dobrar.
+
+  VELOCIDADE:
+  Definida em segundos pelo lojista e aplicada via --marquee-duration. Mais
+  itens exigem mais tempo para manter a mesma sensação de velocidade.
+
+  MOVIMENTO:
+  Pausa quando o rato está por cima e desliga por completo com
+  prefers-reduced-motion (regra global em base.css) — nesse caso fica um
+  friso estático legível.
+{%- endcomment -%}
+
+{%- liquid
+  assign text = section.settings.text | default: settings.marquee_text
+  assign items = text | split: '·'
+-%}
+
+<div
+  class="faixa vdn-section--dark{% if section.settings.reverse %} marquee--reverse{% endif %}{% if section.settings.diagonal %} faixa--diagonal{% endif %} marquee"
+  style="--marquee-duration: {{ section.settings.speed }}s;"
+>
+  {%- comment -%}
+    Duas cópias idênticas: a primeira é lida, a segunda só existe para o loop.
+  {%- endcomment -%}
+  {%- for copy in (1..2) -%}
+    <div class="marquee__track" {% if forloop.last %}aria-hidden="true"{% endif %}>
+      {%- for item in items -%}
+        {%- assign clean = item | strip -%}
+        {%- if clean != blank -%}
+          <span class="faixa__item">{{ clean | escape }}</span>
+          {%- comment -%}
+            A cor do separador vem do `cycle` do Liquid, não de nth-of-type:
+            item e separador são ambos <span>, por isso o CSS contá-los-ia
+            em conjunto e a sequência de cores sairia trocada.
+          {%- endcomment -%}
+          <span class="faixa__sep faixa__sep--{% cycle 'verde', 'amarelo', 'azul', 'vermelho' %}" aria-hidden="true"></span>
+        {%- endif -%}
+      {%- endfor -%}
+    </div>
+  {%- endfor -%}
+</div>
+
+<style>
+  .faixa {
+    padding-block: var(--sp-4);
+    background-color: var(--vdn-ink);
+    color: var(--vdn-on-ink);
+    border-block: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  .faixa--diagonal { transform: rotate(-1.4deg) scaleX(1.04); }
+
+  .faixa__item {
+    font-family: var(--font-display);
+    font-style: italic;
+    font-size: var(--f5);
+    font-weight: 800;
+    font-variation-settings: 'wdth' 120;
+    letter-spacing: -0.02em;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+
+  /* Separadores: pequenos losangos com as cores das três bandeiras. */
+  .faixa__sep {
+    display: inline-block;
+    width: 12px;
+    height: 12px;
+    flex-shrink: 0;
+    transform: rotate(45deg);
+    border-radius: 2px;
+  }
+
+  .faixa__sep--verde { background-color: var(--vdn-verde); }
+  .faixa__sep--amarelo { background-color: var(--vdn-amarelo); }
+  .faixa__sep--azul { background-color: var(--vdn-azul-lit); }
+  .faixa__sep--vermelho { background-color: var(--vdn-vermelho); }
+
+  @media (prefers-reduced-motion: reduce) {
+    /* Sem animação, uma segunda cópia estática seria só ruído duplicado. */
+    .faixa .marquee__track:last-child { display: none; }
+    .faixa { overflow-x: auto; }
+  }
+</style>
+
+{% schema %}
+{
+  "name": "t:sections.faixa_marca.name",
+  "tag": "div",
+  "settings": [
+    {
+      "type": "text",
+      "id": "text",
+      "label": "t:sections.faixa_marca.settings.text.label",
+      "info": "t:sections.faixa_marca.settings.text.info"
+    },
+    {
+      "type": "range",
+      "id": "speed",
+      "min": 15,
+      "max": 90,
+      "step": 5,
+      "unit": "s",
+      "default": 40,
+      "label": "t:sections.faixa_marca.settings.speed.label",
+      "info": "t:sections.faixa_marca.settings.speed.info"
+    },
+    {
+      "type": "checkbox",
+      "id": "reverse",
+      "default": false,
+      "label": "t:sections.faixa_marca.settings.reverse.label"
+    },
+    {
+      "type": "checkbox",
+      "id": "diagonal",
+      "default": false,
+      "label": "t:sections.faixa_marca.settings.diagonal.label",
+      "info": "t:sections.faixa_marca.settings.diagonal.info"
+    }
+  ],
+  "presets": [{ "name": "t:sections.faixa_marca.name" }]
+}
+{% endschema %}

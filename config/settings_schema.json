@@ -1,11 +1,11 @@
 [
   {
     "name": "theme_info",
-    "theme_name": "Base Liquid",
+    "theme_name": "Ventos do Norte",
     "theme_version": "1.0.0",
-    "theme_author": "Team Lecdt",
-    "theme_documentation_url": "https://lecdt.com",
-    "theme_support_url": "https://lecdt.com"
+    "theme_author": "Ventos do Norte",
+    "theme_documentation_url": "https://www.instagram.com/ventosdonorte.pt/",
+    "theme_support_url": "https://www.instagram.com/ventosdonorte.pt/"
   },
   {
     "name": "t:settings_schema.logo.name",
@@ -20,7 +20,7 @@
         "id": "logo_width",
         "min": 50,
         "max": 300,
-        "step": 10,
+        "step": 5,
         "unit": "px",
         "label": "t:settings_schema.logo.settings.logo_width.label",
         "default": 120
@@ -155,7 +155,7 @@
         "id": "page_width",
         "min": 1000,
         "max": 1600,
-        "step": 20,
+        "step": 10,
         "unit": "px",
         "label": "t:settings_schema.layout.settings.page_width.label",
         "default": 1200
@@ -165,7 +165,7 @@
         "id": "spacing_sections",
         "min": 0,
         "max": 100,
-        "step": 4,
+        "step": 2,
         "unit": "px",
         "label": "t:settings_schema.layout.settings.spacing_sections.label",
         "default": 40
@@ -267,6 +267,46 @@
     ]
   },
   {
+    "name": "t:settings_schema.marca.name",
+    "settings": [
+      {
+        "type": "text",
+        "id": "brand_tagline",
+        "default": "Do Brasil para Portugal, ligados pela mesma paixão",
+        "label": "t:settings_schema.marca.settings.brand_tagline.label",
+        "info": "t:settings_schema.marca.settings.brand_tagline.info"
+      },
+      {
+        "type": "text",
+        "id": "marquee_text",
+        "default": "Pipas · Linhas · Acessórios · Qualidade · Paixão",
+        "label": "t:settings_schema.marca.settings.marquee_text.label",
+        "info": "t:settings_schema.marca.settings.marquee_text.info"
+      },
+      {
+        "type": "header",
+        "content": "t:settings_schema.marca.settings.header__envios.content"
+      },
+      {
+        "type": "number",
+        "id": "free_shipping_threshold",
+        "default": 50,
+        "label": "t:settings_schema.marca.settings.free_shipping_threshold.label",
+        "info": "t:settings_schema.marca.settings.free_shipping_threshold.info"
+      },
+      {
+        "type": "header",
+        "content": "t:settings_schema.marca.settings.header__apoio.content"
+      },
+      {
+        "type": "text",
+        "id": "whatsapp_number",
+        "label": "t:settings_schema.marca.settings.whatsapp_number.label",
+        "info": "t:settings_schema.marca.settings.whatsapp_number.info"
+      }
+    ]
+  },
+  {
     "name": "t:settings_schema.social_media.name",
     "settings": [
       {
@@ -276,6 +316,7 @@
       {
         "type": "text",
         "id": "social_instagram_link",
+        "default": "https://www.instagram.com/ventosdonorte.pt/",
         "label": "t:settings_schema.social_media.settings.social_instagram_link.label",
         "info": "t:settings_schema.social_media.settings.social_instagram_link.info"
       },
@@ -283,6 +324,11 @@
         "type": "text",
         "id": "social_facebook_link",
         "label": "t:settings_schema.social_media.settings.social_facebook_link.label"
+      },
+      {
+        "type": "text",
+        "id": "social_tiktok_link",
+        "label": "t:settings_schema.social_media.settings.social_tiktok_link.label"
       },
       {
         "type": "text",

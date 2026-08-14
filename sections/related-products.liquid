@@ -23,18 +23,31 @@
 {%- endcomment -%}
 {%- if section.settings.enable -%}
   <product-recommendations
-    class="related-products page-width"
+    class="related-products page-width vdn-section--light"
     data-url="{{ routes.product_recommendations_url }}?section_id={{ section.id }}&product_id={{ product.id }}&limit={{ section.settings.products_to_show }}"
   >
     {%- if recommendations.performed and recommendations.products_count > 0 -%}
-      <h2 class="related-products__title">{{ section.settings.heading | escape }}</h2>
-      <ul class="product-grid" role="list">
+      <div class="section-head">
+        <h2 class="section-head__title related-products__title">{{ section.settings.heading | escape }}</h2>
+      </div>
+      <ul class="product-grid" role="list" data-reveal-stagger="60">
         {%- for product in recommendations.products -%}
-          <li>{% render 'card-product', card_product: product %}</li>
+          <li data-reveal>{% render 'card-product', card_product: product %}</li>
         {%- endfor -%}
       </ul>
     {%- endif -%}
   </product-recommendations>
+
+  <style>
+    .related-products {
+      display: block;
+      padding-block: var(--sp-8) var(--sp-9);
+      border-top: 1px solid var(--vdn-line);
+    }
+
+    .related-products:empty { display: none; }
+    .related-products__title { font-size: var(--f6); }
+  </style>
 
   <script>
     if (!customElements.get('product-recommendations')) {

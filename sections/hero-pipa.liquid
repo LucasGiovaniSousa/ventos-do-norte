@@ -1,0 +1,406 @@
+{%- comment -%}
+  ============================================================
+  hero-pipa — hero cinematográfico da página inicial
+  ============================================================
+
+  O QUE FAZ:
+  O primeiro ecrã da loja: fundo escuro, linhas de vento desenhadas em SVG,
+  o produto em destaque a flutuar com parallax e o slogan da marca em
+  tipografia itálica-expandida. Aceita imagem ou vídeo de fundo.
+
+  ONDE É USADA:
+  templates/index.json (topo da home). Foi desenhada para viver por baixo do
+  cabeçalho em modo overlay — daí o padding-top reservar a altura do header.
+
+  O CONCEITO:
+  A pipa corta o céu na diagonal. Toda a composição segue esse gesto: as linhas
+  de vento sobem da esquerda-baixa para a direita-alta, o título usa o itálico
+  expandido do wordmark e a imagem do produto entra em escala com um ligeiro
+  desfasamento de scroll.
+
+  ANIMAÇÃO:
+  - Linhas de vento: stroke-dashoffset animado com atrasos escalonados.
+  - Texto: reveal escalonado ([data-reveal-stagger] tratado pelo motion.js).
+  - Imagem: [data-parallax] desloca-a a uma fração do scroll.
+  Tudo desliga com prefers-reduced-motion (regra global em base.css).
+
+  ACESSIBILIDADE:
+  O vídeo de fundo é decorativo: muted, sem controlos e aria-hidden. A mensagem
+  vive toda no texto, portanto nada se perde se a média não carregar.
+{%- endcomment -%}
+
+{%- liquid
+  assign height_class = 'hero--' | append: section.settings.height
+-%}
+
+<section class="hero vdn-section--dark has-grain glow-bg {{ height_class }}">
+  {%- comment -%} ---------- Média de fundo ---------- {%- endcomment -%}
+  {%- if section.settings.video != blank -%}
+    <video
+      class="hero__media"
+      autoplay
+      muted
+      loop
+      playsinline
+      aria-hidden="true"
+      {% if section.settings.image != blank %}poster="{{ section.settings.image | image_url: width: 1600 }}"{% endif %}
+    >
+      <source src="{{ section.settings.video.sources[1].url }}" type="video/mp4">
+    </video>
+  {%- elsif section.settings.image != blank -%}
+    {{
+      section.settings.image
+      | image_url: width: 2400
+      | image_tag:
+        class: 'hero__media',
+        widths: '600, 900, 1200, 1800, 2400',
+        sizes: '100vw',
+        fetchpriority: 'high',
+        alt: ''
+    }}
+  {%- endif -%}
+
+  <div class="hero__veil"></div>
+
+  {%- comment -%} ---------- Linhas de vento ---------- {%- endcomment -%}
+  <svg class="hero__wind" viewBox="0 0 1440 900" preserveAspectRatio="xMidYMid slice" aria-hidden="true" focusable="false">
+    <path class="wind-line" style="--wind-len: 1800; --wind-delay: 200ms" d="M-100 760 C 300 700, 520 520, 900 430 S 1300 300, 1560 240" stroke="rgba(91,140,255,.5)" stroke-width="1.5"/>
+    <path class="wind-line" style="--wind-len: 1800; --wind-delay: 420ms" d="M-100 860 C 340 800, 600 630, 980 540 S 1340 420, 1560 370" stroke="rgba(0,165,68,.45)" stroke-width="1.5"/>
+    <path class="wind-line" style="--wind-len: 1800; --wind-delay: 640ms" d="M-100 660 C 260 610, 460 430, 840 340 S 1260 200, 1560 130" stroke="rgba(255,200,0,.35)" stroke-width="1.5"/>
+  </svg>
+
+  <div class="hero__inner page-width">
+    <div class="hero__content" data-reveal-stagger="110">
+      {%- if section.settings.eyebrow != blank -%}
+        <p class="eyebrow hero__eyebrow" data-reveal>{{ section.settings.eyebrow | escape }}</p>
+      {%- endif -%}
+
+      {%- if section.settings.heading != blank -%}
+        <h1 class="hero__title display-italic" data-reveal>{{ section.settings.heading | escape }}</h1>
+      {%- endif -%}
+
+      {%- if section.settings.subheading != blank -%}
+        <p class="hero__sub" data-reveal>{{ section.settings.subheading | escape }}</p>
+      {%- endif -%}
+
+      {%- if section.settings.button_label != blank or section.settings.button_label_2 != blank -%}
+        <div class="hero__actions" data-reveal>
+          {%- if section.settings.button_label != blank -%}
+            <a href="{{ section.settings.button_link | default: routes.all_products_collection_url }}" class="button button--primary button--large">
+              {{ section.settings.button_label | escape }}
+              {% render 'icon', name: 'arrow-right' %}
+            </a>
+          {%- endif -%}
+          {%- if section.settings.button_label_2 != blank -%}
+            <a href="{{ section.settings.button_link_2 }}" class="button button--secondary button--large">
+              {{ section.settings.button_label_2 | escape }}
+            </a>
+          {%- endif -%}
+        </div>
+      {%- endif -%}
+
+      {%- if section.settings.show_flags -%}
+        <div class="hero__route" data-reveal>
+          <span class="hero__route-flag hero__route-flag--br"></span>
+          <span class="hero__route-line"></span>
+          <span class="hero__route-flag hero__route-flag--pt"></span>
+          <span class="hero__route-text">{{ settings.brand_tagline }}</span>
+        </div>
+      {%- endif -%}
+    </div>
+
+    {%- if section.settings.product_image != blank -%}
+      <div class="hero__product" data-parallax="0.06">
+        {{
+          section.settings.product_image
+          | image_url: width: 1200
+          | image_tag:
+            class: 'hero__product-image',
+            widths: '400, 600, 900, 1200',
+            sizes: '(min-width: 1001px) 42vw, 80vw',
+            fetchpriority: 'high',
+            alt: section.settings.product_image.alt | default: '' | escape
+        }}
+      </div>
+    {%- endif -%}
+  </div>
+
+  {%- if section.settings.show_scroll_cue -%}
+    <span class="hero__cue" aria-hidden="true">
+      <span class="hero__cue-line"></span>
+    </span>
+  {%- endif -%}
+</section>
+
+<style>
+  .hero {
+    position: relative;
+    display: flex;
+    align-items: center;
+    overflow: hidden;
+    isolation: isolate;
+    padding-top: calc(var(--header-h) + var(--sp-7));
+    padding-bottom: var(--sp-8);
+    background-color: var(--vdn-ink);
+    color: var(--vdn-on-ink);
+  }
+
+  .hero--small { min-height: 62vh; }
+  .hero--medium { min-height: 78vh; }
+  .hero--large { min-height: 92vh; }
+
+  /* ---------- Camadas de fundo ---------- */
+  .hero__media {
+    position: absolute;
+    inset: 0;
+    z-index: -3;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .hero__veil {
+    position: absolute;
+    inset: 0;
+    z-index: -2;
+    background:
+      linear-gradient(105deg, var(--vdn-ink) 18%, rgba(10, 10, 11, 0.72) 52%, rgba(10, 10, 11, 0.35) 100%),
+      linear-gradient(0deg, var(--vdn-ink) 2%, transparent 42%);
+  }
+
+  .hero.glow-bg::before { z-index: -1; }
+
+  .hero__wind {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+  }
+
+  /* ---------- Conteúdo ---------- */
+  .hero__inner {
+    position: relative;
+    z-index: 2;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 0.85fr);
+    align-items: center;
+    gap: var(--sp-7);
+    width: 100%;
+  }
+
+  .hero__content { max-width: 40ch; }
+  .hero__eyebrow { color: var(--vdn-amarelo); }
+  .hero__eyebrow::before { background: var(--vdn-amarelo); }
+
+  .hero__title {
+    margin: 0 0 var(--sp-5);
+    font-size: var(--f9);
+    color: var(--vdn-on-ink);
+    /* O contraluz separa o título da imagem quando esta passa por trás. */
+    text-shadow: 0 2px 40px rgba(10, 10, 11, 0.6);
+  }
+
+  .hero__sub {
+    margin: 0 0 var(--sp-6);
+    font-size: var(--f4);
+    line-height: 1.5;
+    color: var(--vdn-on-ink-mut);
+    max-width: 44ch;
+  }
+
+  .hero__actions { display: flex; flex-wrap: wrap; gap: var(--sp-3); }
+
+  /* ---------- Rota Brasil → Portugal ---------- */
+  .hero__route {
+    display: flex;
+    align-items: center;
+    gap: var(--sp-3);
+    margin-top: var(--sp-7);
+    padding-top: var(--sp-5);
+    border-top: 1px solid rgba(255, 255, 255, 0.12);
+  }
+
+  .hero__route-flag { width: 26px; height: 17px; border-radius: 2px; flex-shrink: 0; }
+  .hero__route-flag--br { background: linear-gradient(135deg, var(--vdn-verde) 45%, var(--vdn-amarelo) 45%); }
+  .hero__route-flag--pt { background: linear-gradient(90deg, var(--vdn-verde) 40%, var(--vdn-vermelho) 40%); }
+
+  .hero__route-line {
+    width: 42px;
+    height: 1px;
+    background: repeating-linear-gradient(90deg, var(--vdn-on-ink-mut) 0 5px, transparent 5px 10px);
+  }
+
+  .hero__route-text {
+    font-family: var(--font-display);
+    font-size: var(--f0);
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--vdn-on-ink-mut);
+  }
+
+  /* ---------- Produto ---------- */
+  .hero__product { position: relative; will-change: transform; }
+
+  .hero__product-image {
+    display: block;
+    width: 100%;
+    height: auto;
+    /* Sombra projetada em vez de box-shadow: acompanha o recorte do PNG. */
+    filter: drop-shadow(0 30px 60px rgba(0, 0, 0, 0.55));
+    animation: hero-float 7s ease-in-out infinite;
+  }
+
+  @keyframes hero-float {
+    0%, 100% { transform: translateY(0) rotate(-1deg); }
+    50% { transform: translateY(-18px) rotate(1deg); }
+  }
+
+  /* ---------- Indicador de scroll ---------- */
+  .hero__cue {
+    position: absolute;
+    left: 50%;
+    bottom: var(--sp-5);
+    z-index: 2;
+    width: 1px;
+    height: 46px;
+    overflow: hidden;
+    background-color: rgba(255, 255, 255, 0.18);
+    transform: translateX(-50%);
+  }
+
+  .hero__cue-line {
+    display: block;
+    width: 100%;
+    height: 50%;
+    background-color: var(--vdn-amarelo);
+    animation: cue-drop 2.2s var(--ease-out-expo) infinite;
+  }
+
+  @keyframes cue-drop {
+    0% { transform: translateY(-100%); }
+    60%, 100% { transform: translateY(200%); }
+  }
+
+  /* ---------- Breakpoints ---------- */
+  @media screen and (max-width: 1000px) {
+    .hero { padding-bottom: var(--sp-7); }
+    .hero--small, .hero--medium, .hero--large { min-height: 0; }
+
+    .hero__inner {
+      grid-template-columns: 1fr;
+      gap: var(--sp-6);
+    }
+
+    /* No telemóvel o produto entra primeiro: é o que prende o olhar. */
+    .hero__product { order: -1; max-width: 320px; margin-inline: auto; }
+    .hero__content { max-width: none; }
+    .hero__cue { display: none; }
+    .hero__veil { background: linear-gradient(180deg, rgba(10, 10, 11, 0.45) 0%, rgba(10, 10, 11, 0.85) 55%, var(--vdn-ink) 100%); }
+  }
+</style>
+
+{% schema %}
+{
+  "name": "t:sections.hero_pipa.name",
+  "tag": "section",
+  "settings": [
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "default": "Pipas · Linhas · Acessórios",
+      "label": "t:sections.hero_pipa.settings.eyebrow.label"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "default": "Do Brasil para Portugal",
+      "label": "t:sections.hero_pipa.settings.heading.label"
+    },
+    {
+      "type": "textarea",
+      "id": "subheading",
+      "default": "Pipas, linhas, rabiolas, petecas e futevôlei. Tudo o que precisas para viver o vento, entregue em todo o país.",
+      "label": "t:sections.hero_pipa.settings.subheading.label"
+    },
+    {
+      "type": "header",
+      "content": "t:sections.hero_pipa.settings.header__media.content"
+    },
+    {
+      "type": "image_picker",
+      "id": "image",
+      "label": "t:sections.hero_pipa.settings.image.label",
+      "info": "t:sections.hero_pipa.settings.image.info"
+    },
+    {
+      "type": "video",
+      "id": "video",
+      "label": "t:sections.hero_pipa.settings.video.label",
+      "info": "t:sections.hero_pipa.settings.video.info"
+    },
+    {
+      "type": "image_picker",
+      "id": "product_image",
+      "label": "t:sections.hero_pipa.settings.product_image.label",
+      "info": "t:sections.hero_pipa.settings.product_image.info"
+    },
+    {
+      "type": "header",
+      "content": "t:sections.hero_pipa.settings.header__buttons.content"
+    },
+    {
+      "type": "text",
+      "id": "button_label",
+      "default": "Ver catálogo",
+      "label": "t:sections.hero_pipa.settings.button_label.label"
+    },
+    {
+      "type": "url",
+      "id": "button_link",
+      "label": "t:sections.hero_pipa.settings.button_link.label"
+    },
+    {
+      "type": "text",
+      "id": "button_label_2",
+      "default": "A nossa história",
+      "label": "t:sections.hero_pipa.settings.button_label_2.label"
+    },
+    {
+      "type": "url",
+      "id": "button_link_2",
+      "label": "t:sections.hero_pipa.settings.button_link_2.label"
+    },
+    {
+      "type": "header",
+      "content": "t:sections.hero_pipa.settings.header__layout.content"
+    },
+    {
+      "type": "select",
+      "id": "height",
+      "default": "large",
+      "options": [
+        { "value": "small", "label": "t:sections.hero_pipa.settings.height.options__1.label" },
+        { "value": "medium", "label": "t:sections.hero_pipa.settings.height.options__2.label" },
+        { "value": "large", "label": "t:sections.hero_pipa.settings.height.options__3.label" }
+      ],
+      "label": "t:sections.hero_pipa.settings.height.label"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_flags",
+      "default": true,
+      "label": "t:sections.hero_pipa.settings.show_flags.label"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_scroll_cue",
+      "default": true,
+      "label": "t:sections.hero_pipa.settings.show_scroll_cue.label"
+    }
+  ],
+  "presets": [{ "name": "t:sections.hero_pipa.name" }]
+}
+{% endschema %}

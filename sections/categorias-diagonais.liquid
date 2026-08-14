@@ -1,0 +1,324 @@
+{%- comment -%}
+  ============================================================
+  categorias-diagonais — as categorias da loja em cartões cortados
+  ============================================================
+
+  O QUE FAZ:
+  A porta de entrada para o catálogo: um cartão por categoria (Pipas, Linhas,
+  Rabiolas, Petecas, Futevôlei, Acessórios) com imagem, contagem de produtos e
+  um corte diagonal que ecoa a silhueta da pipa.
+
+  ONDE É USADA:
+  templates/index.json, logo a seguir à faixa de marca.
+
+  O LAYOUT:
+  O primeiro cartão ocupa duas colunas e duas linhas — é o destaque. Os
+  restantes seguem numa grelha normal. Isto dá hierarquia sem obrigar o lojista
+  a configurar tamanhos: basta arrastar para o topo a categoria que quer
+  destacar. Em telemóvel a grelha achata para uma coluna e o destaque perde o
+  tratamento especial, porque aí tudo ocupa a largura toda de qualquer forma.
+
+  A IMAGEM:
+  Usa a imagem da coleção definida no admin do Shopify; se não existir, cai para
+  a imagem do primeiro produto da coleção. O lojista pode ainda sobrepor uma
+  imagem própria no bloco.
+
+  MOVIMENTO:
+  Reveal escalonado à entrada e, no hover, a imagem cresce enquanto o corte
+  diagonal se abre — só transform e clip-path, sem reflow.
+{%- endcomment -%}
+
+<section class="cats vdn-section vdn-section--light">
+  <div class="page-width">
+    {%- if section.settings.heading != blank or section.settings.eyebrow != blank -%}
+      <div class="section-head" data-reveal>
+        <div>
+          {%- if section.settings.eyebrow != blank -%}
+            <p class="eyebrow">{{ section.settings.eyebrow | escape }}</p>
+          {%- endif -%}
+          {%- if section.settings.heading != blank -%}
+            <h2 class="section-head__title">{{ section.settings.heading | escape }}</h2>
+          {%- endif -%}
+          {%- if section.settings.lead != blank -%}
+            <p class="section-head__lead">{{ section.settings.lead | escape }}</p>
+          {%- endif -%}
+        </div>
+
+        {%- if section.settings.link_label != blank -%}
+          <a href="{{ section.settings.link_url | default: routes.collections_url }}" class="link-underline">
+            {{ section.settings.link_label | escape }}
+          </a>
+        {%- endif -%}
+      </div>
+    {%- endif -%}
+
+    <ul class="cats__grid" role="list" data-reveal-stagger="90">
+      {%- for block in section.blocks -%}
+        {%- liquid
+          assign collection = block.settings.collection
+          assign image = block.settings.image | default: collection.image
+
+          # Sem imagem própria nem imagem de coleção, o primeiro produto serve
+          # de capa — evita o cartão cinzento vazio numa loja acabada de montar.
+          if image == blank and collection.products.size > 0
+            assign image = collection.products.first.featured_image
+          endif
+
+          assign title = block.settings.title | default: collection.title
+        -%}
+
+        <li class="cats__cell{% if forloop.first %} cats__cell--feature{% endif %}" data-reveal {{ block.shopify_attributes }}>
+          <a href="{{ collection.url | default: routes.collections_url }}" class="cat">
+            <div class="cat__media">
+              {%- if image != blank -%}
+                {{
+                  image
+                  | image_url: width: 1200
+                  | image_tag:
+                    class: 'cat__image',
+                    loading: 'lazy',
+                    widths: '300, 500, 800, 1200',
+                    sizes: '(min-width: 1001px) 40vw, 90vw',
+                    alt: ''
+                }}
+              {%- else -%}
+                {{ 'collection-1' | placeholder_svg_tag: 'cat__image cat__image--placeholder' }}
+              {%- endif -%}
+            </div>
+
+            <div class="cat__body">
+              {%- if block.settings.icon != 'none' -%}
+                <span class="cat__icon">{% render 'icon', name: block.settings.icon %}</span>
+              {%- endif -%}
+
+              <h3 class="cat__title">{{ title | escape }}</h3>
+
+              <span class="cat__meta">
+                {%- if collection != blank -%}
+                  {{ 'products.facets.product_count_simple' | t: count: collection.products_count }}
+                {%- endif -%}
+              </span>
+
+              <span class="cat__go" aria-hidden="true">{% render 'icon', name: 'arrow-right' %}</span>
+            </div>
+          </a>
+        </li>
+      {%- endfor -%}
+    </ul>
+  </div>
+</section>
+
+<style>
+  .cats__grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    grid-auto-rows: 210px;
+    gap: var(--sp-4);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  /* O primeiro bloco é o destaque: dois por dois. */
+  .cats__cell--feature { grid-column: span 2; grid-row: span 2; }
+
+  .cat {
+    position: relative;
+    display: block;
+    height: 100%;
+    overflow: hidden;
+    text-decoration: none;
+    color: var(--vdn-on-ink);
+    background-color: var(--vdn-ink);
+    border-radius: var(--media-radius);
+    /* O canto inferior esquerdo cortado é a assinatura da pipa. */
+    clip-path: polygon(0 0, 100% 0, 100% 100%, 34px 100%, 0 calc(100% - 34px));
+    transition: clip-path var(--dur-4) var(--ease-out-expo);
+  }
+
+  .cat:hover { clip-path: polygon(0 0, 100% 0, 100% 100%, 60px 100%, 0 calc(100% - 60px)); }
+
+  .cat__media { position: absolute; inset: 0; }
+
+  .cat__image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform var(--dur-5) var(--ease-out-expo);
+  }
+
+  .cat:hover .cat__image { transform: scale(1.07); }
+  .cat__image--placeholder { background-color: var(--vdn-ink-3); }
+
+  /* Véu para o texto se manter legível sobre qualquer fotografia. */
+  .cat__body {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: flex-end;
+    height: 100%;
+    padding: var(--sp-5);
+    background: linear-gradient(0deg, rgba(10, 10, 11, 0.86) 8%, rgba(10, 10, 11, 0.35) 48%, transparent 78%);
+  }
+
+  .cat__icon {
+    position: absolute;
+    top: var(--sp-4);
+    left: var(--sp-5);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    color: var(--vdn-ink);
+    background-color: var(--vdn-amarelo);
+    border-radius: 50%;
+    transition: transform var(--dur-3) var(--ease-spring);
+  }
+
+  .cat__icon svg { width: 24px; height: 24px; }
+  .cat:hover .cat__icon { transform: rotate(-12deg) scale(1.08); }
+
+  .cat__title {
+    margin: 0;
+    font-size: var(--f5);
+    font-variation-settings: 'wdth' 116;
+    text-transform: uppercase;
+    color: var(--vdn-on-ink);
+  }
+
+  .cats__cell--feature .cat__title { font-size: var(--f7); }
+
+  .cat__meta {
+    margin-top: 2px;
+    font-family: var(--font-display);
+    font-size: var(--f0);
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--vdn-on-ink-mut);
+  }
+
+  .cat__go {
+    position: absolute;
+    right: var(--sp-5);
+    bottom: var(--sp-5);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    color: var(--vdn-ink);
+    background-color: var(--vdn-on-ink);
+    border-radius: 50%;
+    opacity: 0;
+    transform: translateX(-8px);
+    transition: opacity var(--dur-3) var(--ease-out-quart), transform var(--dur-3) var(--ease-out-expo);
+  }
+
+  .cat:hover .cat__go,
+  .cat:focus-visible .cat__go { opacity: 1; transform: none; }
+
+  @media screen and (max-width: 1000px) {
+    .cats__grid { grid-template-columns: repeat(2, minmax(0, 1fr)); grid-auto-rows: 190px; }
+    .cats__cell--feature { grid-column: span 2; grid-row: span 1; }
+    .cats__cell--feature .cat__title { font-size: var(--f6); }
+  }
+
+  @media screen and (max-width: 560px) {
+    .cats__grid { grid-template-columns: 1fr; grid-auto-rows: 170px; }
+    .cats__cell--feature { grid-column: span 1; }
+    /* Sem hover no telemóvel, a seta tem de estar sempre visível. */
+    .cat__go { opacity: 1; transform: none; }
+  }
+</style>
+
+{% schema %}
+{
+  "name": "t:sections.categorias_diagonais.name",
+  "tag": "section",
+  "settings": [
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "default": "O catálogo",
+      "label": "t:sections.categorias_diagonais.settings.eyebrow.label"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "default": "Escolhe o teu vento",
+      "label": "t:sections.categorias_diagonais.settings.heading.label"
+    },
+    {
+      "type": "textarea",
+      "id": "lead",
+      "label": "t:sections.categorias_diagonais.settings.lead.label"
+    },
+    {
+      "type": "text",
+      "id": "link_label",
+      "default": "Ver tudo",
+      "label": "t:sections.categorias_diagonais.settings.link_label.label"
+    },
+    {
+      "type": "url",
+      "id": "link_url",
+      "label": "t:sections.categorias_diagonais.settings.link_url.label"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "categoria",
+      "name": "t:sections.categorias_diagonais.blocks.categoria.name",
+      "settings": [
+        {
+          "type": "collection",
+          "id": "collection",
+          "label": "t:sections.categorias_diagonais.blocks.categoria.settings.collection.label"
+        },
+        {
+          "type": "text",
+          "id": "title",
+          "label": "t:sections.categorias_diagonais.blocks.categoria.settings.title.label",
+          "info": "t:sections.categorias_diagonais.blocks.categoria.settings.title.info"
+        },
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "t:sections.categorias_diagonais.blocks.categoria.settings.image.label",
+          "info": "t:sections.categorias_diagonais.blocks.categoria.settings.image.info"
+        },
+        {
+          "type": "select",
+          "id": "icon",
+          "default": "pipa",
+          "options": [
+            { "value": "none", "label": "t:sections.categorias_diagonais.blocks.categoria.settings.icon.options__0.label" },
+            { "value": "pipa", "label": "t:sections.categorias_diagonais.blocks.categoria.settings.icon.options__1.label" },
+            { "value": "linha", "label": "t:sections.categorias_diagonais.blocks.categoria.settings.icon.options__2.label" },
+            { "value": "acessorios", "label": "t:sections.categorias_diagonais.blocks.categoria.settings.icon.options__3.label" },
+            { "value": "peteca", "label": "t:sections.categorias_diagonais.blocks.categoria.settings.icon.options__4.label" },
+            { "value": "bola", "label": "t:sections.categorias_diagonais.blocks.categoria.settings.icon.options__5.label" }
+          ],
+          "label": "t:sections.categorias_diagonais.blocks.categoria.settings.icon.label"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "t:sections.categorias_diagonais.name",
+      "blocks": [
+        { "type": "categoria", "settings": { "icon": "pipa" } },
+        { "type": "categoria", "settings": { "icon": "linha" } },
+        { "type": "categoria", "settings": { "icon": "peteca" } },
+        { "type": "categoria", "settings": { "icon": "bola" } },
+        { "type": "categoria", "settings": { "icon": "acessorios" } }
+      ]
+    }
+  ]
+}
+{% endschema %}

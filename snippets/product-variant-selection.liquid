@@ -108,6 +108,13 @@
         option.querySelectorAll('.product__swatch').forEach(function (l) { l.classList.remove('is-selected'); });
         var label = input.closest('.product__swatch');
         if (label) label.classList.add('is-selected');
+
+        // Refletir o valor escolhido ao lado do nome da opção ("Cor: Vermelho").
+        // Nas amostras de cor o valor só existe como texto para leitores de
+        // ecrã, por isso este rótulo é a única pista visual do que está ativo.
+        var display = option.querySelector('[data-option-display]');
+        if (display) display.textContent = input.value;
+
         updateUI();
       });
     });

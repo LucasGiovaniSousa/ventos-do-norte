@@ -1,39 +1,118 @@
 {%- comment -%}
   ============================================================
-  css-variables — variáveis CSS globais do tema
+  css-variables — design system da Ventos do Norte
   ============================================================
 
   O QUE FAZ:
-  Gera as CSS custom properties (:root) a partir das settings do tema:
-  cores, tipografia (com @font-face), escala de fonte fluida (--f0..--f8)
-  e tokens de layout (largura da página, radius, espaçamento).
-  Também define estilos base de body e headings.
+  Define TODO o vocabulário visual do tema num único bloco inline no <head>:
+  - @font-face da Archivo (variable) auto-hospedada nos assets do tema.
+  - Tokens de marca (--vdn-*): as cores das três bandeiras (Brasil, Portugal,
+    União Europeia) e as superfícies escura/clara. São constantes de marca,
+    NÃO vêm das settings.
+  - Tokens do lojista (--color-*): cores/tipografia editáveis no editor de tema.
+  - Escala tipográfica fluida (--f0..--f9), escala de espaçamento (--sp-1..--sp-10),
+    curvas de easing e durações de animação.
 
   COMO USAR:
   {% render 'css-variables' %}
   Renderize uma única vez, dentro do <head> em theme.liquid.
 
-  PARÂMETROS:
-  Nenhum — lê tudo de settings (settings.color_*, settings.type_*, etc).
+  POR QUE INLINE:
+  As @font-face ficam aqui (e não em assets/fontes.css) para eliminar a cascata
+  de requisições CSS → fonte. Como este bloco já está no <head>, o browser começa
+  a baixar as fontes no primeiro parse, sem esperar por um <link> externo.
+  Auto-hospedar (em vez de usar o CDN do Google) também é o que mantém a loja
+  em conformidade com o RGPD na União Europeia.
+
+  A FONTE:
+  Archivo é uma variable font com eixo de largura (62%–125%) e itálico real —
+  é o que permite reproduzir o wordmark itálico-expandido do logo e o texto
+  corrido do site com uma só família (2 ficheiros por subset).
 
   OBSERVAÇÕES:
-  Mantém aliases retrocompatíveis (--cor-marca, --cor-verde, --bold...)
-  usados por seções antigas. Se remover, quebra o CSS dessas seções.
+  Os aliases retrocompatíveis (--cor-marca, --bold, --estilo...) são usados por
+  seções antigas do tema base. Se remover, quebra o CSS dessas seções.
 {%- endcomment -%}
 {%- liquid
   assign header_font = settings.type_header_font
   assign body_font = settings.type_body_font
-  assign header_font_bold = header_font | font_modify: 'weight', 'bold'
-  assign body_font_bold = body_font | font_modify: 'weight', 'bold'
 -%}
 <style>
-  {{ header_font | font_face: font_display: 'swap' }}
-  {{ header_font_bold | font_face: font_display: 'swap' }}
-  {{ body_font | font_face: font_display: 'swap' }}
-  {{ body_font_bold | font_face: font_display: 'swap' }}
+  /* ==========================================================
+     Archivo — variable font auto-hospedada (RGPD-friendly)
+     wght 400..800 · wdth 62%..125% · roman + itálico
+     ========================================================== */
+  @font-face {
+    font-family: 'Archivo VDN';
+    font-style: normal;
+    font-weight: 400 800;
+    font-stretch: 62% 125%;
+    font-display: swap;
+    src: url({{ 'archivo-latin.woff2' | asset_url }}) format('woff2');
+    unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+  }
+  @font-face {
+    font-family: 'Archivo VDN';
+    font-style: normal;
+    font-weight: 400 800;
+    font-stretch: 62% 125%;
+    font-display: swap;
+    src: url({{ 'archivo-latin-ext.woff2' | asset_url }}) format('woff2');
+    unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+  }
+  @font-face {
+    font-family: 'Archivo VDN';
+    font-style: italic;
+    font-weight: 400 800;
+    font-stretch: 62% 125%;
+    font-display: swap;
+    src: url({{ 'archivo-italic-latin.woff2' | asset_url }}) format('woff2');
+    unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+  }
+  @font-face {
+    font-family: 'Archivo VDN';
+    font-style: italic;
+    font-weight: 400 800;
+    font-stretch: 62% 125%;
+    font-display: swap;
+    src: url({{ 'archivo-italic-latin-ext.woff2' | asset_url }}) format('woff2');
+    unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+  }
 
   :root {
-    /* Colors */
+    /* ========================================================
+       MARCA — constantes. Não editáveis pelo lojista.
+       ======================================================== */
+
+    /* Superfícies escuras (momentos de marca) */
+    --vdn-ink: #0a0a0b;
+    --vdn-ink-2: #141417;
+    --vdn-ink-3: #1e1e23;
+
+    /* Superfícies claras (áreas de compra) */
+    --vdn-sand: #faf8f3;
+    --vdn-surface: #ffffff;
+    --vdn-line: #e4dfd4;
+
+    /* Bandeiras */
+    --vdn-verde: #00a544;      /* Brasil — ação primária */
+    --vdn-verde-esc: #00833a;  /* hover do verde */
+    --vdn-amarelo: #ffc800;    /* Brasil — destaque, badge */
+    --vdn-azul: #1b4fd8;       /* UE / "NORTE" — só sobre fundo claro */
+    --vdn-azul-lit: #5b8cff;   /* variante para texto sobre fundo escuro (AA) */
+    --vdn-vermelho: #e63329;   /* Portugal — promoção, urgência */
+
+    /* Texto sobre escuro */
+    --vdn-on-ink: #f5f4f0;
+    --vdn-on-ink-mut: #9c9ca6;
+
+    /* Texto sobre claro */
+    --vdn-on-sand: #14141a;
+    --vdn-on-sand-mut: #6b6b78;
+
+    /* ========================================================
+       LOJISTA — vêm das settings do editor de tema.
+       ======================================================== */
     --cor-branco: #ffffff;
     --cor-preto: #000000;
     --color-background: {{ settings.color_background }};
@@ -45,53 +124,132 @@
     --color-sale: {{ settings.color_sale }};
     --color-border: {{ settings.color_border }};
 
-    /* Backwards-compatible aliases used by existing sections */
+    /* Aliases retrocompatíveis usados por seções do tema base */
     --cor-gelo: {{ settings.color_background_contrast }};
     --cor-cinza: {{ settings.color_border }};
     --cor-marca: {{ settings.color_accent }};
     --cor-verde: {{ settings.color_sale }};
 
-    /* Typography */
-    --font-heading-family: {{ header_font.family }}, {{ header_font.fallback_families }};
-    --font-heading-weight: {{ header_font.weight }};
-    --font-body-family: {{ body_font.family }}, {{ body_font.fallback_families }};
-    --font-body-weight: {{ body_font.weight }};
+    /* ========================================================
+       TIPOGRAFIA
+       ======================================================== */
+    {%- comment -%}
+      A Archivo auto-hospedada vem sempre primeiro; a fonte escolhida no editor
+      é apenas o fallback. Os filtros `default` garantem que a declaração
+      continua válida mesmo que o handle da settings seja inválido ou vazio —
+      sem eles, uma entrada em branco invalidaria a lista toda.
+    {%- endcomment -%}
+    --font-display: 'Archivo VDN', {{ header_font.family | default: 'Archivo' }}, {{ header_font.fallback_families | default: 'sans-serif' }};
+    --font-body: 'Archivo VDN', {{ body_font.family | default: 'Archivo' }}, {{ body_font.fallback_families | default: 'sans-serif' }};
+
+    /* Aliases retrocompatíveis */
+    --font-heading-family: var(--font-display);
+    --font-body-family: var(--font-body);
+    --font-heading-weight: 800;
+    --font-body-weight: 400;
+    --estilo: var(--font-display);
+    --bold: var(--font-body);
+    --light: var(--font-body);
+
     --font-heading-scale: {{ settings.heading_scale | divided_by: 100.0 }};
     --font-body-scale: {{ settings.body_scale | divided_by: 100.0 }};
 
-    /* Backwards-compatible font aliases */
-    --estilo: var(--font-heading-family);
-    --bold: var(--font-body-family);
-    --light: var(--font-body-family);
+    /* Larguras do eixo variable: o "expandido" do wordmark */
+    --wdth-display: 118;
+    --wdth-body: 100;
 
-    /* Fluid type scale */
-    --f0: clamp(0.5rem, 1vw, 0.7rem);
-    --f1: clamp(0.7rem, 1vw, 0.9rem);
-    --f2: clamp(0.9rem, 1vw, 1.1rem);
-    --f3: clamp(1.1rem, 1vw, 1.3rem);
-    --f4: clamp(1.3rem, 1vw, 1.5rem);
-    --f5: clamp(1.5rem, 1vw, 1.8rem);
-    --f6: clamp(1.8rem, 1vw, 2.2rem);
-    --f7: clamp(2.2rem, 1vw, 2.5rem);
-    --f8: clamp(3rem, 1vw, 4rem);
+    /* ========================================================
+       ESCALA TIPOGRÁFICA FLUIDA
+       Interpola entre 375px e 1440px de viewport.
+       ======================================================== */
+    --f0: clamp(0.6875rem, 0.666rem + 0.094vw, 0.75rem);   /* 11 → 12 */
+    --f1: clamp(0.75rem, 0.706rem + 0.188vw, 0.875rem);    /* 12 → 14 */
+    --f2: clamp(0.9375rem, 0.915rem + 0.094vw, 1rem);      /* 15 → 16 */
+    --f3: clamp(1rem, 0.956rem + 0.188vw, 1.125rem);       /* 16 → 18 */
+    --f4: clamp(1.125rem, 1.037rem + 0.376vw, 1.375rem);   /* 18 → 22 */
+    --f5: clamp(1.375rem, 1.243rem + 0.563vw, 1.75rem);    /* 22 → 28 */
+    --f6: clamp(1.625rem, 1.361rem + 1.127vw, 2.375rem);   /* 26 → 38 */
+    --f7: clamp(2rem, 1.516rem + 2.066vw, 3.375rem);       /* 32 → 54 */
+    --f8: clamp(2.625rem, 1.701rem + 3.944vw, 5.25rem);    /* 42 → 84 */
+    --f9: clamp(3.25rem, 1.754rem + 6.385vw, 7.5rem);      /* 52 → 120 */
 
-    /* Layout */
+    /* ========================================================
+       ESPAÇAMENTO
+       ======================================================== */
+    --sp-1: 4px;
+    --sp-2: 8px;
+    --sp-3: 12px;
+    --sp-4: 16px;
+    --sp-5: 24px;
+    --sp-6: 32px;
+    --sp-7: 48px;
+    --sp-8: 64px;
+    --sp-9: 96px;
+    --sp-10: 128px;
+
+    /* ========================================================
+       MOVIMENTO
+       ======================================================== */
+    --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+    --ease-out-quart: cubic-bezier(0.25, 1, 0.5, 1);
+    --ease-spring: cubic-bezier(0.34, 1.4, 0.64, 1);
+    --dur-1: 150ms;
+    --dur-2: 250ms;
+    --dur-3: 400ms;
+    --dur-4: 700ms;
+    --dur-5: 1100ms;
+
+    /* ========================================================
+       LAYOUT
+       ======================================================== */
     --page-width: {{ settings.page_width }}px;
     --spacing-sections: {{ settings.spacing_sections }}px;
     --buttons-radius: {{ settings.buttons_radius }}px;
     --inputs-radius: {{ settings.inputs_radius }}px;
     --media-radius: {{ settings.media_radius }}px;
+    --header-h: 72px;
+
+    /* Sombras — calibradas para o fundo areia, não para branco puro */
+    --shadow-1: 0 1px 2px rgba(20, 20, 26, 0.06), 0 2px 8px rgba(20, 20, 26, 0.04);
+    --shadow-2: 0 2px 6px rgba(20, 20, 26, 0.07), 0 12px 28px rgba(20, 20, 26, 0.08);
+    --shadow-3: 0 4px 12px rgba(20, 20, 26, 0.1), 0 24px 56px rgba(20, 20, 26, 0.12);
   }
 
+  @media screen and (min-width: 1001px) {
+    :root { --header-h: 84px; }
+  }
+
+  /* ==========================================================
+     Base do documento
+     ========================================================== */
   body {
-    font-family: var(--font-body-family);
-    font-weight: var(--font-body-weight);
-    color: var(--color-text);
-    background-color: var(--color-background);
+    font-family: var(--font-body);
+    font-weight: 400;
+    font-size: var(--f2);
+    font-variation-settings: 'wdth' var(--wdth-body);
+    line-height: 1.6;
+    color: var(--vdn-on-sand);
+    background-color: var(--vdn-sand);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
   }
 
   h1, h2, h3, h4, h5, h6 {
-    font-family: var(--font-heading-family);
-    font-weight: var(--font-heading-weight);
+    font-family: var(--font-display);
+    font-weight: 800;
+    font-variation-settings: 'wdth' var(--wdth-display);
+    line-height: 1.04;
+    letter-spacing: -0.025em;
+    text-wrap: balance;
   }
+
+  h1 { font-size: calc(var(--f8) * var(--font-heading-scale)); }
+  h2 { font-size: calc(var(--f7) * var(--font-heading-scale)); }
+  h3 { font-size: calc(var(--f6) * var(--font-heading-scale)); }
+  h4 { font-size: calc(var(--f5) * var(--font-heading-scale)); }
+  h5 { font-size: calc(var(--f4) * var(--font-heading-scale)); }
+  h6 { font-size: calc(var(--f3) * var(--font-heading-scale)); line-height: 1.2; }
+
+  p { text-wrap: pretty; }
 </style>

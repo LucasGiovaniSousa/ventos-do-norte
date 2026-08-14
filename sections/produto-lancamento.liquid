@@ -1,0 +1,335 @@
+{%- comment -%}
+  ============================================================
+  produto-lancamento — montra de um produto em destaque
+  ============================================================
+
+  O QUE FAZ:
+  Uma secção escura de largura total dedicada a UM produto: imagem grande a
+  rodar/flutuar, título, argumentos de venda em lista, preço e botão de compra
+  direta. Pensada para lançamentos — o caso de uso imediato é a bola oficial de
+  Futevôlei Altinha anunciada no Instagram.
+
+  ONDE É USADA:
+  templates/index.json, a meio da página, como quebra escura entre duas secções
+  claras de produto.
+
+  A COMPRA DIRETA:
+  Se o produto tiver uma só variante, a secção mostra um botão que adiciona ao
+  carrinho sem sair da home (o assets/carrinho.js intercepta o formulário e abre
+  o painel). Com múltiplas variantes seria preciso escolher opções, por isso aí
+  o botão passa a ser um link para a ficha do produto — mais honesto do que
+  adicionar uma variante à sorte.
+
+  MODO "EM BREVE":
+  Sem produto selecionado, ou com o produto indisponível, a secção mostra o
+  estado de antecipação (selo "em breve" e o botão desativado) em vez de
+  desaparecer. Serve para criar expectativa antes de o stock entrar.
+{%- endcomment -%}
+
+{%- liquid
+  assign product = section.settings.product
+  assign image = section.settings.image | default: product.featured_image
+  assign can_buy = false
+  if product != blank and product.available and product.variants.size == 1
+    assign can_buy = true
+  endif
+-%}
+
+<section class="lancamento vdn-section vdn-section--dark has-grain glow-bg">
+  <div class="lancamento__inner page-width">
+    <div class="lancamento__media" data-reveal="scale">
+      {%- if image != blank -%}
+        {{
+          image
+          | image_url: width: 1400
+          | image_tag:
+            class: 'lancamento__image',
+            loading: 'lazy',
+            widths: '400, 700, 1000, 1400',
+            sizes: '(min-width: 1001px) 46vw, 86vw',
+            alt: image.alt | default: product.title | default: '' | escape
+        }}
+      {%- else -%}
+        {{ 'product-1' | placeholder_svg_tag: 'lancamento__image' }}
+      {%- endif -%}
+
+      {%- if section.settings.badge != blank -%}
+        <span class="lancamento__badge">{{ section.settings.badge | escape }}</span>
+      {%- endif -%}
+    </div>
+
+    <div class="lancamento__body" data-reveal-stagger="90">
+      {%- if section.settings.eyebrow != blank -%}
+        <p class="eyebrow" data-reveal>{{ section.settings.eyebrow | escape }}</p>
+      {%- endif -%}
+
+      <h2 class="lancamento__title display-italic" data-reveal>
+        {{ section.settings.heading | default: product.title | escape }}
+      </h2>
+
+      {%- if section.settings.text != blank -%}
+        <div class="lancamento__text rte" data-reveal>{{ section.settings.text }}</div>
+      {%- endif -%}
+
+      {%- if section.blocks.size > 0 -%}
+        <ul class="lancamento__features" role="list" data-reveal>
+          {%- for block in section.blocks -%}
+            <li class="lancamento__feature" {{ block.shopify_attributes }}>
+              {% render 'icon', name: 'check' %}
+              <span>{{ block.settings.text | escape }}</span>
+            </li>
+          {%- endfor -%}
+        </ul>
+      {%- endif -%}
+
+      <div class="lancamento__actions" data-reveal>
+        {%- if product != blank -%}
+          <span class="lancamento__price">
+            {%- if product.available -%}
+              {% render 'price', product: product, use_variant: true, show_compare: true %}
+            {%- else -%}
+              <span class="lancamento__soon">{{ 'products.product.out_of_stock' | t }}</span>
+            {%- endif -%}
+          </span>
+
+          {%- if can_buy -%}
+            {%- form 'product', product, data-type: 'add-to-cart-form', class: 'lancamento__form' -%}
+              <input type="hidden" name="id" value="{{ product.selected_or_first_available_variant.id }}">
+              <button type="submit" name="add" class="button button--primary button--large">
+                {{ 'products.product.add_to_cart' | t }}
+                {% render 'icon', name: 'arrow-right' %}
+              </button>
+            {%- endform -%}
+          {%- else -%}
+            <a
+              href="{{ product.url }}"
+              class="button button--contrast button--large"
+              {% unless product.available %}aria-disabled="true"{% endunless %}
+            >
+              {%- if product.available -%}
+                {{ 'products.product.choose_options' | t }}
+              {%- else -%}
+                {{ 'products.product.view_full_details' | t }}
+              {%- endif -%}
+            </a>
+          {%- endif -%}
+        {%- else -%}
+          <span class="lancamento__soon">{{ section.settings.badge | default: 'Em breve' | escape }}</span>
+          {%- if section.settings.button_link != blank -%}
+            <a href="{{ section.settings.button_link }}" class="button button--contrast button--large">
+              {{ section.settings.button_label | escape }}
+            </a>
+          {%- endif -%}
+        {%- endif -%}
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .lancamento { overflow: hidden; }
+
+  .lancamento__inner {
+    position: relative;
+    z-index: 2;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    align-items: center;
+    gap: var(--sp-8);
+  }
+
+  /* ---------- Média ---------- */
+  .lancamento__media { position: relative; }
+
+  .lancamento__image {
+    display: block;
+    width: 100%;
+    height: auto;
+    filter: drop-shadow(0 40px 70px rgba(0, 0, 0, 0.5));
+    animation: lancamento-spin 26s linear infinite;
+  }
+
+  /* Rotação muito lenta: a bola parece suspensa, não a girar. */
+  @keyframes lancamento-spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+  }
+
+  .lancamento__badge {
+    position: absolute;
+    top: 6%;
+    right: 4%;
+    display: inline-flex;
+    align-items: center;
+    padding: var(--sp-2) var(--sp-4);
+    font-family: var(--font-display);
+    font-style: italic;
+    font-size: var(--f1);
+    font-weight: 800;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--vdn-ink);
+    background-color: var(--vdn-amarelo);
+    border-radius: var(--buttons-radius);
+    transform: rotate(6deg);
+    box-shadow: 0 10px 24px rgba(0, 0, 0, 0.35);
+  }
+
+  /* ---------- Corpo ---------- */
+  .lancamento__title {
+    margin: 0 0 var(--sp-5);
+    font-size: var(--f8);
+    color: var(--vdn-on-ink);
+  }
+
+  .lancamento__text {
+    margin-bottom: var(--sp-6);
+    font-size: var(--f3);
+    color: var(--vdn-on-ink-mut);
+    max-width: 46ch;
+  }
+
+  .lancamento__features {
+    display: grid;
+    gap: var(--sp-3);
+    margin: 0 0 var(--sp-7);
+    padding: 0;
+    list-style: none;
+  }
+
+  .lancamento__feature {
+    display: flex;
+    align-items: center;
+    gap: var(--sp-3);
+    font-size: var(--f2);
+    color: var(--vdn-on-ink);
+  }
+
+  .lancamento__feature svg {
+    flex-shrink: 0;
+    width: 20px;
+    height: 20px;
+    padding: 3px;
+    color: var(--vdn-ink);
+    background-color: var(--vdn-verde);
+    border-radius: 50%;
+  }
+
+  .lancamento__actions {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: var(--sp-5);
+  }
+
+  .lancamento__price {
+    font-family: var(--font-display);
+    font-size: var(--f6);
+    font-weight: 800;
+    font-variation-settings: 'wdth' 112;
+    letter-spacing: -0.02em;
+    color: var(--vdn-on-ink);
+  }
+
+  .lancamento__soon {
+    font-family: var(--font-display);
+    font-size: var(--f2);
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--vdn-amarelo);
+  }
+
+  .lancamento__form { margin: 0; }
+
+  @media screen and (max-width: 1000px) {
+    .lancamento__inner { grid-template-columns: 1fr; gap: var(--sp-6); }
+    .lancamento__media { max-width: 420px; margin-inline: auto; }
+    .lancamento__title { font-size: var(--f7); }
+  }
+</style>
+
+{% schema %}
+{
+  "name": "t:sections.produto_lancamento.name",
+  "tag": "section",
+  "settings": [
+    {
+      "type": "product",
+      "id": "product",
+      "label": "t:sections.produto_lancamento.settings.product.label",
+      "info": "t:sections.produto_lancamento.settings.product.info"
+    },
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "default": "Novidade a chegar",
+      "label": "t:sections.produto_lancamento.settings.eyebrow.label"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "default": "Bola oficial de Futevôlei Altinha",
+      "label": "t:sections.produto_lancamento.settings.heading.label",
+      "info": "t:sections.produto_lancamento.settings.heading.info"
+    },
+    {
+      "type": "richtext",
+      "id": "text",
+      "default": "<p>Desenvolvida para quem gosta de diversão, praia, amigos e desporto. Toque macio, costura reforçada e o equilíbrio certo para o altinha.</p>",
+      "label": "t:sections.produto_lancamento.settings.text.label"
+    },
+    {
+      "type": "text",
+      "id": "badge",
+      "default": "Em breve",
+      "label": "t:sections.produto_lancamento.settings.badge.label"
+    },
+    {
+      "type": "image_picker",
+      "id": "image",
+      "label": "t:sections.produto_lancamento.settings.image.label",
+      "info": "t:sections.produto_lancamento.settings.image.info"
+    },
+    {
+      "type": "header",
+      "content": "t:sections.produto_lancamento.settings.header__fallback.content"
+    },
+    {
+      "type": "text",
+      "id": "button_label",
+      "default": "Avisa-me",
+      "label": "t:sections.produto_lancamento.settings.button_label.label"
+    },
+    {
+      "type": "url",
+      "id": "button_link",
+      "label": "t:sections.produto_lancamento.settings.button_link.label"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "feature",
+      "name": "t:sections.produto_lancamento.blocks.feature.name",
+      "settings": [
+        {
+          "type": "text",
+          "id": "text",
+          "default": "Ideal para praia, parque e jardim",
+          "label": "t:sections.produto_lancamento.blocks.feature.settings.text.label"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "t:sections.produto_lancamento.name",
+      "blocks": [
+        { "type": "feature", "settings": { "text": "Ideal para praia, parque e jardim" } },
+        { "type": "feature", "settings": { "text": "Toque macio e costura reforçada" } },
+        { "type": "feature", "settings": { "text": "Aprovada para futevôlei e altinha" } }
+      ]
+    }
+  ]
+}
+{% endschema %}

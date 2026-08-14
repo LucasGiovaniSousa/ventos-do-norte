@@ -1,26 +1,38 @@
 /*
   ============================================================
-  base.css — Estilos base, utilitarios e componentes compartilhados
+  base.css — Componentes e utilitários da Ventos do Norte
   ============================================================
 
-  O QUE FAZ:
-  Reune os estilos globais reutilizaveis do tema:
-  - Utilitarios de acessibilidade (.visually-hidden, skip link,
-    foco visivel para teclado / WCAG, alvos de toque de 44px).
-  - Container de largura de pagina (.page-width).
-  - Componentes compartilhados: botoes (.button), campos de
-    formulario (.field__input), grade e card de produto
-    (.product-grid, .card-product__*), texto rico (.rte).
+  ORGANIZAÇÃO:
+  1.  Acessibilidade
+  2.  Layout (page-width, secções)
+  3.  Sistema de tema por secção (dark / claro)
+  4.  Tipografia utilitária (eyebrow, display, kicker)
+  5.  Botões
+  6.  Campos de formulário
+  7.  Badges e pills
+  8.  Grelha e card de produto
+  9.  Texto rico (RTE)
+  10. Movimento (reveal, marquee, parallax)
+  11. Textura e motivos gráficos (grão, linhas de vento, corte diagonal)
 
-  OBSERVACOES:
-  Todas as cores e raios usam variaveis CSS do tema com fallback
-  (ex: var(--color-accent, #000)), definidas em
-  snippets/css-variables.liquid.
-  Breakpoint mobile em 1000px. Alvos interativos respeitam o
-  minimo de 44px (WCAG 2.5.5).
+  SISTEMA DE TEMA POR SECÇÃO:
+  Cada secção declara .vdn-section--dark ou .vdn-section--light. Isso redefine
+  um conjunto de variáveis locais (--sec-bg, --sec-fg, --sec-line...) que todos
+  os componentes lá dentro consomem. Um botão, um card ou um input herdam o
+  contraste correto automaticamente — não é preciso escrever variantes "no dark"
+  para cada componente.
+
+  MOVIMENTO:
+  Todas as animações são canceladas em bloco no final do ficheiro quando o
+  utilizador pede prefers-reduced-motion. Só se anima transform e opacity.
+
+  Tokens em snippets/css-variables.liquid.
 */
 
-/* Utilitarios de acessibilidade e estilos de componentes compartilhados */
+/* ==========================================================
+   1. ACESSIBILIDADE
+   ========================================================== */
 
 .visually-hidden {
   position: absolute !important;
@@ -39,18 +51,17 @@
   top: -100px;
   left: 0;
   z-index: 9999;
-  padding: 12px 20px;
-  color: var(--color-accent-text, #fff);
-  background-color: var(--color-accent, #000);
-  border-radius: 0 0 var(--buttons-radius, 4px) 0;
-  transition: top 0.15s ease;
+  padding: var(--sp-3) var(--sp-5);
+  font-family: var(--font-display);
+  font-weight: 700;
+  color: var(--vdn-ink);
+  background-color: var(--vdn-amarelo);
+  border-radius: 0 0 var(--buttons-radius) 0;
+  transition: top var(--dur-2) var(--ease-out-expo);
 }
 
-.skip-to-content-link:focus {
-  top: 0;
-}
+.skip-to-content-link:focus { top: 0; }
 
-/* Visible focus state for keyboard users (WCAG) */
 a:focus-visible,
 button:focus-visible,
 input:focus-visible,
@@ -58,82 +69,14 @@ select:focus-visible,
 textarea:focus-visible,
 summary:focus-visible,
 [tabindex]:focus-visible {
-  outline: 2px solid var(--color-accent, #000);
-  outline-offset: 2px;
+  outline: 2px solid var(--sec-focus, var(--vdn-azul));
+  outline-offset: 3px;
+  border-radius: 2px;
 }
 
-.focus-none:focus {
-  outline: none;
-  box-shadow: none;
-}
+.focus-none:focus { outline: none; box-shadow: none; }
 
-/* Page width container */
-.page-width {
-  width: 100%;
-  max-width: var(--page-width, 1200px);
-  margin: 0 auto;
-  padding: 0 20px;
-  box-sizing: border-box;
-}
-
-/* Shared button */
-.button,
-button.button {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 44px;
-  padding: 12px 24px;
-  font-family: var(--font-heading-family);
-  font-size: var(--f2);
-  color: var(--color-accent-text, #fff);
-  background-color: var(--color-accent, #000);
-  border: 1px solid var(--color-accent, #000);
-  border-radius: var(--buttons-radius, 4px);
-  cursor: pointer;
-  text-decoration: none;
-  transition: opacity 0.15s ease;
-}
-
-.button:hover {
-  opacity: 0.85;
-}
-
-.button--secondary {
-  color: var(--color-text, #000);
-  background-color: transparent;
-  border-color: var(--color-border, #c2c2c2);
-}
-
-.button[disabled],
-.button[aria-disabled="true"] {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-/* Shared form inputs */
-.field__input,
-.select__select,
-textarea.field__input {
-  width: 100%;
-  min-height: 44px;
-  padding: 10px 12px;
-  font-family: var(--font-body-family);
-  font-size: var(--f2);
-  color: var(--color-text, #000);
-  background-color: var(--color-background, #fff);
-  border: 1px solid var(--color-border, #c2c2c2);
-  border-radius: var(--inputs-radius, 4px);
-  box-sizing: border-box;
-}
-
-.field__label {
-  display: block;
-  margin-bottom: 6px;
-  font-size: var(--f1);
-}
-
-/* Minimum touch target for interactive icons (WCAG 2.5.5) */
+/* Alvo de toque mínimo de 44px (WCAG 2.5.5) */
 .tap-target {
   display: inline-flex;
   align-items: center;
@@ -142,59 +85,674 @@ textarea.field__input {
   min-height: 44px;
 }
 
-/* Product grid */
+/* ==========================================================
+   2. LAYOUT
+   ========================================================== */
+
+.page-width {
+  width: 100%;
+  max-width: var(--page-width);
+  margin-inline: auto;
+  padding-inline: var(--sp-5);
+  box-sizing: border-box;
+}
+
+.page-width--wide { max-width: calc(var(--page-width) + 200px); }
+.page-width--narrow { max-width: 760px; }
+
+@media screen and (min-width: 1001px) {
+  .page-width { padding-inline: var(--sp-7); }
+}
+
+.vdn-section {
+  position: relative;
+  padding-block: var(--sp-8);
+  background-color: var(--sec-bg);
+  color: var(--sec-fg);
+}
+
+@media screen and (min-width: 1001px) {
+  .vdn-section { padding-block: var(--sp-9); }
+}
+
+.vdn-section--flush { padding-block: 0; }
+.vdn-section--tight { padding-block: var(--sp-6); }
+
+/* ==========================================================
+   3. SISTEMA DE TEMA POR SECÇÃO
+   ========================================================== */
+
+.vdn-section--light {
+  --sec-bg: var(--vdn-sand);
+  --sec-bg-raised: var(--vdn-surface);
+  --sec-fg: var(--vdn-on-sand);
+  --sec-fg-mut: var(--vdn-on-sand-mut);
+  --sec-line: var(--vdn-line);
+  --sec-accent: var(--vdn-azul);
+  --sec-focus: var(--vdn-azul);
+}
+
+.vdn-section--dark {
+  --sec-bg: var(--vdn-ink);
+  --sec-bg-raised: var(--vdn-ink-2);
+  --sec-fg: var(--vdn-on-ink);
+  --sec-fg-mut: var(--vdn-on-ink-mut);
+  --sec-line: rgba(255, 255, 255, 0.14);
+  --sec-accent: var(--vdn-azul-lit);
+  --sec-focus: var(--vdn-amarelo);
+}
+
+/* O documento arranca em modo claro para que componentes fora de uma
+   secção (drawers, toasts) tenham sempre valores definidos. */
+:root {
+  --sec-bg: var(--vdn-sand);
+  --sec-bg-raised: var(--vdn-surface);
+  --sec-fg: var(--vdn-on-sand);
+  --sec-fg-mut: var(--vdn-on-sand-mut);
+  --sec-line: var(--vdn-line);
+  --sec-accent: var(--vdn-azul);
+  --sec-focus: var(--vdn-azul);
+}
+
+/* Scrim partilhado por todos os painéis sobrepostos (menu, pesquisa, carrinho).
+   Existe uma única instância, no layout, gerida pelo assets/overlay.js. */
+.scrim {
+  position: fixed;
+  inset: 0;
+  z-index: 120;
+  background-color: rgba(10, 10, 11, 0.55);
+  backdrop-filter: blur(2px);
+  opacity: 0;
+  transition: opacity var(--dur-3) var(--ease-out-quart);
+}
+
+.scrim:not([hidden]) { display: block; }
+.scrim.is-open { opacity: 1; }
+
+/* Bloquear o scroll do fundo enquanto um painel está aberto. */
+body.overlay-open { overflow: hidden; }
+
+/* ==========================================================
+   4. TIPOGRAFIA UTILITÁRIA
+   ========================================================== */
+
+/* Sobrelinha: pequena, maiúscula, muito espaçada — marca as secções */
+.eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-2);
+  margin: 0 0 var(--sp-4);
+  font-family: var(--font-display);
+  font-size: var(--f0);
+  font-weight: 700;
+  font-variation-settings: 'wdth' 105;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--sec-fg-mut);
+}
+
+.eyebrow::before {
+  content: '';
+  width: 24px;
+  height: 2px;
+  background: linear-gradient(90deg, var(--vdn-verde), var(--vdn-amarelo));
+}
+
+.eyebrow--center { justify-content: center; }
+
+/* Display itálico-expandido: o gesto do wordmark. Usar com moderação. */
+.display-italic {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-weight: 800;
+  font-variation-settings: 'wdth' 125;
+  letter-spacing: -0.03em;
+  line-height: 0.92;
+  text-transform: uppercase;
+}
+
+.text-mut { color: var(--sec-fg-mut); }
+
+/* Cabeçalho de secção: título à esquerda, "ver tudo" à direita */
+.section-head {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--sp-5);
+  margin-bottom: var(--sp-7);
+}
+
+.section-head__title { margin: 0; }
+.section-head__lead {
+  max-width: 52ch;
+  margin: var(--sp-4) 0 0;
+  font-size: var(--f3);
+  color: var(--sec-fg-mut);
+}
+
+@media screen and (max-width: 749px) {
+  .section-head { flex-direction: column; align-items: flex-start; }
+}
+
+/* ==========================================================
+   5. BOTÕES
+   ========================================================== */
+
+.button,
+button.button {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--sp-2);
+  min-height: 48px;
+  padding: var(--sp-3) var(--sp-6);
+  font-family: var(--font-display);
+  font-size: var(--f1);
+  font-weight: 700;
+  font-variation-settings: 'wdth' 105;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  text-decoration: none;
+  white-space: nowrap;
+  cursor: pointer;
+  border: 1px solid transparent;
+  border-radius: var(--buttons-radius);
+  transition:
+    transform var(--dur-2) var(--ease-spring),
+    background-color var(--dur-2) var(--ease-out-quart),
+    color var(--dur-2) var(--ease-out-quart),
+    border-color var(--dur-2) var(--ease-out-quart),
+    box-shadow var(--dur-2) var(--ease-out-quart);
+}
+
+.button:active { transform: translateY(1px) scale(0.99); }
+
+/* Primário — verde Brasil, a ação de compra */
+.button--primary {
+  color: #ffffff;
+  background-color: var(--vdn-verde);
+  border-color: var(--vdn-verde);
+  box-shadow: 0 4px 14px rgba(0, 165, 68, 0.28);
+}
+
+.button--primary:hover {
+  background-color: var(--vdn-verde-esc);
+  border-color: var(--vdn-verde-esc);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 22px rgba(0, 165, 68, 0.36);
+}
+
+/* Secundário — herda o contraste da secção */
+.button--secondary {
+  color: var(--sec-fg);
+  background-color: transparent;
+  border-color: var(--sec-line);
+}
+
+.button--secondary:hover {
+  border-color: var(--sec-fg);
+  background-color: color-mix(in srgb, var(--sec-fg) 8%, transparent);
+  transform: translateY(-2px);
+}
+
+/* Sólido invertido — para os heros escuros */
+.button--contrast {
+  color: var(--vdn-ink);
+  background-color: var(--vdn-on-ink);
+  border-color: var(--vdn-on-ink);
+}
+
+.button--contrast:hover {
+  background-color: var(--vdn-amarelo);
+  border-color: var(--vdn-amarelo);
+  transform: translateY(-2px);
+}
+
+.button--small { min-height: 40px; padding: var(--sp-2) var(--sp-4); font-size: var(--f0); }
+.button--large { min-height: 56px; padding: var(--sp-4) var(--sp-7); font-size: var(--f2); }
+.button--full { width: 100%; }
+
+.button[disabled],
+.button[aria-disabled='true'] {
+  opacity: 0.45;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+/* Link com sublinhado que cresce da esquerda */
+.link-underline {
+  position: relative;
+  font-family: var(--font-display);
+  font-size: var(--f1);
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  text-decoration: none;
+  color: var(--sec-fg);
+  padding-bottom: 3px;
+}
+
+.link-underline::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  height: 2px;
+  background-color: currentColor;
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform var(--dur-3) var(--ease-out-expo);
+}
+
+.link-underline:hover::after { transform: scaleX(1); }
+
+/* ==========================================================
+   6. CAMPOS DE FORMULÁRIO
+   ========================================================== */
+
+.field__input,
+.select__select,
+textarea.field__input {
+  width: 100%;
+  min-height: 48px;
+  padding: var(--sp-3) var(--sp-4);
+  font-family: var(--font-body);
+  font-size: var(--f2);
+  color: var(--sec-fg);
+  background-color: var(--sec-bg-raised);
+  border: 1px solid var(--sec-line);
+  border-radius: var(--inputs-radius);
+  box-sizing: border-box;
+  transition: border-color var(--dur-2) var(--ease-out-quart), box-shadow var(--dur-2) var(--ease-out-quart);
+}
+
+.field__input:focus,
+.select__select:focus,
+textarea.field__input:focus {
+  outline: none;
+  border-color: var(--sec-accent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--sec-accent) 22%, transparent);
+}
+
+.field__input::placeholder { color: var(--sec-fg-mut); }
+
+.field__label {
+  display: block;
+  margin-bottom: var(--sp-2);
+  font-size: var(--f1);
+  font-weight: 500;
+  color: var(--sec-fg-mut);
+}
+
+.select__select {
+  appearance: none;
+  padding-right: var(--sp-8);
+  cursor: pointer;
+}
+
+.select {
+  position: relative;
+}
+
+.select::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  right: var(--sp-4);
+  width: 8px;
+  height: 8px;
+  border-right: 2px solid currentColor;
+  border-bottom: 2px solid currentColor;
+  transform: translateY(-70%) rotate(45deg);
+  pointer-events: none;
+  opacity: 0.6;
+}
+
+/* ==========================================================
+   7. BADGES E PILLS
+   ========================================================== */
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px var(--sp-2);
+  font-family: var(--font-display);
+  font-size: var(--f0);
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  line-height: 1.4;
+  border-radius: 3px;
+}
+
+.badge--sale { color: #ffffff; background-color: var(--vdn-vermelho); }
+.badge--new { color: var(--vdn-ink); background-color: var(--vdn-amarelo); }
+.badge--soldout { color: var(--vdn-on-ink); background-color: var(--vdn-ink-3); }
+
+/* ==========================================================
+   8. GRELHA E CARD DE PRODUTO
+   ========================================================== */
+
 .product-grid {
   display: grid;
-  grid-template-columns: repeat(var(--grid-columns, 4), 1fr);
-  gap: 24px;
+  grid-template-columns: repeat(var(--grid-columns, 4), minmax(0, 1fr));
+  gap: var(--sp-6) var(--sp-5);
   list-style: none;
   margin: 0;
   padding: 0;
 }
 
 @media screen and (max-width: 1000px) {
-  .product-grid {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 12px;
-  }
+  .product-grid { grid-template-columns: repeat(var(--grid-columns-tablet, 3), minmax(0, 1fr)); }
 }
 
-/* Product card */
-.card-product__link { text-decoration: none; color: inherit; display: block; }
+@media screen and (max-width: 749px) {
+  .product-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--sp-5) var(--sp-3); }
+}
+
+.card-product { position: relative; height: 100%; }
+
+.card-product__link {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  text-decoration: none;
+  color: inherit;
+}
+
 .card-product__media {
   position: relative;
   width: 100%;
   overflow: hidden;
-  border-radius: var(--media-radius, 8px);
-  background-color: var(--color-background-contrast, #f2f3f8);
+  border-radius: var(--media-radius);
+  background-color: var(--sec-bg-raised);
+  border: 1px solid var(--sec-line);
 }
+
 .card-product__image {
   position: absolute;
   inset: 0;
   width: 100%;
   height: 100%;
   object-fit: cover;
+  transition: transform var(--dur-4) var(--ease-out-expo), opacity var(--dur-3) var(--ease-out-quart);
 }
-.card-product__image--secondary { opacity: 0; transition: opacity 0.25s ease; }
-.card-product:hover .card-product__image--secondary { opacity: 1; }
-.card-product__badge {
-  position: absolute;
-  top: 10px;
-  left: 10px;
-  padding: 3px 8px;
-  font-size: var(--f0, 0.7rem);
-  text-transform: uppercase;
-  color: var(--color-accent-text, #fff);
-  background-color: var(--color-sale, #1cb744);
-  border-radius: 4px;
-}
-.card-product__badge--sold-out { background-color: var(--color-border, #c2c2c2); color: var(--color-text, #000); }
-.card-product__info { padding: 12px 4px; }
-.card-product__vendor { display: block; font-size: var(--f0); opacity: 0.6; margin-bottom: 4px; }
-.card-product__title { font-size: var(--f2); font-weight: normal; margin-bottom: 6px; }
-.price--card { font-size: var(--f2); }
 
-/* Rich text content (RTE) shared styles */
-.rte a { color: var(--color-accent); }
+.card-product__image--primary { transform: scale(1.001); }
+.card-product:hover .card-product__image--primary { transform: scale(1.05); }
+
+.card-product__image--secondary { opacity: 0; }
+.card-product:hover .card-product__image--secondary { opacity: 1; transform: scale(1.05); }
+
+.card-product__badges {
+  position: absolute;
+  top: var(--sp-3);
+  left: var(--sp-3);
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--sp-1);
+}
+
+.card-product__info {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-1);
+  padding: var(--sp-4) var(--sp-1) 0;
+}
+
+.card-product__vendor {
+  font-family: var(--font-display);
+  font-size: var(--f0);
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--sec-fg-mut);
+}
+
+.card-product__title {
+  margin: 0;
+  font-family: var(--font-body);
+  font-size: var(--f3);
+  font-weight: 500;
+  line-height: 1.3;
+  letter-spacing: -0.01em;
+}
+
+.price--card {
+  margin-top: auto;
+  padding-top: var(--sp-1);
+  font-family: var(--font-display);
+  font-size: var(--f3);
+  font-weight: 700;
+  font-variation-settings: 'wdth' 108;
+}
+
+/* Preço — classes emitidas por snippets/price.liquid.
+   Vivem aqui (e não numa secção) porque o mesmo snippet é usado no card, na
+   grelha, no carrinho, na ficha de produto e na pesquisa. */
+.price {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: var(--sp-2);
+  color: var(--sec-fg);
+}
+
+.price__regular,
+.price__sale { font-weight: 700; }
+.price__sale { color: var(--vdn-vermelho); }
+
+.price__compare {
+  font-size: 0.82em;
+  font-weight: 400;
+  color: var(--sec-fg-mut);
+  text-decoration: line-through;
+}
+
+.price__badge {
+  padding: 2px 6px;
+  font-family: var(--font-display);
+  font-size: var(--f0);
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #fff;
+  background-color: var(--vdn-vermelho);
+  border-radius: 3px;
+}
+
+/* Amostras de cor */
+.swatches {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  margin: var(--sp-1) 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.swatches__dot {
+  width: 13px;
+  height: 13px;
+  border-radius: 50%;
+  background: var(--swatch, #c9c6bd);
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.18);
+}
+
+.swatches__more { font-size: var(--f0); color: var(--sec-fg-mut); }
+
+/* Adição rápida.
+   Fica em fluxo normal (não absoluta) para reservar sempre o seu espaço: assim
+   todos os cards da grelha têm a mesma altura e nada salta quando o botão
+   aparece. Onde há rato, entra suavemente no hover; em ecrãs de toque, onde
+   hover não existe, está permanentemente visível. */
+.card-product__add { margin-top: var(--sp-3); }
+.card-product__form { margin: 0; }
+
+@media (hover: hover) {
+  .card-product__add {
+    opacity: 0;
+    transform: translateY(8px);
+    transition: opacity var(--dur-3) var(--ease-out-quart), transform var(--dur-3) var(--ease-out-expo);
+  }
+
+  .card-product:hover .card-product__add,
+  .card-product:focus-within .card-product__add { opacity: 1; transform: none; }
+}
+
+/* ==========================================================
+   9. TEXTO RICO
+   ========================================================== */
+
+.rte { font-size: var(--f3); line-height: 1.7; color: var(--sec-fg); }
+.rte > * + * { margin-top: 1em; }
+.rte a { color: var(--sec-accent); text-underline-offset: 3px; }
 .rte img { max-width: 100%; height: auto; border-radius: var(--media-radius); }
-.rte ul, .rte ol { padding-left: 1.5em; }
+.rte ul, .rte ol { padding-left: 1.4em; }
+.rte li + li { margin-top: 0.4em; }
+.rte h2, .rte h3, .rte h4 { margin-top: 1.6em; }
+.rte strong { font-weight: 700; }
+
+/* ==========================================================
+   10. MOVIMENTO
+   ========================================================== */
+
+/* Reveal ao entrar no viewport. O JS (motion.js) acrescenta .is-revealed.
+   Sem JS, o :not() garante que o conteúdo aparece na mesma. */
+.no-js [data-reveal] { opacity: 1 !important; transform: none !important; }
+
+[data-reveal] {
+  opacity: 0;
+  transform: translateY(24px);
+  transition:
+    opacity var(--dur-4) var(--ease-out-expo),
+    transform var(--dur-4) var(--ease-out-expo);
+  transition-delay: var(--reveal-delay, 0ms);
+}
+
+[data-reveal].is-revealed { opacity: 1; transform: none; }
+
+[data-reveal='left'] { transform: translateX(-32px); }
+[data-reveal='right'] { transform: translateX(32px); }
+[data-reveal='scale'] { transform: scale(0.94); }
+[data-reveal='clip'] { opacity: 1; clip-path: inset(0 100% 0 0); transition: clip-path var(--dur-5) var(--ease-out-expo); }
+[data-reveal='clip'].is-revealed { clip-path: inset(0 0 0 0); }
+
+/* Marquee infinito. Duplicar o conteúdo no markup para o loop ser contínuo. */
+.marquee {
+  display: flex;
+  overflow: hidden;
+  user-select: none;
+  mask-image: linear-gradient(90deg, transparent, #000 6%, #000 94%, transparent);
+}
+
+.marquee__track {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: var(--sp-6);
+  padding-right: var(--sp-6);
+  animation: marquee-scroll var(--marquee-duration, 40s) linear infinite;
+}
+
+.marquee:hover .marquee__track { animation-play-state: paused; }
+.marquee--reverse .marquee__track { animation-direction: reverse; }
+
+@keyframes marquee-scroll {
+  from { transform: translateX(0); }
+  to { transform: translateX(-100%); }
+}
+
+/* ==========================================================
+   11. TEXTURA E MOTIVOS GRÁFICOS
+   ========================================================== */
+
+/* Grão: tira o "digital liso" das superfícies escuras */
+.has-grain { position: relative; isolation: isolate; }
+
+.has-grain::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  opacity: 0.05;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+.has-grain > * { position: relative; z-index: 2; }
+
+/* Corte diagonal: o gesto da pipa a cortar o céu */
+.clip-kite {
+  clip-path: polygon(0 0, 100% 0, 100% calc(100% - 48px), 0 100%);
+}
+
+.clip-kite--up {
+  clip-path: polygon(0 48px, 100% 0, 100% 100%, 0 100%);
+}
+
+/* Faixa das três bandeiras — separador de marca */
+.flag-rule {
+  height: 3px;
+  border: 0;
+  margin: 0;
+  background: linear-gradient(
+    90deg,
+    var(--vdn-verde) 0 20%,
+    var(--vdn-amarelo) 20% 40%,
+    var(--vdn-azul) 40% 60%,
+    var(--vdn-vermelho) 60% 80%,
+    var(--vdn-verde) 80% 100%
+  );
+}
+
+/* Brilho radial de fundo para as secções escuras */
+.glow-bg::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(60% 50% at 15% 0%, rgba(0, 165, 68, 0.16), transparent 70%),
+    radial-gradient(50% 45% at 85% 10%, rgba(27, 79, 216, 0.18), transparent 70%),
+    radial-gradient(40% 40% at 60% 100%, rgba(255, 200, 0, 0.08), transparent 70%);
+}
+
+/* Linhas de vento em SVG: o traço desenha-se sozinho */
+.wind-line {
+  fill: none;
+  stroke-linecap: round;
+  stroke-dasharray: var(--wind-len, 1200);
+  stroke-dashoffset: var(--wind-len, 1200);
+  animation: wind-draw var(--dur-5) var(--ease-out-expo) forwards;
+  animation-delay: var(--wind-delay, 0ms);
+}
+
+@keyframes wind-draw {
+  to { stroke-dashoffset: 0; }
+}
+
+/* ==========================================================
+   MOVIMENTO REDUZIDO — desliga tudo de uma vez
+   ========================================================== */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  [data-reveal] { opacity: 1 !important; transform: none !important; clip-path: none !important; }
+  .marquee__track { animation: none; }
+  .wind-line { stroke-dashoffset: 0; animation: none; }
+}

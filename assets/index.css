@@ -4,17 +4,21 @@
   ============================================================
 
   O QUE FAZ:
-  Este é o unico arquivo CSS carregado pelo layout (theme.liquid).
-  Ele importa os demais na ordem correta:
-  1. fontes.css     — carregamento de fontes / @font-face
-  2. normalizar.css — reset e normalizacao entre navegadores
-  3. base.css       — estilos base, utilitarios e componentes compartilhados
+  Único ficheiro CSS carregado pelo layout (theme.liquid). Importa os
+  restantes pela ordem correta:
+  1. normalizar.css — reset e normalização entre browsers
+  2. base.css       — componentes, utilitários e sistema de tema por secção
 
-  OBSERVACOES:
-  A ordem dos @import importa: fontes primeiro, depois o reset e por
-  ultimo os estilos base (que dependem do reset ja aplicado).
-  Para adicionar CSS global novo, prefira base.css em vez deste arquivo.
+  ONDE ESTÁ O RESTO:
+  - Tokens (cores, tipografia, espaçamento, easing) e as @font-face da Archivo
+    estão inline no <head>, em snippets/css-variables.liquid. Ficam inline de
+    propósito: evitam a cascata <link> CSS → fonte e fazem o browser começar a
+    descarregar as fontes no primeiro parse do documento.
+  - CSS específico de uma secção vive dentro do próprio ficheiro da secção,
+    numa tag <style>. Assim cada secção é autocontida e o editor de tema pode
+    adicioná-la/removê-la sem deixar CSS órfão.
+
+  Para CSS global novo, prefira base.css a este ficheiro.
 */
-@import url('./fontes.css');
 @import url('./normalizar.css');
 @import url('./base.css');

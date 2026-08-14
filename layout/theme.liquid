@@ -31,8 +31,17 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
-    <meta name="theme-color" content="{{ settings.color_accent }}">
+    <meta name="theme-color" content="#0a0a0b">
     <link rel="canonical" href="{{ canonical_url }}">
+
+    {%- comment -%}
+      As fontes estão auto-hospedadas nos assets do tema (RGPD) e declaradas
+      inline em 'css-variables'. Pré-carregar os subsets latinos evita o
+      "flash de texto sem estilo" no primeiro render — os latin-ext e itálicos
+      ficam de fora porque raramente entram acima da dobra.
+    {%- endcomment -%}
+    {{ 'archivo-latin.woff2' | asset_url | preload_tag: as: 'font', type: 'font/woff2', crossorigin: 'anonymous' }}
+    {{ 'archivo-italic-latin.woff2' | asset_url | preload_tag: as: 'font', type: 'font/woff2', crossorigin: 'anonymous' }}
 
     {%- if settings.favicon != blank -%}
       <link rel="icon" type="image/png" href="{{ settings.favicon | image_url: width: 32, height: 32 }}">
@@ -55,7 +64,18 @@
     {{ 'index.css' | asset_url | stylesheet_tag }}
     {% render 'css-variables' %}
 
-    <script>document.documentElement.className = document.documentElement.className.replace('no-js', 'js');</script>
+    <script>
+      document.documentElement.className = document.documentElement.className.replace('no-js', 'js');
+      // Strings que o JavaScript precisa de mostrar ao utilizador. Ficam aqui
+      // para passarem pelo sistema de traduções em vez de nascerem em inglês
+      // dentro dos ficheiros .js.
+      window.themeStrings = {
+        addedToCart: {{ 'products.product.added_to_cart' | t | json }},
+        cartError: {{ 'sections.cart.cart_error' | t | json }}
+      };
+    </script>
+    <script src="{{ 'overlay.js' | asset_url }}" defer="defer"></script>
+    <script src="{{ 'motion.js' | asset_url }}" defer="defer"></script>
     <script src="{{ 'carrinho.js' | asset_url }}" defer="defer"></script>
 
     {{ content_for_header }}
@@ -67,9 +87,17 @@
     </a>
 
     {% render 'alerta' %}
-    {% render 'carrinho' %}
 
     {% sections 'header-group' %}
+
+    {%- comment -%}
+      O painel do carrinho é uma section (e não um snippet) para poder ser
+      re-renderizado pela Section Rendering API a cada alteração do carrinho.
+    {%- endcomment -%}
+    {% section 'cart-drawer' %}
+
+    {%- comment -%} Scrim único, partilhado por todos os painéis sobrepostos. {%- endcomment -%}
+    <div class="scrim" data-scrim hidden></div>
 
     <main id="MainContent" class="content-for-layout focus-none" role="main" tabindex="-1">
       {{ content_for_layout }}

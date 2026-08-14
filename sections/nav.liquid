@@ -1,53 +1,67 @@
 {%- comment -%}
   ============================================================
-  NAV / HEADER — cabeçalho do site
+  NAV / HEADER — cabeçalho da Ventos do Norte
   ============================================================
 
   O QUE FAZ:
-  Monta o cabeçalho da loja: logo, navegação de múltiplos níveis
-  (menu com submenus e sub-submenus), busca, link de conta,
-  contador do carrinho e seletores de localização (país/moeda e
-  idioma). Inclui menu mobile com botão hambúrguer.
+  Barra de navegação escura e sticky, presente em todas as páginas: logótipo,
+  menu de até 3 níveis com mega-menu, pesquisa em overlay com sugestões ao vivo,
+  conta, carrinho com contador e seletores de país/idioma. Em ecrãs pequenos o
+  menu passa a um painel deslizante de ecrã inteiro.
 
   ONDE É USADA:
-  No layout (layout/theme.liquid), como header fixo presente em
-  todas as páginas. É uma section de grupo/header do tema.
+  layout/theme.liquid, através do grupo de secções 'header-group'.
 
-  PRINCIPAIS PARTES:
-  - Logo: usa settings.logo (imagem) ou, se vazio, o nome da loja
-    (shop.name) como texto.
-  - header__nav: percorre section.settings.menu.links montando o
-    menu desktop com até 3 níveis (link > child > grandchild).
-  - header__actions: busca (details com painel), conta (só se
-    customer_accounts_enabled) e carrinho com contador
-    data-cart-count baseado em cart.item_count.
-  - Localização: renderiza o snippet 'localization-form' conforme
-    os settings enable_country_selector / enable_language_selector.
-  - header__mobile-nav: menu alternativo para telas <= 1000px,
-    aberto/fechado pelo <script> que alterna aria-expanded/hidden.
+  O MODO OVERLAY:
+  Na página inicial o cabeçalho começa transparente, por cima do hero escuro, e
+  só ganha fundo sólido depois de o utilizador começar a deslizar. Nas restantes
+  páginas é sempre sólido. Quem alterna as classes é o motion.js, que publica
+  .is-scrolled no <html> — aqui só reagimos com CSS.
 
-  OBSERVAÇÕES:
-  - Ícones vêm do snippet 'icon' (search, account, cart, etc.).
-  - O menu é definido no setting menu (link_list, default
-    "main-menu"); submenus só aparecem se o link tiver filhos.
-  - Estilos e o JS do toggle mobile ficam inline neste arquivo.
+  PESQUISA PREDITIVA:
+  O formulário é um <form> normal que funciona sem JavaScript (submete para
+  /search). Com JS, cada tecla consulta /search/suggest.json e mostra sugestões
+  por baixo. É melhoria progressiva: se o fetch falhar, o Enter continua a levar
+  à página de resultados.
+
+  ACESSIBILIDADE:
+  - Os painéis (pesquisa e menu mobile) prendem o foco enquanto estão abertos,
+    fecham com Escape e devolvem o foco ao botão que os abriu.
+  - O mega-menu abre com hover e com foco de teclado (:focus-within).
+  - O contador do carrinho é anunciado por um aria-label com o total de artigos.
 {%- endcomment -%}
-<header class="header page-width" data-section-id="{{ section.id }}">
-  <div class="header__inner">
+
+{%- liquid
+  assign is_overlay = false
+  if request.page_type == 'index'
+    assign is_overlay = true
+  endif
+-%}
+
+<header
+  class="header{% if is_overlay %} header--overlay{% endif %}"
+  data-section-id="{{ section.id }}"
+>
+  <div class="header__bar page-width">
     <button
       type="button"
-      class="header__menu-toggle tap-target"
-      aria-label="{{ 'sections.header.menu' | t }}"
+      class="header__icon-btn header__menu-toggle tap-target"
+      aria-label="{{ 'sections.header.open_menu' | t }}"
       aria-expanded="false"
       aria-controls="MobileNav-{{ section.id }}"
+      data-menu-toggle
     >
-      <span class="header__burger"></span>
+      {% render 'icon', name: 'menu' %}
     </button>
 
-    <a href="{{ routes.root_url }}" class="header__logo-link">
+    <a href="{{ routes.root_url }}" class="header__logo" aria-label="{{ shop.name | escape }}">
       {%- if settings.logo != blank -%}
-        {%- assign logo_alt = shop.name | escape -%}
-        {%- assign logo_height = settings.logo_width | divided_by: settings.logo.aspect_ratio -%}
+        {%- liquid
+          assign logo_height = settings.logo_width | divided_by: settings.logo.aspect_ratio
+          # Escapar antes: um filtro dentro de um argumento de image_tag
+          # confunde o parser do Liquid.
+          assign logo_alt = shop.name | escape
+        -%}
         {{
           settings.logo
           | image_url: width: 600
@@ -60,32 +74,57 @@
             sizes: '(max-width: 1000px) 40vw, 200px'
         }}
       {%- else -%}
-        <span class="header__logo-text">{{ shop.name }}</span>
+        <span class="header__logo-text">
+          <span class="header__logo-ventos">Ventos</span><span class="header__logo-do">do</span><span class="header__logo-norte">Norte</span>
+        </span>
       {%- endif -%}
     </a>
 
-    <nav class="header__nav" role="navigation" aria-label="{{ 'sections.header.menu' | t }}">
+    <nav class="header__nav" aria-label="{{ 'sections.header.menu' | t }}">
       <ul class="header__menu" role="list">
         {%- for link in section.settings.menu.links -%}
-          <li class="header__menu-item {% if link.links != blank %}header__menu-item--has-dropdown{% endif %}">
-            <a href="{{ link.url }}" class="header__menu-link" {% if link.current %}aria-current="page"{% endif %}>
-              {{ link.title | escape }}
+          {%- assign has_children = false -%}
+          {%- if link.links != blank -%}
+            {%- assign has_children = true -%}
+          {%- endif -%}
+          <li class="header__item{% if has_children %} header__item--mega{% endif %}">
+            <a
+              href="{{ link.url }}"
+              class="header__link{% if link.current or link.child_active %} is-active{% endif %}"
+              {% if link.current %}aria-current="page"{% endif %}
+            >
+              <span>{{ link.title | escape }}</span>
             </a>
-            {%- if link.links != blank -%}
-              <ul class="header__submenu" role="list">
-                {%- for child in link.links -%}
-                  <li class="header__submenu-item {% if child.links != blank %}header__submenu-item--has-dropdown{% endif %}">
-                    <a href="{{ child.url }}" class="header__submenu-link">{{ child.title | escape }}</a>
-                    {%- if child.links != blank -%}
-                      <ul class="header__submenu header__submenu--nested" role="list">
-                        {%- for grandchild in child.links -%}
-                          <li><a href="{{ grandchild.url }}" class="header__submenu-link">{{ grandchild.title | escape }}</a></li>
-                        {%- endfor -%}
-                      </ul>
-                    {%- endif -%}
-                  </li>
-                {%- endfor -%}
-              </ul>
+
+            {%- if has_children -%}
+              <div class="mega">
+                <div class="mega__inner page-width">
+                  <ul class="mega__cols" role="list">
+                    {%- for child in link.links -%}
+                      <li class="mega__col">
+                        <a href="{{ child.url }}" class="mega__col-title">
+                          {{ child.title | escape }}
+                          {% render 'icon', name: 'arrow-up-right' %}
+                        </a>
+                        {%- if child.links != blank -%}
+                          <ul class="mega__sub" role="list">
+                            {%- for grandchild in child.links -%}
+                              <li>
+                                <a href="{{ grandchild.url }}" class="mega__sub-link">{{ grandchild.title | escape }}</a>
+                              </li>
+                            {%- endfor -%}
+                          </ul>
+                        {%- endif -%}
+                      </li>
+                    {%- endfor -%}
+                  </ul>
+
+                  <a href="{{ link.url }}" class="mega__all">
+                    {{ 'sections.header.view_all_in' | t: title: link.title }}
+                    {% render 'icon', name: 'arrow-right' %}
+                  </a>
+                </div>
+              </div>
             {%- endif -%}
           </li>
         {%- endfor -%}
@@ -93,40 +132,116 @@
     </nav>
 
     <div class="header__actions">
-      <details class="header__search">
-        <summary class="header__action-button tap-target" aria-label="{{ 'general.search.search' | t }}">
-          {% render 'icon', name: 'search' %}
-        </summary>
-        <div class="header__search-panel">
-          <form action="{{ routes.search_url }}" method="get" role="search" class="header__search-form">
-            <input
-              type="search"
-              name="q"
-              value="{{ search.terms | escape }}"
-              placeholder="{{ 'general.search.placeholder' | t }}"
-              aria-label="{{ 'general.search.search' | t }}"
-              class="field__input"
-            >
-            <button type="submit" class="visually-hidden">{{ 'general.search.submit' | t }}</button>
-          </form>
-        </div>
-      </details>
+      <button
+        type="button"
+        class="header__icon-btn tap-target"
+        aria-label="{{ 'sections.header.open_search' | t }}"
+        aria-expanded="false"
+        aria-controls="SearchPanel-{{ section.id }}"
+        data-search-toggle
+      >
+        {% render 'icon', name: 'search' %}
+      </button>
 
       {%- if shop.customer_accounts_enabled -%}
-        <a href="{{ routes.account_url }}" class="header__action-button tap-target" aria-label="{{ 'customer.account.title' | t }}">
+        <a
+          href="{{ routes.account_url }}"
+          class="header__icon-btn tap-target header__account"
+          aria-label="{{ 'customer.account.title' | t }}"
+        >
           {% render 'icon', name: 'account' %}
         </a>
       {%- endif -%}
 
-      <a href="{{ routes.cart_url }}" class="header__action-button header__cart tap-target" aria-label="{{ 'templates.cart.cart' | t }}">
+      <a
+        href="{{ routes.cart_url }}"
+        class="header__icon-btn header__cart tap-target"
+        aria-label="{{ 'sections.header.cart_count' | t: count: cart.item_count }}"
+        data-cart-toggle
+      >
         {% render 'icon', name: 'cart' %}
-        <span class="header__cart-count" data-cart-count>{{ cart.item_count }}</span>
+        <span
+          class="header__cart-count{% if cart.item_count == 0 %} is-empty{% endif %}"
+          data-cart-count
+        >{{ cart.item_count }}</span>
       </a>
     </div>
   </div>
 
+  <hr class="flag-rule header__rule">
+</header>
+
+{%- comment -%} ---------- Overlay de pesquisa ---------- {%- endcomment -%}
+<div class="search-panel" id="SearchPanel-{{ section.id }}" data-search-panel hidden>
+  <div class="search-panel__inner page-width">
+    <form action="{{ routes.search_url }}" method="get" role="search" class="search-panel__form">
+      <input type="hidden" name="type" value="product">
+      <label class="visually-hidden" for="SearchInput-{{ section.id }}">{{ 'general.search.search' | t }}</label>
+      {% render 'icon', name: 'search' %}
+      <input
+        type="search"
+        id="SearchInput-{{ section.id }}"
+        name="q"
+        value="{{ search.terms | escape }}"
+        placeholder="{{ 'general.search.placeholder' | t }}"
+        autocomplete="off"
+        class="search-panel__input"
+        data-search-input
+        data-overlay-focus
+      >
+      <button
+        type="button"
+        class="header__icon-btn tap-target"
+        aria-label="{{ 'sections.header.close_search' | t }}"
+        data-search-close
+      >
+        {% render 'icon', name: 'close' %}
+      </button>
+    </form>
+
+    <div class="search-panel__results" data-search-results aria-live="polite"></div>
+  </div>
+</div>
+
+{%- comment -%} ---------- Menu mobile ---------- {%- endcomment -%}
+<div class="mobile-nav" id="MobileNav-{{ section.id }}" data-mobile-nav hidden>
+  <div class="mobile-nav__head">
+    <span class="mobile-nav__title">{{ 'sections.header.menu' | t }}</span>
+    <button
+      type="button"
+      class="header__icon-btn tap-target"
+      aria-label="{{ 'sections.header.close_menu' | t }}"
+      data-menu-close
+    >
+      {% render 'icon', name: 'close' %}
+    </button>
+  </div>
+
+  <ul class="mobile-nav__list" role="list">
+    {%- for link in section.settings.menu.links -%}
+      <li class="mobile-nav__item">
+        {%- if link.links != blank -%}
+          <details class="mobile-nav__details">
+            <summary class="mobile-nav__summary">
+              <span>{{ link.title | escape }}</span>
+              {% render 'icon', name: 'chevron' %}
+            </summary>
+            <ul class="mobile-nav__sub" role="list">
+              <li><a href="{{ link.url }}" class="mobile-nav__sub-link is-all">{{ 'sections.header.view_all_in' | t: title: link.title }}</a></li>
+              {%- for child in link.links -%}
+                <li><a href="{{ child.url }}" class="mobile-nav__sub-link">{{ child.title | escape }}</a></li>
+              {%- endfor -%}
+            </ul>
+          </details>
+        {%- else -%}
+          <a href="{{ link.url }}" class="mobile-nav__link">{{ link.title | escape }}</a>
+        {%- endif -%}
+      </li>
+    {%- endfor -%}
+  </ul>
+
   {%- if section.settings.enable_country_selector or section.settings.enable_language_selector -%}
-    <div class="header__localization">
+    <div class="mobile-nav__localization">
       {% render 'localization-form',
         section_id: section.id,
         show_country: section.settings.enable_country_selector,
@@ -134,154 +249,422 @@
       %}
     </div>
   {%- endif -%}
-</header>
 
-<div class="header__mobile-nav" id="MobileNav-{{ section.id }}" hidden>
-  <ul class="header__mobile-menu" role="list">
-    {%- for link in section.settings.menu.links -%}
-      <li>
-        <a href="{{ link.url }}" class="header__mobile-link">{{ link.title | escape }}</a>
-        {%- if link.links != blank -%}
-          <ul role="list" class="header__mobile-submenu">
-            {%- for child in link.links -%}
-              <li><a href="{{ child.url }}" class="header__mobile-link header__mobile-link--child">{{ child.title | escape }}</a></li>
-            {%- endfor -%}
-          </ul>
-        {%- endif -%}
-      </li>
-    {%- endfor -%}
-  </ul>
+  <p class="mobile-nav__tagline">{{ settings.brand_tagline }}</p>
 </div>
 
 <style>
-  .header__inner {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 20px;
-    padding: 16px 0;
+  /* ---------- Barra ---------- */
+  .header {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background-color: var(--vdn-ink);
+    transition: background-color var(--dur-3) var(--ease-out-quart), box-shadow var(--dur-3) var(--ease-out-quart);
   }
-  .header__logo-image { display: block; height: auto; }
-  .header__logo-text { font-family: var(--font-heading-family); font-size: var(--f4); }
-  .header__nav { flex: 1; }
-  .header__menu {
+
+  /* Na home o cabeçalho flutua por cima do hero escuro até haver scroll. */
+  .header--overlay {
+    background-color: transparent;
+    margin-bottom: calc(var(--header-h) * -1 - 3px);
+  }
+
+  .is-scrolled .header--overlay {
+    background-color: color-mix(in srgb, var(--vdn-ink) 88%, transparent);
+    backdrop-filter: saturate(160%) blur(14px);
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.35);
+  }
+
+  .is-scrolled .header:not(.header--overlay) { box-shadow: 0 8px 30px rgba(0, 0, 0, 0.22); }
+
+  .header__bar {
     display: flex;
     align-items: center;
-    gap: 24px;
+    gap: var(--sp-5);
+    height: var(--header-h);
+    transition: height var(--dur-3) var(--ease-out-quart);
+  }
+
+  .is-scrolled .header__bar { height: 64px; }
+
+  .header__rule {
+    opacity: 0;
+    transition: opacity var(--dur-3) var(--ease-out-quart);
+  }
+
+  .is-scrolled .header__rule { opacity: 1; }
+  .header--overlay .header__rule { opacity: 0; }
+  .is-scrolled .header--overlay .header__rule { opacity: 1; }
+
+  /* ---------- Logótipo ---------- */
+  .header__logo { display: flex; align-items: center; text-decoration: none; flex-shrink: 0; }
+  .header__logo-image { display: block; height: auto; width: auto; max-height: 44px; }
+
+  .header__logo-text {
+    display: flex;
+    align-items: baseline;
+    gap: 0.28em;
+    font-family: var(--font-display);
+    font-style: italic;
+    font-weight: 800;
+    font-size: var(--f4);
+    font-variation-settings: 'wdth' 122;
+    letter-spacing: -0.02em;
+    text-transform: uppercase;
+    line-height: 1;
+    white-space: nowrap;
+  }
+
+  .header__logo-ventos { color: var(--vdn-on-ink); }
+  .header__logo-do { font-size: 0.5em; color: var(--vdn-on-ink-mut); letter-spacing: 0.1em; }
+  .header__logo-norte { color: var(--vdn-azul-lit); }
+
+  /* ---------- Menu desktop ---------- */
+  .header__nav { flex: 1; display: flex; justify-content: center; }
+  .header__menu { display: flex; align-items: center; gap: var(--sp-1); margin: 0; padding: 0; list-style: none; }
+  .header__item { position: relative; }
+
+  .header__link {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    height: 44px;
+    padding: 0 var(--sp-4);
+    font-family: var(--font-display);
+    font-size: var(--f1);
+    font-weight: 600;
+    font-variation-settings: 'wdth' 104;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    text-decoration: none;
+    color: var(--vdn-on-ink);
+    white-space: nowrap;
+  }
+
+  .header__link > span { position: relative; }
+
+  .header__link > span::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: -5px;
+    width: 100%;
+    height: 2px;
+    background: linear-gradient(90deg, var(--vdn-verde), var(--vdn-amarelo));
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform var(--dur-3) var(--ease-out-expo);
+  }
+
+  .header__link:hover > span::after,
+  .header__link.is-active > span::after,
+  .header__item:focus-within > .header__link > span::after { transform: scaleX(1); }
+
+  /* ---------- Mega-menu ---------- */
+  .mega {
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    z-index: 90;
+    width: 100vw;
+    max-width: 100vw;
+    padding-top: 3px;
+    transform: translateX(-50%);
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition: opacity var(--dur-2) var(--ease-out-quart), visibility var(--dur-2);
+  }
+
+  .header__item--mega:hover > .mega,
+  .header__item--mega:focus-within > .mega {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+  }
+
+  .mega__inner {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: var(--sp-8);
+    padding-block: var(--sp-7);
+    background-color: var(--vdn-ink-2);
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow: 0 24px 48px rgba(0, 0, 0, 0.4);
+    max-width: none;
+  }
+
+  .mega__cols {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: var(--sp-5) var(--sp-7);
+    flex: 1;
     margin: 0;
     padding: 0;
     list-style: none;
+    max-width: var(--page-width);
   }
-  .header__menu-item { position: relative; }
-  .header__menu-link,
-  .header__submenu-link {
-    font-family: var(--font-heading-family);
-    font-size: var(--f2);
-    color: var(--color-text);
+
+  .mega__col-title {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-family: var(--font-display);
+    font-size: var(--f1);
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
     text-decoration: none;
-    padding: 8px 0;
-    display: inline-block;
+    color: var(--vdn-on-ink);
   }
-  .header__submenu {
-    position: absolute;
-    top: 100%;
-    left: 0;
-    min-width: 200px;
-    margin: 0;
-    padding: 8px 0;
-    list-style: none;
-    background-color: var(--color-background);
-    border: 1px solid var(--color-border);
-    border-radius: var(--inputs-radius);
-    opacity: 0;
-    visibility: hidden;
-    transform: translateY(6px);
-    transition: opacity 0.15s ease, transform 0.15s ease, visibility 0.15s;
-    z-index: 20;
+
+  .mega__col-title svg { width: 14px; height: 14px; opacity: 0; transform: translate(-4px, 4px); transition: all var(--dur-2) var(--ease-out-quart); }
+  .mega__col-title:hover svg { opacity: 1; transform: none; }
+  .mega__col-title:hover { color: var(--vdn-amarelo); }
+
+  .mega__sub { margin: var(--sp-3) 0 0; padding: 0; list-style: none; display: grid; gap: var(--sp-2); }
+
+  .mega__sub-link {
+    font-size: var(--f2);
+    text-decoration: none;
+    color: var(--vdn-on-ink-mut);
+    transition: color var(--dur-1) var(--ease-out-quart);
   }
-  .header__submenu--nested { top: 0; left: 100%; }
-  .header__menu-item--has-dropdown:hover > .header__submenu,
-  .header__menu-item--has-dropdown:focus-within > .header__submenu,
-  .header__submenu-item--has-dropdown:hover > .header__submenu,
-  .header__submenu-item--has-dropdown:focus-within > .header__submenu {
-    opacity: 1;
-    visibility: visible;
-    transform: translateY(0);
+
+  .mega__sub-link:hover { color: var(--vdn-on-ink); }
+
+  .mega__all {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--sp-2);
+    flex-shrink: 0;
+    padding: var(--sp-3) var(--sp-5);
+    font-family: var(--font-display);
+    font-size: var(--f1);
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    text-decoration: none;
+    color: var(--vdn-ink);
+    background-color: var(--vdn-amarelo);
+    border-radius: var(--buttons-radius);
+    transition: transform var(--dur-2) var(--ease-spring);
   }
-  .header__submenu-item { position: relative; }
-  .header__submenu-link { padding: 6px 16px; width: 100%; }
-  .header__actions { display: flex; align-items: center; gap: 8px; }
-  .header__action-button {
+
+  .mega__all:hover { transform: translateX(4px); }
+
+  /* ---------- Ações ---------- */
+  .header__actions { display: flex; align-items: center; gap: var(--sp-1); margin-left: auto; }
+
+  .header__icon-btn {
+    position: relative;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    position: relative;
-    color: var(--color-text);
+    min-width: 44px;
+    min-height: 44px;
+    color: var(--vdn-on-ink);
     background: none;
     border: none;
+    border-radius: 50%;
     cursor: pointer;
     text-decoration: none;
+    transition: background-color var(--dur-2) var(--ease-out-quart), transform var(--dur-2) var(--ease-spring);
   }
-  .header__action-button svg { width: 22px; height: 22px; }
+
+  .header__icon-btn:hover { background-color: rgba(255, 255, 255, 0.1); transform: translateY(-1px); }
+  .header__icon-btn svg { width: 22px; height: 22px; }
+
   .header__cart-count {
     position: absolute;
-    top: 2px;
+    top: 4px;
     right: 2px;
-    min-width: 18px;
-    height: 18px;
-    padding: 0 4px;
+    min-width: 19px;
+    height: 19px;
+    padding: 0 5px;
+    font-family: var(--font-display);
     font-size: 11px;
-    line-height: 18px;
+    font-weight: 700;
+    line-height: 19px;
     text-align: center;
-    color: var(--color-accent-text);
-    background-color: var(--color-accent);
-    border-radius: 9px;
+    color: #fff;
+    background-color: var(--vdn-verde);
+    border-radius: 10px;
+    transition: transform var(--dur-2) var(--ease-spring);
   }
-  .header__search { position: relative; }
-  .header__search summary { list-style: none; }
-  .header__search summary::-webkit-details-marker { display: none; }
-  .header__search-panel {
-    position: absolute;
-    top: 100%;
-    right: 0;
-    width: 320px;
-    max-width: 90vw;
-    padding: 12px;
-    background-color: var(--color-background);
-    border: 1px solid var(--color-border);
-    border-radius: var(--inputs-radius);
-    z-index: 20;
-  }
-  .header__menu-toggle { display: none; background: none; border: none; }
-  .header__burger,
-  .header__burger::before,
-  .header__burger::after {
-    display: block;
-    width: 22px;
-    height: 2px;
-    background-color: var(--color-text);
-    transition: transform 0.2s ease;
-  }
-  .header__burger { position: relative; }
-  .header__burger::before { content: ''; position: absolute; top: -7px; }
-  .header__burger::after { content: ''; position: absolute; top: 7px; }
-  .header__mobile-nav {
-    padding: 16px 20px;
-    border-top: 1px solid var(--color-border);
-  }
-  .header__mobile-menu, .header__mobile-submenu { list-style: none; margin: 0; padding: 0; }
-  .header__mobile-link { display: block; padding: 12px 0; font-size: var(--f3); color: var(--color-text); text-decoration: none; }
-  .header__mobile-link--child { padding-left: 16px; font-size: var(--f2); opacity: 0.8; }
-  .header__localization { padding: 8px 0; }
 
+  .header__cart-count.is-empty { opacity: 0; transform: scale(0.5); }
+  .header__cart-count.is-bumped { animation: cart-bump 500ms var(--ease-spring); }
+
+  @keyframes cart-bump {
+    0% { transform: scale(1); }
+    35% { transform: scale(1.45); }
+    100% { transform: scale(1); }
+  }
+
+  /* ---------- Overlay de pesquisa ---------- */
+  .search-panel {
+    position: fixed;
+    inset: 0 0 auto;
+    z-index: 130;
+    background-color: var(--vdn-ink);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+    transform: translateY(-100%);
+    transition: transform var(--dur-3) var(--ease-out-expo);
+  }
+
+  .search-panel:not([hidden]) { display: block; }
+  .search-panel.is-open { transform: none; }
+
+  .search-panel__inner { padding-block: var(--sp-5); }
+
+  .search-panel__form {
+    display: flex;
+    align-items: center;
+    gap: var(--sp-3);
+    padding-bottom: var(--sp-4);
+    border-bottom: 2px solid rgba(255, 255, 255, 0.16);
+    color: var(--vdn-on-ink-mut);
+  }
+
+  .search-panel__form > svg { width: 24px; height: 24px; flex-shrink: 0; }
+
+  .search-panel__input {
+    flex: 1;
+    min-height: 48px;
+    padding: 0;
+    font-family: var(--font-display);
+    font-size: var(--f5);
+    font-weight: 600;
+    color: var(--vdn-on-ink);
+    background: none;
+    border: none;
+    outline: none;
+  }
+
+  .search-panel__input::placeholder { color: var(--vdn-on-ink-mut); font-weight: 400; }
+
+  .search-panel__results { max-height: 60vh; overflow-y: auto; }
+  .search-panel__results:not(:empty) { padding-top: var(--sp-5); }
+
+  .search-suggestions { display: grid; gap: var(--sp-2); margin: 0; padding: 0; list-style: none; }
+
+  .search-suggestion {
+    display: flex;
+    align-items: center;
+    gap: var(--sp-4);
+    padding: var(--sp-2);
+    border-radius: var(--inputs-radius);
+    text-decoration: none;
+    color: var(--vdn-on-ink);
+    transition: background-color var(--dur-1) var(--ease-out-quart);
+  }
+
+  .search-suggestion:hover { background-color: rgba(255, 255, 255, 0.07); }
+  .search-suggestion img { width: 56px; height: 56px; object-fit: cover; border-radius: 6px; flex-shrink: 0; background: var(--vdn-ink-3); }
+  .search-suggestion__title { font-size: var(--f2); font-weight: 500; }
+  .search-suggestion__price { font-family: var(--font-display); font-size: var(--f1); font-weight: 700; color: var(--vdn-on-ink-mut); }
+  .search-panel__empty { padding: var(--sp-4) 0; color: var(--vdn-on-ink-mut); }
+
+  /* ---------- Menu mobile ---------- */
+  .mobile-nav {
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    z-index: 130;
+    display: flex;
+    flex-direction: column;
+    width: min(90vw, 420px);
+    padding: var(--sp-5);
+    overflow-y: auto;
+    background-color: var(--vdn-ink);
+    color: var(--vdn-on-ink);
+    transform: translateX(-100%);
+    transition: transform var(--dur-3) var(--ease-out-expo);
+  }
+
+  .mobile-nav.is-open { transform: none; }
+
+  .mobile-nav__head { display: flex; align-items: center; justify-content: space-between; margin-bottom: var(--sp-4); }
+
+  .mobile-nav__title {
+    font-family: var(--font-display);
+    font-size: var(--f1);
+    font-weight: 700;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--vdn-on-ink-mut);
+  }
+
+  .mobile-nav__list { margin: 0; padding: 0; list-style: none; }
+  .mobile-nav__item { border-bottom: 1px solid rgba(255, 255, 255, 0.1); }
+
+  .mobile-nav__link,
+  .mobile-nav__summary {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--sp-3);
+    padding: var(--sp-4) 0;
+    font-family: var(--font-display);
+    font-size: var(--f4);
+    font-weight: 700;
+    font-variation-settings: 'wdth' 108;
+    letter-spacing: 0.01em;
+    text-transform: uppercase;
+    text-decoration: none;
+    color: var(--vdn-on-ink);
+    cursor: pointer;
+    list-style: none;
+  }
+
+  .mobile-nav__summary::-webkit-details-marker { display: none; }
+  .mobile-nav__summary svg { transition: transform var(--dur-2) var(--ease-out-quart); flex-shrink: 0; }
+  .mobile-nav__details[open] .mobile-nav__summary svg { transform: rotate(180deg); }
+  .mobile-nav__details[open] .mobile-nav__summary { color: var(--vdn-amarelo); }
+
+  .mobile-nav__sub { margin: 0 0 var(--sp-4); padding: 0; list-style: none; display: grid; gap: var(--sp-1); }
+
+  .mobile-nav__sub-link {
+    display: block;
+    padding: var(--sp-2) 0 var(--sp-2) var(--sp-4);
+    font-size: var(--f3);
+    text-decoration: none;
+    color: var(--vdn-on-ink-mut);
+    border-left: 2px solid rgba(255, 255, 255, 0.12);
+  }
+
+  .mobile-nav__sub-link:hover { color: var(--vdn-on-ink); border-left-color: var(--vdn-verde); }
+  .mobile-nav__sub-link.is-all { color: var(--vdn-azul-lit); font-weight: 500; }
+
+  .mobile-nav__localization { margin-top: var(--sp-5); }
+
+  .mobile-nav__tagline {
+    margin: auto 0 0;
+    padding-top: var(--sp-6);
+    font-family: var(--font-display);
+    font-style: italic;
+    font-size: var(--f1);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--vdn-on-ink-mut);
+  }
+
+  /* ---------- Breakpoints ---------- */
   @media screen and (max-width: 1000px) {
     .header__nav { display: none; }
-    .header__menu-toggle { display: inline-flex; }
-    .header__inner { justify-content: space-between; }
-    .header__logo-link { margin: 0 auto; }
+    .header__account { display: none; }
+    .header__logo { margin-inline: auto; }
+    .header__bar { gap: var(--sp-2); }
+    .search-panel__input { font-size: var(--f4); }
   }
+
   @media screen and (min-width: 1001px) {
-    .header__mobile-nav { display: none !important; }
+    .header__menu-toggle { display: none; }
+    .mobile-nav { display: none !important; }
   }
 </style>
 
@@ -289,13 +672,89 @@
   (function () {
     var section = document.querySelector('.header[data-section-id="{{ section.id }}"]');
     if (!section) return;
-    var toggle = section.querySelector('.header__menu-toggle');
-    var nav = document.getElementById('MobileNav-{{ section.id }}');
-    if (toggle && nav) {
-      toggle.addEventListener('click', function () {
-        var open = toggle.getAttribute('aria-expanded') === 'true';
-        toggle.setAttribute('aria-expanded', String(!open));
-        nav.hidden = open;
+
+    var searchPanel = document.getElementById('SearchPanel-{{ section.id }}');
+    var mobileNav = document.getElementById('MobileNav-{{ section.id }}');
+    var searchInput = searchPanel && searchPanel.querySelector('[data-search-input]');
+    var results = searchPanel && searchPanel.querySelector('[data-search-results]');
+
+    // Scrim, bloqueio de scroll, Escape e prisão de foco vivem no
+    // assets/overlay.js, que é partilhado com o painel do carrinho.
+    var overlay = window.VDN && window.VDN.overlay;
+    if (!overlay) return;
+
+    section.querySelector('[data-menu-toggle]').addEventListener('click', function () {
+      overlay.open(mobileNav, this);
+    });
+
+    section.querySelector('[data-search-toggle]').addEventListener('click', function () {
+      overlay.open(searchPanel, this);
+    });
+
+    mobileNav.querySelector('[data-menu-close]').addEventListener('click', overlay.close);
+    searchPanel.querySelector('[data-search-close]').addEventListener('click', overlay.close);
+
+    /* ---- Pesquisa preditiva ---- */
+
+    var timer = null;
+    var controller = null;
+
+    var NO_SUGGESTIONS = {{ 'general.search.no_suggestions' | t | json }};
+
+    function renderResults(items) {
+      if (!items.length) {
+        results.innerHTML = '<p class="search-panel__empty">' + NO_SUGGESTIONS + '</p>';
+        return;
+      }
+
+      var html = '<ul class="search-suggestions" role="list">';
+      items.forEach(function (p) {
+        var img = p.featured_image && p.featured_image.url
+          ? '<img src="' + p.featured_image.url + '&width=112" alt="" loading="lazy" width="56" height="56">'
+          : '<img alt="" width="56" height="56">';
+        html +=
+          '<li><a class="search-suggestion" href="' + p.url + '">' + img +
+          '<span class="search-suggestion__title">' + p.title + '</span>' +
+          '<span class="search-suggestion__price">' + (p.price || '') + '</span></a></li>';
+      });
+      results.innerHTML = html + '</ul>';
+    }
+
+    function suggest(term) {
+      // Cancelar o pedido anterior: com escrita rápida as respostas podem
+      // chegar fora de ordem e mostrar sugestões de um termo já abandonado.
+      if (controller) controller.abort();
+      controller = new AbortController();
+
+      // O endpoint .json é bastante mais leve do que renderizar uma secção.
+      fetch(
+        '{{ routes.predictive_search_url }}.json?q=' + encodeURIComponent(term) +
+          '&resources[type]=product&resources[limit]=6',
+        { signal: controller.signal }
+      )
+        .then(function (r) { return r.ok ? r.json() : Promise.reject(r.status); })
+        .then(function (data) {
+          var products = (data.resources && data.resources.results && data.resources.results.products) || [];
+          renderResults(products);
+        })
+        .catch(function (err) {
+          // Abortos são esperados quando o utilizador continua a escrever.
+          if (err && err.name === 'AbortError') return;
+          results.innerHTML = '';
+        });
+    }
+
+    if (searchInput) {
+      searchInput.addEventListener('input', function () {
+        var term = this.value.trim();
+        window.clearTimeout(timer);
+
+        if (term.length < 2) {
+          results.innerHTML = '';
+          return;
+        }
+
+        timer = window.setTimeout(function () { suggest(term); }, 220);
       });
     }
   })();

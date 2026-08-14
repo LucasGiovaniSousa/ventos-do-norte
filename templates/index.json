@@ -1,19 +1,126 @@
 {
   "sections": {
     "hero": {
-      "type": "image-banner",
-      "blocks": {
-        "heading": { "type": "heading", "settings": { "heading": "Welcome to your store" } },
-        "text": { "type": "text", "settings": { "text": "<p>Add your headline and shop link here.</p>" } },
-        "button": { "type": "button", "settings": { "button_label": "Shop now" } }
-      },
-      "block_order": ["heading", "text", "button"],
-      "settings": { "height": "medium", "text_alignment": "center" }
+      "type": "hero-pipa",
+      "settings": {
+        "eyebrow": "Pipas · Linhas · Acessórios",
+        "heading": "Do Brasil para Portugal",
+        "subheading": "Pipas, linhas, rabiolas, petecas e futevôlei. Tudo o que precisas para viver o vento, entregue em todo o país.",
+        "button_label": "Ver catálogo",
+        "button_label_2": "A nossa história",
+        "height": "large",
+        "show_flags": true,
+        "show_scroll_cue": true
+      }
     },
-    "featured": {
+    "faixa_topo": {
+      "type": "faixa-marca",
+      "settings": {
+        "speed": 40,
+        "reverse": false,
+        "diagonal": false
+      }
+    },
+    "categorias": {
+      "type": "categorias-diagonais",
+      "blocks": {
+        "pipas": { "type": "categoria", "settings": { "title": "Pipas", "icon": "pipa" } },
+        "linhas": { "type": "categoria", "settings": { "title": "Linhas e carretéis", "icon": "linha" } },
+        "petecas": { "type": "categoria", "settings": { "title": "Petecas", "icon": "peteca" } },
+        "futevolei": { "type": "categoria", "settings": { "title": "Futevôlei", "icon": "bola" } },
+        "acessorios": { "type": "categoria", "settings": { "title": "Rabiolas e acessórios", "icon": "acessorios" } }
+      },
+      "block_order": ["pipas", "linhas", "petecas", "futevolei", "acessorios"],
+      "settings": {
+        "eyebrow": "O catálogo",
+        "heading": "Escolhe o teu vento",
+        "lead": "Do papel de seda ao ripstop, da linha encerada à peteca de pena natural. Selecionamos o que realmente voa.",
+        "link_label": "Ver tudo"
+      }
+    },
+    "mais_vendidos": {
       "type": "featured-collection",
-      "settings": { "heading": "Featured collection", "products_to_show": 4, "columns_desktop": 4 }
+      "settings": {
+        "eyebrow": "Os favoritos",
+        "heading": "Mais vendidos",
+        "products_to_show": 4,
+        "columns_desktop": 4,
+        "color_scheme": "light",
+        "show_view_all": true
+      }
+    },
+    "lancamento": {
+      "type": "produto-lancamento",
+      "blocks": {
+        "f1": { "type": "feature", "settings": { "text": "Ideal para praia, parque e jardim" } },
+        "f2": { "type": "feature", "settings": { "text": "Toque macio e costura reforçada" } },
+        "f3": { "type": "feature", "settings": { "text": "Aprovada para futevôlei e altinha" } },
+        "f4": { "type": "feature", "settings": { "text": "Perfeita para o convívio entre amigos" } }
+      },
+      "block_order": ["f1", "f2", "f3", "f4"],
+      "settings": {
+        "eyebrow": "Novidade a chegar",
+        "heading": "Bola oficial de Futevôlei Altinha",
+        "text": "<p>Desenvolvida para quem gosta de diversão, praia, amigos e desporto. Toque macio, costura reforçada e o equilíbrio certo para o altinha.</p>",
+        "badge": "Em breve",
+        "button_label": "Avisa-me"
+      }
+    },
+    "novidades": {
+      "type": "featured-collection",
+      "settings": {
+        "eyebrow": "Acabadas de chegar",
+        "heading": "Novidades",
+        "products_to_show": 4,
+        "columns_desktop": 4,
+        "color_scheme": "light",
+        "show_view_all": true
+      }
+    },
+    "faixa_fundo": {
+      "type": "faixa-marca",
+      "settings": {
+        "text": "Do Brasil para Portugal · Ligados pela mesma paixão · Envio para toda a Europa",
+        "speed": 55,
+        "reverse": true,
+        "diagonal": true
+      }
+    },
+    "historia": {
+      "type": "rich-text",
+      "blocks": {
+        "heading": { "type": "heading", "settings": { "heading": "Nascemos de uma saudade" } },
+        "text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>A Ventos do Norte nasceu da vontade de trazer para Portugal aquilo com que crescemos no Brasil: a tarde inteira a empinar pipa, a peteca a passar de mão em mão, a bola a não tocar no chão. Trouxemos os produtos, o cuidado na escolha e a paixão. O vento, esse, já cá estava.</p>"
+          }
+        },
+        "button": { "type": "button", "settings": { "button_label": "Conhece a marca" } }
+      },
+      "block_order": ["heading", "text", "button"]
+    },
+    "pilares": {
+      "type": "pilares",
+      "blocks": {
+        "p1": { "type": "pilar", "settings": { "icon": "truck", "title": "Envio para todo o país", "text": "Expedimos de Portugal em 24–48h úteis." } },
+        "p2": { "type": "pilar", "settings": { "icon": "refresh", "title": "14 dias para devolver", "text": "Não gostaste? Devolves sem complicações." } },
+        "p3": { "type": "pilar", "settings": { "icon": "shield", "title": "Pagamento seguro", "text": "MB WAY, Multibanco, cartão e PayPal." } },
+        "p4": { "type": "pilar", "settings": { "icon": "whatsapp", "title": "Falamos contigo", "text": "Tira dúvidas por WhatsApp antes de comprar." } }
+      },
+      "block_order": ["p1", "p2", "p3", "p4"],
+      "settings": {}
     }
   },
-  "order": ["hero", "featured"]
+  "order": [
+    "hero",
+    "faixa_topo",
+    "categorias",
+    "mais_vendidos",
+    "lancamento",
+    "novidades",
+    "faixa_fundo",
+    "historia",
+    "pilares"
+  ]
 }

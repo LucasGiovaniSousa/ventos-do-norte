@@ -4,23 +4,43 @@
   ============================================================
 
   O QUE FAZ:
-  Renderiza o card de um produto: imagem (com troca de imagem no hover se
-  ativado nas settings), badge de promoção/esgotado, vendor opcional,
-  título e preço (via snippet 'price').
+  A unidade base de todas as grelhas da loja: imagem (com troca no hover),
+  etiquetas de estado, amostras de cor, título, preço e um botão de adição
+  rápida ao carrinho.
 
   COMO USAR:
   {% render 'card-product', card_product: product %}
-  Dentro de um loop de coleção, por exemplo.
+  {% render 'card-product', card_product: product, show_quick_add: false %}
 
   PARÂMETROS:
-  - card_product: objeto product a ser exibido no card.
+  - card_product   (obrigatório) objeto product.
+  - show_quick_add (opcional, por omissão true) mostra o botão de adição rápida.
 
-  OBSERVAÇÕES:
-  O aspect ratio da imagem vem de settings.card_image_ratio
-  ('portrait', 'square' ou 'adapt'). A segunda imagem no hover depende de
-  settings.card_show_second_image; o vendor depende de settings.card_show_vendor.
+  A ADIÇÃO RÁPIDA:
+  Só aparece quando o produto tem uma única variante disponível. Com várias
+  variantes seria preciso escolher tamanho/cor, e adicionar uma à sorte gera
+  devoluções — nesse caso o botão passa a "Escolher opções" e leva à ficha.
+  O formulário é um {% form 'product' %} nativo, por isso funciona sem
+  JavaScript; com JS, o assets/carrinho.js intercepta-o e abre o painel.
+
+  AS AMOSTRAS DE COR:
+  Lidas da opção chamada "Cor"/"Color". Cada valor vira um círculo colorido
+  através de uma CSS custom property — nomes de cor em português e inglês são
+  reconhecidos pelo browser em muitos casos; para os que não são, fica o
+  fallback cinzento e o nome no title.
+
+  ETIQUETAS:
+  Promoção (com percentagem), Novidade (produto criado há menos de 30 dias) e
+  Esgotado. A ordem é intencional: o desconto vende mais do que a novidade.
+
+  ACESSIBILIDADE:
+  O link cobre a imagem e o título; o botão de adição rápida fica FORA do <a>
+  para não aninhar controlos interativos. A imagem secundária é decorativa.
 {%- endcomment -%}
+
 {%- liquid
+  assign show_quick_add = show_quick_add | default: true, allow_false: true
+
   assign ratio = 1
   case settings.card_image_ratio
     when 'portrait'
@@ -32,7 +52,26 @@
         assign ratio = card_product.featured_media.aspect_ratio
       endif
   endcase
+
+  assign on_sale = false
+  if card_product.compare_at_price > card_product.price and card_product.available
+    assign on_sale = true
+    assign saved = card_product.compare_at_price | minus: card_product.price | times: 100.0 | divided_by: card_product.compare_at_price | round
+  endif
+
+  # "Novidade": publicado há menos de 30 dias.
+  assign is_new = false
+  assign age = 'now' | date: '%s' | minus: card_product.published_at | date: '%s'
+  if age < 2592000 and card_product.available and on_sale == false
+    assign is_new = true
+  endif
+
+  assign single_variant = false
+  if card_product.variants.size == 1 and card_product.available
+    assign single_variant = true
+  endif
 -%}
+
 <div class="card-product">
   <a href="{{ card_product.url }}" class="card-product__link">
     <div class="card-product__media" style="padding-bottom: {{ 1 | divided_by: ratio | times: 100 }}%;">
@@ -44,7 +83,7 @@
             loading: 'lazy',
             class: 'card-product__image card-product__image--primary',
             widths: '180, 360, 540, 720',
-            sizes: '(min-width: 1000px) 25vw, 50vw',
+            sizes: '(min-width: 1001px) 25vw, 50vw',
             alt: card_product.featured_media.alt | default: card_product.title | escape
         }}
         {%- if settings.card_show_second_image and card_product.media[1] -%}
@@ -55,27 +94,109 @@
               loading: 'lazy',
               class: 'card-product__image card-product__image--secondary',
               widths: '180, 360, 540, 720',
-              sizes: '(min-width: 1000px) 25vw, 50vw',
-              alt: card_product.media[1].alt | default: card_product.title | escape
+              sizes: '(min-width: 1001px) 25vw, 50vw',
+              alt: ''
           }}
         {%- endif -%}
       {%- else -%}
         {{ 'product-1' | placeholder_svg_tag: 'card-product__image placeholder-svg' }}
       {%- endif -%}
 
-      {%- if card_product.compare_at_price > card_product.price and card_product.available -%}
-        <span class="card-product__badge">{{ 'products.product.on_sale' | t }}</span>
-      {%- elsif card_product.available == false -%}
-        <span class="card-product__badge card-product__badge--sold-out">{{ 'products.product.sold_out' | t }}</span>
-      {%- endif -%}
+      <div class="card-product__badges">
+        {%- if on_sale -%}
+          <span class="badge badge--sale">−{{ saved }}%</span>
+        {%- elsif is_new -%}
+          <span class="badge badge--new">{{ 'products.product.new' | t }}</span>
+        {%- endif -%}
+        {%- unless card_product.available -%}
+          <span class="badge badge--soldout">{{ 'products.product.sold_out' | t }}</span>
+        {%- endunless -%}
+      </div>
     </div>
 
     <div class="card-product__info">
       {%- if settings.card_show_vendor and card_product.vendor != blank -%}
         <span class="card-product__vendor">{{ card_product.vendor }}</span>
       {%- endif -%}
+
       <h3 class="card-product__title">{{ card_product.title | escape }}</h3>
+
+      {%- for option in card_product.options_with_values -%}
+        {%- assign name = option.name | downcase -%}
+        {%- if name == 'cor' or name == 'color' or name == 'cores' -%}
+          <ul class="swatches" role="list" aria-label="{{ option.name | escape }}">
+            {%- for value in option.values limit: 5 -%}
+              {%- liquid
+                # Nomes de cor em português não são cores CSS válidas
+                # ("azul", "vermelho"), por isso são mapeados à mão. O que não
+                # estiver na lista fica com um cinzento neutro — melhor do que
+                # uma amostra invisível.
+                assign key = value | downcase | strip
+                case key
+                  when 'preto', 'preta', 'black'
+                    assign swatch = '#111114'
+                  when 'branco', 'branca', 'white'
+                    assign swatch = '#f3f3ef'
+                  when 'vermelho', 'vermelha', 'red'
+                    assign swatch = '#e63329'
+                  when 'azul', 'blue'
+                    assign swatch = '#1b4fd8'
+                  when 'verde', 'green'
+                    assign swatch = '#00a544'
+                  when 'amarelo', 'amarela', 'yellow'
+                    assign swatch = '#ffc800'
+                  when 'rosa', 'pink'
+                    assign swatch = '#ec4899'
+                  when 'roxo', 'roxa', 'purple'
+                    assign swatch = '#7c3aed'
+                  when 'laranja', 'orange'
+                    assign swatch = '#f97316'
+                  when 'cinzento', 'cinza', 'grey', 'gray'
+                    assign swatch = '#9ca3af'
+                  when 'castanho', 'brown'
+                    assign swatch = '#78432a'
+                  when 'multicolor', 'colorido', 'colorida', 'sortido'
+                    assign swatch = 'linear-gradient(135deg,#e63329,#ffc800,#00a544,#1b4fd8)'
+                  else
+                    assign swatch = '#c9c6bd'
+                endcase
+              -%}
+              <li
+                class="swatches__dot"
+                style="--swatch: {{ swatch }};"
+                title="{{ value | escape }}"
+              ></li>
+            {%- endfor -%}
+            {%- if option.values.size > 5 -%}
+              <li class="swatches__more">+{{ option.values.size | minus: 5 }}</li>
+            {%- endif -%}
+          </ul>
+          {%- break -%}
+        {%- endif -%}
+      {%- endfor -%}
+
       {% render 'price', product: card_product, use_variant: false, show_compare: true, price_class: 'price--card' %}
     </div>
   </a>
+
+  {%- comment -%}
+    Fora do <a> de propósito: um <button> ou <form> dentro de um link é markup
+    inválido e quebra a navegação por teclado.
+  {%- endcomment -%}
+  {%- if show_quick_add and card_product.available -%}
+    <div class="card-product__add">
+      {%- if single_variant -%}
+        {%- form 'product', card_product, data-type: 'add-to-cart-form', class: 'card-product__form' -%}
+          <input type="hidden" name="id" value="{{ card_product.selected_or_first_available_variant.id }}">
+          <button type="submit" name="add" class="button button--primary button--small button--full">
+            {{ 'products.product.quick_add' | t }}
+          </button>
+        {%- endform -%}
+      {%- else -%}
+        <a href="{{ card_product.url }}" class="button button--secondary button--small button--full">
+          {{ 'products.product.choose_options' | t }}
+        </a>
+      {%- endif -%}
+    </div>
+  {%- endif -%}
 </div>

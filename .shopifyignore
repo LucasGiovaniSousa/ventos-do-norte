@@ -1,0 +1,14 @@
+# Ficheiros que NÃO devem ser enviados para a loja Shopify.
+# O tema só usa: assets/ config/ layout/ locales/ sections/ snippets/ templates/
+
+# Material de apoio ao projeto (fotos originais, CSV de importação, notas).
+# Vive no repositório para ficar versionado, mas não pertence ao tema.
+# Padrão com glob explícito: "data/" sozinho gera aviso no Shopify CLI.
+data/*
+data/**/*
+
+# Documentação
+*.md
+
+# Sistema
+.DS_Store

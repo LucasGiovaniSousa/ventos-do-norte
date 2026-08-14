@@ -12,7 +12,15 @@
           "type": "buy_buttons",
           "settings": { "show_dynamic_checkout": true }
         },
+        "trust": { "type": "trust" },
         "description": { "type": "description" },
+        "envios": {
+          "type": "accordion",
+          "settings": {
+            "heading": "Envios e devoluções",
+            "content": "<p>Expedimos de Portugal em 24–48h úteis. Entrega em 1 a 3 dias úteis no continente. Tens 14 dias para devolver, desde que o produto venha por usar e na embalagem original.</p>"
+          }
+        },
         "share": { "type": "share" }
       },
       "block_order": [
@@ -22,7 +30,9 @@
         "variant_picker",
         "quantity",
         "buy_buttons",
+        "trust",
         "description",
+        "envios",
         "share"
       ]
     },

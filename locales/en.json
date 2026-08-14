@@ -6,7 +6,7 @@
     },
     "404": {
       "title": "Page not found",
-      "subtext": "The page you are looking for does not exist."
+      "subtext": "The page you're looking for doesn't exist. Maybe the wind took it."
     },
     "password_page": {
       "password_label": "Password",
@@ -15,12 +15,13 @@
     },
     "search": {
       "search": "Search",
-      "placeholder": "Search",
+      "placeholder": "Search kites, lines, shuttlecocks…",
       "submit": "Search",
       "results_with_count": "{{ count }} result for \"{{ terms }}\"",
       "results_with_count_plural": "{{ count }} results for \"{{ terms }}\"",
       "no_results": "No results found for \"{{ terms }}\". Check the spelling or use a different word or phrase.",
-      "reset": "Clear search term"
+      "reset": "Clear search term",
+      "no_suggestions": "No suggestions. Press Enter to see all results."
     },
     "pagination": {
       "label": "Pagination",
@@ -34,8 +35,8 @@
     "continue_shopping": "Continue shopping",
     "newsletter_form": {
       "newsletter_email": "Email",
-      "email_placeholder": "Email",
-      "confirmation": "Thanks for subscribing.",
+      "email_placeholder": "Your email",
+      "confirmation": "Thanks! You're on board.",
       "button_label": "Subscribe"
     }
   },
@@ -65,7 +66,7 @@
   },
   "newsletter": {
     "label": "Email",
-    "success": "Thanks for subscribing.",
+    "success": "Thanks! You're on board.",
     "button_label": "Subscribe"
   },
   "products": {
@@ -112,7 +113,24 @@
         "play_video": "Play video"
       },
       "choose_options": "Choose options",
-      "choose_product_options": "Choose options for {{ product_name }}"
+      "choose_product_options": "Choose options for {{ product_name }}",
+      "quick_add": "Quick add",
+      "added_to_cart": "Added to cart",
+      "new": "New",
+      "in_stock": "In stock — ships within 24h",
+      "low_stock": "Only {{ count }} left",
+      "out_of_stock": "Currently out of stock",
+      "save_amount": "Save {{ amount }}",
+      "specifications": "Specifications",
+      "shipping_returns": "Shipping & returns",
+      "trust": {
+        "shipping_title": "Nationwide shipping",
+        "shipping_text": "Dispatched from Portugal in 24–48 working hours.",
+        "returns_title": "14-day returns",
+        "returns_text": "Changed your mind? Send it back, no fuss.",
+        "secure_title": "Secure payment",
+        "secure_text": "MB WAY, Multibanco, card and PayPal."
+      }
     },
     "facets": {
       "sort_by_label": "Sort by:",
@@ -125,7 +143,10 @@
       "from": "From",
       "to": "To",
       "product_count": "{{ product_count }} of {{ count }} products",
-      "product_count_simple": "{{ count }} products"
+      "product_count_simple": "{{ count }} products",
+      "filter_drawer_title": "Filter products",
+      "active_filters": "Active filters",
+      "show_results": "Show results"
     }
   },
   "templates": {
@@ -172,7 +193,13 @@
       "cart_count": {
         "one": "{{ count }} item",
         "other": "{{ count }} items"
-      }
+      },
+      "open_menu": "Open menu",
+      "close_menu": "Close menu",
+      "open_search": "Open search",
+      "close_search": "Close search",
+      "open_cart": "Open cart",
+      "view_all_in": "View all in {{ title }}"
     },
     "cart": {
       "title": "Your cart",
@@ -196,12 +223,20 @@
       "subtotal": "Subtotal",
       "new_subtotal": "New subtotal",
       "update": "Update",
-      "remove": "Remove"
+      "remove": "Remove",
+      "empty_subtext": "Let's get it flying. Discover our kites, lines and shuttlecocks.",
+      "view_cart": "View cart",
+      "free_shipping_progress_html": "You're <strong>{{ amount }}</strong> away from free shipping",
+      "free_shipping_reached": "Nice! You've got free shipping 🎉"
     },
     "footer": {
       "payment": "Payment methods",
       "rights": "All rights reserved.",
-      "base_by_html": "Base by <a href=\"{{ link }}\" target=\"_blank\" rel=\"noopener\">Team Lecdt</a>"
+      "base_by_html": "Base by <a href=\"{{ link }}\" target=\"_blank\" rel=\"noopener\">Team Lecdt</a>",
+      "newsletter_title": "Catch the wind first",
+      "newsletter_text": "New arrivals, launches and offers — no spam, promise.",
+      "follow_us": "Follow us",
+      "brand_line": "From Brazil to Portugal, bound by the same passion"
     },
     "collection_list": {
       "view_all": "View all"
@@ -209,6 +244,13 @@
     "featured_collection": {
       "view_all": "View all",
       "view_all_label": "View all products in the {{ collection_name }} collection"
+    },
+    "pilares": {
+      "pipas": "Kites",
+      "linhas": "Lines",
+      "acessorios": "Accessories",
+      "qualidade": "Quality",
+      "paixao": "Passion"
     }
   },
   "customer": {

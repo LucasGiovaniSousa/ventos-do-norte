@@ -1,2 +1,8 @@
 .DS_Store
 .shopify
+
+# Vídeos originais (~41 MB). Ficam no disco para carregar no admin do Shopify,
+# mas não em git: ficheiros binários grandes incham o repositório para sempre,
+# porque cada versão fica guardada no histórico. As fotos (~3 MB) ficam
+# versionadas, essas compensam.
+data/imagens/*.mp4
