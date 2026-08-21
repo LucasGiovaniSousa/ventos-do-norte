@@ -123,6 +123,80 @@
     </g>
   </svg>
 
+  {%- comment -%}
+    ---------- A pipa ----------
+    Camada directa do hero, e NÃO uma coluna dentro do .hero__inner.
+
+    A razão é o mix-blend-mode. O `screen` funde um elemento com o que está
+    pintado por baixo DENTRO DO MESMO CONTEXTO DE EMPILHAMENTO. O .hero__inner
+    tem z-index, portanto é um contexto próprio; lá dentro, por baixo da pipa,
+    só há vazio — e o vídeo aparecia como um rectângulo preto por não ter nada
+    com que fundir. Aqui, o contexto é o do .hero: por baixo estão o véu, o
+    brilho e as linhas de vento, e o preto do vídeo desaparece contra eles.
+  {%- endcomment -%}
+  {%- liquid
+    # O painel da direita, por ordem de preferência:
+    #   1. vídeo escolhido no editor (settings.kite_video)
+    #   2. o vídeo que vem com o tema (assets/hero-pipa.mp4)
+    #   3. a imagem de produto
+    # O nº 2 existe para a loja abrir já com a pipa a voar, sem carregamentos.
+    assign tem_video_editor = false
+    if section.settings.kite_video != blank
+      assign tem_video_editor = true
+    endif
+
+    assign usar_video_tema = false
+    if tem_video_editor == false and section.settings.use_default_kite
+      assign usar_video_tema = true
+    endif
+
+    assign e_video = false
+    if tem_video_editor or usar_video_tema
+      assign e_video = true
+    endif
+  -%}
+  {%- if e_video or section.settings.product_image != blank -%}
+    <div class="hero__product{% if e_video %} hero__product--video{% endif %}" data-parallax="0.02">
+      {%- if tem_video_editor -%}
+        <video
+          class="hero__product-video"
+          autoplay
+          muted
+          loop
+          playsinline
+          aria-hidden="true"
+          {% if section.settings.product_image != blank %}poster="{{ section.settings.product_image | image_url: width: 1200 }}"{% endif %}
+        >
+          <source src="{{ section.settings.kite_video.sources[1].url }}" type="video/mp4">
+        </video>
+      {%- elsif usar_video_tema -%}
+        <video
+          class="hero__product-video"
+          autoplay
+          muted
+          loop
+          playsinline
+          aria-hidden="true"
+          poster="{{ 'hero-pipa-poster.jpg' | asset_url }}"
+        >
+          <source src="{{ 'hero-pipa.mp4' | asset_url }}" type="video/mp4">
+        </video>
+      {%- else -%}
+        {%- assign kite_alt = section.settings.product_image.alt | default: '' | escape -%}
+        {{
+          section.settings.product_image
+          | image_url: width: 1400
+          | image_tag:
+            class: 'hero__product-image',
+            widths: '400, 700, 1000, 1400',
+            sizes: '(min-width: 1001px) 50vw, 88vw',
+            fetchpriority: 'high',
+            alt: kite_alt
+        }}
+      {%- endif -%}
+    </div>
+  {%- endif -%}
+
   <div class="hero__inner page-width">
     <div class="hero__content" data-reveal-stagger="110">
       {%- if section.settings.eyebrow != blank -%}
@@ -163,74 +237,6 @@
       {%- endif -%}
     </div>
 
-    {%- comment -%}
-      O painel da direita, por ordem de preferência:
-        1. vídeo escolhido no editor (settings.kite_video)
-        2. o vídeo que vem com o tema (assets/hero-pipa.mp4)
-        3. a imagem de produto
-
-      O nº 2 existe para a loja já abrir com a pipa a voar, sem ninguém ter de
-      carregar nada. Quem quiser trocar por outro vídeo fá-lo pelo editor, e
-      essa escolha ganha sempre.
-    {%- endcomment -%}
-    {%- liquid
-      assign tem_video_editor = false
-      if section.settings.kite_video != blank
-        assign tem_video_editor = true
-      endif
-
-      assign usar_video_tema = false
-      if tem_video_editor == false and section.settings.use_default_kite
-        assign usar_video_tema = true
-      endif
-    -%}
-    {%- liquid
-      assign e_video = false
-      if tem_video_editor or usar_video_tema
-        assign e_video = true
-      endif
-    -%}
-    {%- if e_video or section.settings.product_image != blank -%}
-      <div class="hero__product{% if e_video %} hero__product--video{% endif %}" data-parallax="0.08">
-        {%- if tem_video_editor -%}
-          <video
-            class="hero__product-video"
-            autoplay
-            muted
-            loop
-            playsinline
-            aria-hidden="true"
-            {% if section.settings.product_image != blank %}poster="{{ section.settings.product_image | image_url: width: 1200 }}"{% endif %}
-          >
-            <source src="{{ section.settings.kite_video.sources[1].url }}" type="video/mp4">
-          </video>
-        {%- elsif usar_video_tema -%}
-          <video
-            class="hero__product-video"
-            autoplay
-            muted
-            loop
-            playsinline
-            aria-hidden="true"
-            poster="{{ 'hero-pipa-poster.jpg' | asset_url }}"
-          >
-            <source src="{{ 'hero-pipa.mp4' | asset_url }}" type="video/mp4">
-          </video>
-        {%- else -%}
-          {%- assign kite_alt = section.settings.product_image.alt | default: '' | escape -%}
-          {{
-            section.settings.product_image
-            | image_url: width: 1400
-            | image_tag:
-              class: 'hero__product-image',
-              widths: '400, 700, 1000, 1400',
-              sizes: '(min-width: 1001px) 50vw, 88vw',
-              fetchpriority: 'high',
-              alt: kite_alt
-          }}
-        {%- endif -%}
-      </div>
-    {%- endif -%}
   </div>
 
   {%- if section.settings.show_scroll_cue -%}
@@ -292,18 +298,19 @@
   }
 
   /* ---------- Conteúdo ---------- */
+  /* O texto vive na metade esquerda. A metade direita fica deliberadamente
+     vazia: é o espaço onde a pipa flutua, em camada própria. */
   .hero__inner {
     position: relative;
     z-index: 2;
-    display: grid;
-    /* A pipa manda: fica com a coluna maior, à direita, longe do texto. */
-    grid-template-columns: minmax(0, 0.92fr) minmax(0, 1.08fr);
-    align-items: center;
-    gap: var(--sp-6);
     width: 100%;
   }
 
   .hero__content { max-width: 42ch; }
+
+  @media screen and (min-width: 1001px) {
+    .hero__content { max-width: min(48%, 46ch); }
+  }
   .hero__eyebrow { color: var(--vdn-amarelo); }
   .hero__eyebrow::before { background: var(--vdn-amarelo); }
 
@@ -358,7 +365,18 @@
   }
 
   /* ---------- Produto ---------- */
-  .hero__product { position: relative; will-change: transform; }
+  /* z-index 1: acima das linhas de vento (-1) e do véu (-2), abaixo do texto
+     (2). A pipa passa por cima do fundo mas nunca por cima das palavras. */
+  .hero__product {
+    position: absolute;
+    top: 50%;
+    right: -2%;
+    z-index: 1;
+    width: 52%;
+    max-width: 760px;
+    translate: 0 -50%;
+    will-change: transform;
+  }
 
   .hero__product-image {
     display: block;
@@ -380,20 +398,18 @@
      não teria nada com que fundir — era daí que vinha o rectângulo preto.
      Declarado aqui, funde com o que está pintado por baixo dentro do hero:
      as linhas de vento e o brilho de fundo. */
-  .hero__product--video {
-    mix-blend-mode: screen;
-    /* Transbordar a coluna: a pipa passa por cima das linhas em vez de ficar
-       arrumada num painel. */
-    width: 128%;
-    margin-left: -14%;
-    margin-block: -8%;
-  }
+  /* `screen` faz o preto desaparecer: screen com preto devolve o fundo
+     intacto, e só a pipa, que é clara, sobrevive à mistura. É o equivalente a
+     um canal alfa sem precisar de vídeo com alfa — que, em WebM VP9 ou HEVC,
+     nenhum browser suporta de forma consistente. */
+  .hero__product--video { mix-blend-mode: screen; }
 
   .hero__product-video {
     display: block;
     width: 100%;
     height: auto;
-    animation: hero-float 9s ease-in-out infinite;
+    /* Sem animação CSS: o balanço já vem do vídeo. Sobrepor um flutuar em CSS
+       fazia a pipa derivar pelo ecrã — exactamente o que se pediu para evitar. */
   }
 
   /* Sem drop-shadow no vídeo: a sombra desenharia a silhueta do RECTÂNGULO do
@@ -452,13 +468,16 @@
     .hero { padding-bottom: var(--sp-7); }
     .hero--small, .hero--medium, .hero--large { min-height: 0; }
 
-    .hero__inner {
-      grid-template-columns: 1fr;
-      gap: var(--sp-6);
+    /* No telemóvel não há metade livre: a pipa sobe para o canto superior
+       direito e fica como atmosfera atrás do texto, mais discreta para não
+       disputar legibilidade com o título. */
+    .hero__product {
+      top: 22%;
+      right: -16%;
+      width: 80%;
+      max-width: 430px;
+      opacity: 0.72;
     }
-
-    /* No telemóvel o produto entra primeiro: é o que prende o olhar. */
-    .hero__product { order: -1; max-width: 320px; margin-inline: auto; }
     .hero__content { max-width: none; }
     .hero__cue { display: none; }
     .hero__veil { background: linear-gradient(180deg, rgba(10, 10, 11, 0.45) 0%, rgba(10, 10, 11, 0.85) 55%, var(--vdn-ink) 100%); }
