@@ -322,7 +322,11 @@
   /* ---------- Menu desktop ---------- */
   .header__nav { flex: 1; display: flex; justify-content: center; }
   .header__menu { display: flex; align-items: center; gap: var(--sp-1); margin: 0; padding: 0; list-style: none; }
-  .header__item { position: relative; }
+  /* SEM position:relative de propósito. O mega-menu posiciona-se em relação ao
+     .header (que é sticky, logo já é um bloco contentor), o que lhe permite usar
+     left/right: 0 em vez de 100vw. O 100vw inclui a largura da barra de scroll e
+     era a segunda fonte de deslize horizontal. */
+  .header__item { }
 
   .header__link {
     position: relative;
@@ -364,12 +368,10 @@
   .mega {
     position: absolute;
     top: 100%;
-    left: 50%;
+    left: 0;
+    right: 0;
     z-index: 90;
-    width: 100vw;
-    max-width: 100vw;
     padding-top: 3px;
-    transform: translateX(-50%);
     opacity: 0;
     visibility: hidden;
     pointer-events: none;

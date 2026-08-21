@@ -451,6 +451,14 @@
         },
         "show_scroll_cue": {
           "label": "Show scroll cue"
+        },
+        "kite_video": {
+          "label": "Kite video (right panel)",
+          "info": "Replaces the featured image. Plays muted and looped, blended into the dark background."
+        },
+        "use_default_kite": {
+          "label": "Use the theme's animated kite",
+          "info": "Shows the video bundled with the theme when you haven't picked your own."
         }
       }
     },

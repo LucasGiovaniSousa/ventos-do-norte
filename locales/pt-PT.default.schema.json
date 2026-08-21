@@ -451,6 +451,14 @@
         },
         "show_scroll_cue": {
           "label": "Mostrar indicador de scroll"
+        },
+        "kite_video": {
+          "label": "Vídeo da pipa (painel direito)",
+          "info": "Substitui a imagem em destaque. Reproduz sem som e em loop, e funde-se no fundo escuro."
+        },
+        "use_default_kite": {
+          "label": "Usar a pipa animada do tema",
+          "info": "Mostra o vídeo incluído no tema quando não escolheres um vídeo teu."
         }
       }
     },

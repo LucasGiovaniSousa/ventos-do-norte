@@ -109,18 +109,66 @@
       {%- endif -%}
     </div>
 
-    {%- if section.settings.product_image != blank -%}
-      <div class="hero__product" data-parallax="0.06">
-        {{
-          section.settings.product_image
-          | image_url: width: 1200
-          | image_tag:
-            class: 'hero__product-image',
-            widths: '400, 600, 900, 1200',
-            sizes: '(min-width: 1001px) 42vw, 80vw',
-            fetchpriority: 'high',
-            alt: section.settings.product_image.alt | default: '' | escape
-        }}
+    {%- comment -%}
+      O painel da direita, por ordem de preferência:
+        1. vídeo escolhido no editor (settings.kite_video)
+        2. o vídeo que vem com o tema (assets/hero-pipa.mp4)
+        3. a imagem de produto
+
+      O nº 2 existe para a loja já abrir com a pipa a voar, sem ninguém ter de
+      carregar nada. Quem quiser trocar por outro vídeo fá-lo pelo editor, e
+      essa escolha ganha sempre.
+    {%- endcomment -%}
+    {%- liquid
+      assign tem_video_editor = false
+      if section.settings.kite_video != blank
+        assign tem_video_editor = true
+      endif
+
+      assign usar_video_tema = false
+      if tem_video_editor == false and section.settings.use_default_kite
+        assign usar_video_tema = true
+      endif
+    -%}
+    {%- if tem_video_editor or usar_video_tema or section.settings.product_image != blank -%}
+      <div class="hero__product" data-parallax="0.08">
+        {%- if tem_video_editor -%}
+          <video
+            class="hero__product-video"
+            autoplay
+            muted
+            loop
+            playsinline
+            aria-hidden="true"
+            {% if section.settings.product_image != blank %}poster="{{ section.settings.product_image | image_url: width: 1200 }}"{% endif %}
+          >
+            <source src="{{ section.settings.kite_video.sources[1].url }}" type="video/mp4">
+          </video>
+        {%- elsif usar_video_tema -%}
+          <video
+            class="hero__product-video"
+            autoplay
+            muted
+            loop
+            playsinline
+            aria-hidden="true"
+            poster="{{ 'hero-pipa-poster.jpg' | asset_url }}"
+          >
+            <source src="{{ 'hero-pipa.mp4' | asset_url }}" type="video/mp4">
+          </video>
+        {%- else -%}
+          {%- assign kite_alt = section.settings.product_image.alt | default: '' | escape -%}
+          {{
+            section.settings.product_image
+            | image_url: width: 1400
+            | image_tag:
+              class: 'hero__product-image',
+              widths: '400, 700, 1000, 1400',
+              sizes: '(min-width: 1001px) 50vw, 88vw',
+              fetchpriority: 'high',
+              alt: kite_alt
+          }}
+        {%- endif -%}
       </div>
     {%- endif -%}
   </div>
@@ -139,15 +187,19 @@
     align-items: center;
     overflow: hidden;
     isolation: isolate;
-    padding-top: calc(var(--header-h) + var(--sp-7));
-    padding-bottom: var(--sp-8);
+    /* O padding-top reserva a altura do cabeçalho, que flutua por cima. */
+    padding-top: calc(var(--header-h) + var(--sp-5));
+    padding-bottom: var(--sp-6);
     background-color: var(--vdn-ink);
     color: var(--vdn-on-ink);
   }
 
-  .hero--small { min-height: 62vh; }
-  .hero--medium { min-height: 78vh; }
-  .hero--large { min-height: 92vh; }
+  /* svh = "small viewport height": a altura com as barras do browser VISÍVEIS.
+     Com vh, no telemóvel, o hero fica mais alto do que o ecrã e os botões caem
+     abaixo da dobra até o utilizador deslizar. */
+  .hero--small { min-height: 70svh; }
+  .hero--medium { min-height: 85svh; }
+  .hero--large { min-height: 100svh; }
 
   /* ---------- Camadas de fundo ---------- */
   .hero__media {
@@ -184,30 +236,34 @@
     position: relative;
     z-index: 2;
     display: grid;
-    grid-template-columns: minmax(0, 1fr) minmax(0, 0.85fr);
+    /* A pipa manda: fica com a coluna maior, à direita, longe do texto. */
+    grid-template-columns: minmax(0, 0.92fr) minmax(0, 1.08fr);
     align-items: center;
-    gap: var(--sp-7);
+    gap: var(--sp-6);
     width: 100%;
   }
 
-  .hero__content { max-width: 40ch; }
+  .hero__content { max-width: 42ch; }
   .hero__eyebrow { color: var(--vdn-amarelo); }
   .hero__eyebrow::before { background: var(--vdn-amarelo); }
 
+  /* Escala própria, mais contida do que a --f9: o objetivo é o bloco inteiro
+     (sobrelinha + título + texto + botões) caber no primeiro ecrã de um portátil
+     sem obrigar a deslizar para ver os botões. */
   .hero__title {
-    margin: 0 0 var(--sp-5);
-    font-size: var(--f9);
+    margin: 0 0 var(--sp-4);
+    font-size: clamp(2.5rem, 1.2rem + 3.9vw, 4.75rem);
     color: var(--vdn-on-ink);
     /* O contraluz separa o título da imagem quando esta passa por trás. */
     text-shadow: 0 2px 40px rgba(10, 10, 11, 0.6);
   }
 
   .hero__sub {
-    margin: 0 0 var(--sp-6);
-    font-size: var(--f4);
+    margin: 0 0 var(--sp-5);
+    font-size: var(--f3);
     line-height: 1.5;
     color: var(--vdn-on-ink-mut);
-    max-width: 44ch;
+    max-width: 42ch;
   }
 
   .hero__actions { display: flex; flex-wrap: wrap; gap: var(--sp-3); }
@@ -217,8 +273,8 @@
     display: flex;
     align-items: center;
     gap: var(--sp-3);
-    margin-top: var(--sp-7);
-    padding-top: var(--sp-5);
+    margin-top: var(--sp-5);
+    padding-top: var(--sp-4);
     border-top: 1px solid rgba(255, 255, 255, 0.12);
   }
 
@@ -244,13 +300,21 @@
   /* ---------- Produto ---------- */
   .hero__product { position: relative; will-change: transform; }
 
-  .hero__product-image {
+  .hero__product-image,
+  .hero__product-video {
     display: block;
     width: 100%;
     height: auto;
     /* Sombra projetada em vez de box-shadow: acompanha o recorte do PNG. */
     filter: drop-shadow(0 30px 60px rgba(0, 0, 0, 0.55));
     animation: hero-float 7s ease-in-out infinite;
+  }
+
+  /* O vídeo vem com fundo; o modo `screen` deixa o preto dele fundir-se no
+     fundo escuro da secção, o que dá o efeito de a pipa flutuar sem moldura. */
+  .hero__product-video {
+    mix-blend-mode: screen;
+    border-radius: var(--media-radius);
   }
 
   @keyframes hero-float {
@@ -282,6 +346,23 @@
   @keyframes cue-drop {
     0% { transform: translateY(-100%); }
     60%, 100% { transform: translateY(200%); }
+  }
+
+  /* ---------- Ecrãs baixos ----------
+     Portáteis de 13" em janela não maximizada ficam com ~650px de altura útil.
+     Aqui encolhe-se o que é acessório para os botões continuarem visíveis sem
+     deslizar: a linha da rota sai, os espaços apertam. */
+  @media screen and (min-width: 1001px) and (max-height: 820px) {
+    .hero__title { font-size: clamp(2.25rem, 1rem + 3vw, 3.5rem); }
+    .hero__sub { font-size: var(--f2); margin-bottom: var(--sp-4); }
+    .hero__route { margin-top: var(--sp-4); padding-top: var(--sp-3); }
+  }
+
+  @media screen and (min-width: 1001px) and (max-height: 700px) {
+    .hero--large { min-height: 0; }
+    .hero__route { display: none; }
+    .hero__cue { display: none; }
+    .hero__eyebrow { margin-bottom: var(--sp-2); }
   }
 
   /* ---------- Breakpoints ---------- */
@@ -346,6 +427,19 @@
       "id": "product_image",
       "label": "t:sections.hero_pipa.settings.product_image.label",
       "info": "t:sections.hero_pipa.settings.product_image.info"
+    },
+    {
+      "type": "video",
+      "id": "kite_video",
+      "label": "t:sections.hero_pipa.settings.kite_video.label",
+      "info": "t:sections.hero_pipa.settings.kite_video.info"
+    },
+    {
+      "type": "checkbox",
+      "id": "use_default_kite",
+      "default": true,
+      "label": "t:sections.hero_pipa.settings.use_default_kite.label",
+      "info": "t:sections.hero_pipa.settings.use_default_kite.info"
     },
     {
       "type": "header",

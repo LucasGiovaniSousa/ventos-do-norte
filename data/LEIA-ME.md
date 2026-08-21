@@ -63,3 +63,40 @@ exposição em pesquisas mas **não resolve a questão de fundo**. Vale a pena
 confirmar com o fornecedor se as estampas são licenciadas; se não forem, o mais
 seguro é vender apenas os desenhos genéricos (estrelas, caveiras, geométricos),
 que são a maioria do stock.
+
+---
+
+# `produto/` — fotos prontas para o catálogo
+
+Recortadas com a Vision framework do macOS (o mesmo motor do "Remover fundo" da
+Pré-visualização), compostas sobre branco puro e enquadradas em 2000×2000 com
+8% de margem. A margem e o tamanho são iguais em todas de propósito: é isso que
+faz a grelha do catálogo parecer alinhada em vez de cada produto flutuar num
+sítio diferente do card.
+
+O utilitário está em `/private/tmp/.../bgtool/` (temporário). Se for preciso
+repetir, o código está no histórico desta conversa — são ~80 linhas de Swift.
+
+## Prontas a usar (10)
+
+| Ficheiro | Nota |
+|---|---|
+| `bola-futevolei-vdn-marca.jpg` | **A melhor do lote.** Bola com a marca impressa. Imagem principal do lançamento. |
+| `bola-futevolei-ultratermo.jpg` · `-approved.jpg` · `-frente.jpg` · `-lisa.jpg` | Outros ângulos. A legenda "imagem meramente ilustrativa" foi removida no recorte. |
+| `peteca-altiva-branca.jpg` · `-tricolor.jpg` · `-neon.jpg` | Recorte limpo, penas incluídas. |
+| `pipa-estrelas-rosa-recorte.jpg` | A única pipa que já vinha em fundo limpo. |
+| `pipa-personagem-heroi.jpg` | Recorte perfeito — estava pendurada, não pousada. |
+
+## Em `produto/_rever/` (5) — precisam de refotografia
+
+Nestas, a pipa está **pousada sobre o carretel de madeira**, sobreposta a ele.
+Nenhum recorte automático os separa: para o segmentador são um só objeto. Testei
+a Vision do macOS e o removedor do Higgsfield — os dois trazem o carretel junto.
+
+Não é limitação da ferramenta, é da fotografia. A solução é rápida:
+
+> Pendura a pipa contra uma parede lisa e clara (ou um lençol branco), com luz
+> de dia por uma janela lateral, e fotografa de frente. Foi assim que a
+> `pipa-personagem-heroi` saiu perfeita — e essa foi tirada na mesma loja.
+
+Depois é só voltar a passar pelo recorte.

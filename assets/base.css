@@ -89,6 +89,16 @@ summary:focus-visible,
    2. LAYOUT
    ========================================================== */
 
+/* Rede de segurança contra deslize horizontal.
+   `clip` e não `hidden`: o `hidden` transformaria o <html> num contentor de
+   scroll e partiria todos os `position: sticky` da loja (cabeçalho, barra de
+   filtros, coluna do produto). O `clip` corta sem criar esse contentor.
+   Isto é a rede, não a solução — cada elemento que transborde deve ser
+   corrigido na origem. */
+html {
+  overflow-x: clip;
+}
+
 .page-width {
   width: 100%;
   max-width: var(--page-width);

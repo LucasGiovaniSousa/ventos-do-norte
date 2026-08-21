@@ -33,10 +33,17 @@
   assign items = text | split: '·'
 -%}
 
-<div
-  class="faixa vdn-section--dark{% if section.settings.reverse %} marquee--reverse{% endif %}{% if section.settings.diagonal %} faixa--diagonal{% endif %} marquee"
-  style="--marquee-duration: {{ section.settings.speed }}s;"
->
+{%- comment -%}
+  O invólucro existe só para recortar. Inclinar uma faixa de largura total faz a
+  sua caixa envolvente ficar MAIS LARGA do que o ecrã, e o documento passa a
+  deslizar na horizontal. O .faixa-wrap corta esse excesso; a inclinação
+  continua a ler-se porque a faixa sangra para fora dele.
+{%- endcomment -%}
+<div class="faixa-wrap{% if section.settings.diagonal %} faixa-wrap--diagonal{% endif %}">
+  <div
+    class="faixa vdn-section--dark{% if section.settings.reverse %} marquee--reverse{% endif %}{% if section.settings.diagonal %} faixa--diagonal{% endif %} marquee"
+    style="--marquee-duration: {{ section.settings.speed }}s;"
+  >
   {%- comment -%}
     Duas cópias idênticas: a primeira é lida, a segunda só existe para o loop.
   {%- endcomment -%}
@@ -55,7 +62,8 @@
         {%- endif -%}
       {%- endfor -%}
     </div>
-  {%- endfor -%}
+    {%- endfor -%}
+  </div>
 </div>
 
 <style>
@@ -66,7 +74,16 @@
     border-block: 1px solid rgba(255, 255, 255, 0.1);
   }
 
-  .faixa--diagonal { transform: rotate(-1.4deg) scaleX(1.04); }
+  /* Recorta o excesso horizontal da faixa inclinada. `clip` em vez de `hidden`
+     para não criar um contexto de scroll que estragaria o sticky do cabeçalho. */
+  .faixa-wrap { overflow-x: clip; }
+
+  /* Folga vertical para a inclinação caber sem ser cortada em cima e em baixo. */
+  .faixa-wrap--diagonal { padding-block: 20px; }
+
+  /* O scaleX alarga a faixa para além do ecrã: assim as pontas inclinadas
+     sangram para fora em vez de deixarem triângulos vazios nos cantos. */
+  .faixa--diagonal { transform: rotate(-1.4deg) scaleX(1.06); }
 
   .faixa__item {
     font-family: var(--font-display);
