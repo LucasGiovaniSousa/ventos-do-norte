@@ -20,6 +20,14 @@
   observada em tempo real — mudar a preferência no sistema operativo tem efeito
   sem recarregar a página.
 
+  ROBUSTEZ:
+  O CSS do reveal está todo atrás da classe .reveal-ready, que é este ficheiro
+  que acrescenta ao <html>. Enquanto ela não existir, nada está escondido. Ou
+  seja: se este ficheiro não carregar, for bloqueado ou rebentar, a página
+  aparece inteira em vez de aparecer vazia. Cada passo do arranque está no seu
+  próprio try, e há ainda um temporizador de 3 s que revela o que estiver
+  dentro do ecrã e tenha ficado para trás.
+
   PERFORMANCE:
   - O reveal usa IntersectionObserver e deixa de observar cada elemento assim que
     ele aparece (one-shot).
@@ -163,11 +171,33 @@
      -------------------------------------------------------- */
 
   function init() {
-    applySvgMotion();
-    setupReveal();
-    readParallax();
-    applyParallax();
-    onScrollHeader();
+    // Cada passo isolado no seu try. São todos decorativos, e nenhum decoração
+    // deve poder impedir o passo seguinte — muito menos o dos reveals, de que
+    // depende o conteúdo ser visível.
+    try { applySvgMotion(); } catch (e) {}
+
+    try {
+      // A classe é o compromisso: a partir daqui o CSS pode esconder, porque
+      // este código está vivo e vai revelar. Se o setupReveal rebentar a
+      // seguir, tiramos a classe e a página volta a aparecer inteira.
+      root.classList.add('reveal-ready');
+      setupReveal();
+    } catch (e) {
+      root.classList.remove('reveal-ready');
+    }
+
+    try { readParallax(); applyParallax(); } catch (e) {}
+    try { onScrollHeader(); } catch (e) {}
+
+    // Rede de segurança: passados 3 s, o que estiver dentro do ecrã e ainda
+    // escondido é revelado. Cobre o caso de o IntersectionObserver não
+    // disparar — melhor uma animação perdida do que texto invisível.
+    window.setTimeout(function () {
+      document.querySelectorAll('[data-reveal]:not(.is-revealed)').forEach(function (el) {
+        var r = el.getBoundingClientRect();
+        if (r.top < window.innerHeight && r.bottom > 0) revealNow(el);
+      });
+    }, 3000);
 
     window.addEventListener(
       'scroll',

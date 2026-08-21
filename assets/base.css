@@ -633,11 +633,22 @@ textarea.field__input:focus {
    10. MOVIMENTO
    ========================================================== */
 
-/* Reveal ao entrar no viewport. O JS (motion.js) acrescenta .is-revealed.
-   Sem JS, o :not() garante que o conteúdo aparece na mesma. */
-.no-js [data-reveal] { opacity: 1 !important; transform: none !important; }
+/* Reveal ao entrar no viewport.
+   ------------------------------------------------------------------
+   TUDO ESTÁ ATRÁS DE .reveal-ready, E ISSO É DELIBERADO.
 
-[data-reveal] {
+   O motion.js só acrescenta essa classe ao <html> no instante em que está
+   prestes a tratar dos reveals. Antes disso — e se o JS falhar, for bloqueado,
+   ou rebentar noutro sítio qualquer — nada é escondido e a página aparece
+   inteira.
+
+   A versão anterior escondia o conteúdo à partida e contava com o JS para o
+   revelar. Bastou um percalço para a home ficar sem texto nem botões: uma
+   animação decorativa a falhar levava consigo o conteúdo da página.
+
+   A regra é essa: esconder conteúdo é prometer voltar a mostrá-lo, e a
+   promessa só se faz depois de se saber que se pode cumprir. */
+.reveal-ready [data-reveal] {
   opacity: 0;
   transform: translateY(24px);
   transition:
@@ -646,13 +657,13 @@ textarea.field__input:focus {
   transition-delay: var(--reveal-delay, 0ms);
 }
 
-[data-reveal].is-revealed { opacity: 1; transform: none; }
+.reveal-ready [data-reveal].is-revealed { opacity: 1; transform: none; }
 
-[data-reveal='left'] { transform: translateX(-32px); }
-[data-reveal='right'] { transform: translateX(32px); }
-[data-reveal='scale'] { transform: scale(0.94); }
-[data-reveal='clip'] { opacity: 1; clip-path: inset(0 100% 0 0); transition: clip-path var(--dur-5) var(--ease-out-expo); }
-[data-reveal='clip'].is-revealed { clip-path: inset(0 0 0 0); }
+.reveal-ready [data-reveal='left'] { transform: translateX(-32px); }
+.reveal-ready [data-reveal='right'] { transform: translateX(32px); }
+.reveal-ready [data-reveal='scale'] { transform: scale(0.94); }
+.reveal-ready [data-reveal='clip'] { opacity: 1; clip-path: inset(0 100% 0 0); transition: clip-path var(--dur-5) var(--ease-out-expo); }
+.reveal-ready [data-reveal='clip'].is-revealed { clip-path: inset(0 0 0 0); }
 
 /* Marquee infinito. Duplicar o conteúdo no markup para o loop ser contínuo. */
 .marquee {
