@@ -370,11 +370,18 @@
   .hero__product {
     position: absolute;
     top: 50%;
-    right: -2%;
+    right: -4%;
     z-index: 1;
-    width: 52%;
-    max-width: 760px;
+    width: 58%;
+    max-width: 820px;
     translate: 0 -50%;
+    /* A pipa foi filmada de frente. A rotação põe-na na diagonal, com a
+       rabiola a cair para a esquerda — a pose que se pediu.
+       Rodar sai de graça: os cantos do vídeo que passam a sobrar são pretos, e
+       o `screen` faz o preto desaparecer. Não há caixa a denunciar a rotação.
+       `rotate` é propriedade própria, separada de `transform` — não colide com
+       o translate3d que o parallax escreve. */
+    rotate: 28deg;
     will-change: transform;
   }
 
@@ -408,6 +415,16 @@
     display: block;
     width: 100%;
     height: auto;
+
+    /* Opacidade aparente.
+       No modo `screen` o resultado é `1-(1-a)(1-b)`: um pixel claro tapa o
+       fundo, um pixel escuro deixa-o passar. Era por isso que se via através
+       dos panos verde e vermelho, que são os mais escuros da pipa.
+       Levantar o brilho e o contraste torna a pipa sólida — e o preto do fundo
+       continua preto, porque qualquer multiplicação por zero dá zero.
+       Não há aqui perda: é o mesmo mecanismo, com a pipa mais acima na escala. */
+    filter: brightness(1.42) contrast(1.12) saturate(1.18);
+
     /* Sem animação CSS: o balanço já vem do vídeo. Sobrepor um flutuar em CSS
        fazia a pipa derivar pelo ecrã — exactamente o que se pediu para evitar. */
   }
@@ -472,11 +489,12 @@
        direito e fica como atmosfera atrás do texto, mais discreta para não
        disputar legibilidade com o título. */
     .hero__product {
-      top: 22%;
-      right: -16%;
-      width: 80%;
-      max-width: 430px;
-      opacity: 0.72;
+      top: 20%;
+      right: -18%;
+      width: 86%;
+      max-width: 460px;
+      rotate: 24deg;
+      opacity: 0.8;
     }
     .hero__content { max-width: none; }
     .hero__cue { display: none; }
