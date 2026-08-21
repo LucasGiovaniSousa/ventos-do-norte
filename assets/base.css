@@ -734,18 +734,31 @@ textarea.field__input:focus {
     radial-gradient(40% 40% at 60% 100%, rgba(255, 200, 0, 0.08), transparent 70%);
 }
 
-/* Linhas de vento em SVG: o traço desenha-se sozinho */
+/* Linhas de vento em SVG.
+   Duas animações encadeadas: a primeira desenha o traço à entrada, a segunda
+   fica a correr para sempre e faz a luz percorrer o fio — como quando o vento
+   viaja ao longo de uma linha de pipa.
+   A ondulação lateral não está aqui: vem do filtro de turbulência declarado
+   dentro do próprio SVG da secção. */
 .wind-line {
   fill: none;
   stroke-linecap: round;
   stroke-dasharray: var(--wind-len, 1200);
   stroke-dashoffset: var(--wind-len, 1200);
-  animation: wind-draw var(--dur-5) var(--ease-out-expo) forwards;
-  animation-delay: var(--wind-delay, 0ms);
+  animation:
+    wind-draw var(--dur-5) var(--ease-out-expo) var(--wind-delay, 0ms) forwards,
+    wind-flow var(--flow, 32s) linear var(--dur-5) infinite;
 }
 
 @keyframes wind-draw {
   to { stroke-dashoffset: 0; }
+}
+
+/* Um dasharray longo com um intervalo curto deixa o fio quase inteiro visível;
+   o que se desloca é a falha, que se lê como um sopro a passar. */
+@keyframes wind-flow {
+  from { stroke-dasharray: 1400 90; stroke-dashoffset: 0; }
+  to { stroke-dasharray: 1400 90; stroke-dashoffset: -1490; }
 }
 
 /* ==========================================================

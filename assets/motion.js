@@ -139,10 +139,31 @@
   }
 
   /* --------------------------------------------------------
+     4. ANIMAÇÕES SMIL DO SVG
+     -------------------------------------------------------- */
+
+  // As <animate> dentro de SVG são SMIL, não CSS: a media query
+  // prefers-reduced-motion não lhes toca. Quem as pára é o pauseAnimations()
+  // do próprio elemento <svg>. Sem isto, quem pede movimento reduzido
+  // continuaria a ver as linhas de vento a ondular.
+  function applySvgMotion() {
+    document.querySelectorAll('svg').forEach(function (svg) {
+      if (typeof svg.pauseAnimations !== 'function') return;
+      if (reduceMotion.matches) {
+        svg.pauseAnimations();
+        svg.setCurrentTime(0);
+      } else {
+        svg.unpauseAnimations();
+      }
+    });
+  }
+
+  /* --------------------------------------------------------
      Arranque
      -------------------------------------------------------- */
 
   function init() {
+    applySvgMotion();
     setupReveal();
     readParallax();
     applyParallax();
@@ -171,6 +192,7 @@
 
   // O editor de tema recria secções sem recarregar a página.
   document.addEventListener('shopify:section:load', function () {
+    applySvgMotion();
     setupReveal();
     readParallax();
   });
@@ -183,6 +205,7 @@
       });
       document.querySelectorAll('[data-reveal]').forEach(revealNow);
     }
+    applySvgMotion();
     readParallax();
     onScroll();
   };

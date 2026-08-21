@@ -62,11 +62,65 @@
 
   <div class="hero__veil"></div>
 
-  {%- comment -%} ---------- Linhas de vento ---------- {%- endcomment -%}
-  <svg class="hero__wind" viewBox="0 0 1440 900" preserveAspectRatio="xMidYMid slice" aria-hidden="true" focusable="false">
-    <path class="wind-line" style="--wind-len: 1800; --wind-delay: 200ms" d="M-100 760 C 300 700, 520 520, 900 430 S 1300 300, 1560 240" stroke="rgba(91,140,255,.5)" stroke-width="1.5"/>
-    <path class="wind-line" style="--wind-len: 1800; --wind-delay: 420ms" d="M-100 860 C 340 800, 600 630, 980 540 S 1340 420, 1560 370" stroke="rgba(0,165,68,.45)" stroke-width="1.5"/>
-    <path class="wind-line" style="--wind-len: 1800; --wind-delay: 640ms" d="M-100 660 C 260 610, 460 430, 840 340 S 1260 200, 1560 130" stroke="rgba(255,200,0,.35)" stroke-width="1.5"/>
+  {%- comment -%}
+    ---------- Linhas de vento ----------
+    Cinco fios que atravessam o hero em diagonal, nas cores das bandeiras.
+
+    A ondulação vem de um filtro SVG: o feTurbulence gera ruído e o
+    feDisplacementMap empurra cada ponto do traço segundo esse ruído. Animar a
+    baseFrequency faz o ruído respirar, e os fios ondulam como se o vento
+    passasse por eles. É o filtro que faz o trabalho — os `d` são curvas
+    estáticas.
+
+    Porquê um filtro e não animar o `d`: interpolar curvas de Bézier obriga a
+    escrever cada fotograma à mão e a manter o mesmo número de pontos. O filtro
+    dá ondulação contínua e irregular com uma declaração.
+
+    Cada fio tem o seu `seed`, senão ondulariam todos em uníssono — que é
+    exactamente o que o vento não faz.
+  {%- endcomment -%}
+  <svg class="hero__wind" viewBox="0 0 1440 900" preserveAspectRatio="none" aria-hidden="true" focusable="false">
+    <defs>
+      {%- for i in (1..3) -%}
+        <filter id="vento-{{ section.id }}-{{ i }}" x="-20%" y="-40%" width="140%" height="180%">
+          <feTurbulence
+            type="fractalNoise"
+            baseFrequency="0.004 0.011"
+            numOctaves="2"
+            seed="{{ i | times: 7 }}"
+            result="ruido"
+          >
+            <animate
+              attributeName="baseFrequency"
+              dur="{{ i | times: 4 | plus: 14 }}s"
+              values="0.004 0.011; 0.007 0.019; 0.003 0.009; 0.004 0.011"
+              repeatCount="indefinite"
+            />
+          </feTurbulence>
+          <feDisplacementMap
+            in="SourceGraphic"
+            in2="ruido"
+            scale="{{ i | times: 6 | plus: 18 }}"
+            xChannelSelector="R"
+            yChannelSelector="G"
+          />
+        </filter>
+      {%- endfor -%}
+    </defs>
+
+    <g filter="url(#vento-{{ section.id }}-1)">
+      <path class="wind-line" style="--wind-len: 2000; --wind-delay: 150ms; --flow: 30s" d="M-150 780 C 260 720, 520 540, 900 445 S 1320 305, 1620 235" stroke="rgba(91,140,255,.55)" stroke-width="1.6"/>
+      <path class="wind-line" style="--wind-len: 2000; --wind-delay: 700ms; --flow: 38s" d="M-150 700 C 240 645, 470 465, 850 360 S 1290 215, 1620 145" stroke="rgba(255,200,0,.4)" stroke-width="1.2"/>
+    </g>
+
+    <g filter="url(#vento-{{ section.id }}-2)">
+      <path class="wind-line" style="--wind-len: 2000; --wind-delay: 380ms; --flow: 34s" d="M-150 880 C 300 820, 590 645, 980 550 S 1360 425, 1620 365" stroke="rgba(0,165,68,.5)" stroke-width="1.6"/>
+    </g>
+
+    <g filter="url(#vento-{{ section.id }}-3)">
+      <path class="wind-line" style="--wind-len: 2000; --wind-delay: 950ms; --flow: 42s" d="M-150 960 C 330 905, 640 745, 1030 655 S 1390 540, 1620 490" stroke="rgba(230,51,41,.34)" stroke-width="1.2"/>
+      <path class="wind-line" style="--wind-len: 2000; --wind-delay: 1200ms; --flow: 46s" d="M-150 610 C 220 560, 430 390, 800 285 S 1250 130, 1620 55" stroke="rgba(255,255,255,.14)" stroke-width="1"/>
+    </g>
   </svg>
 
   <div class="hero__inner page-width">
@@ -130,8 +184,14 @@
         assign usar_video_tema = true
       endif
     -%}
-    {%- if tem_video_editor or usar_video_tema or section.settings.product_image != blank -%}
-      <div class="hero__product" data-parallax="0.08">
+    {%- liquid
+      assign e_video = false
+      if tem_video_editor or usar_video_tema
+        assign e_video = true
+      endif
+    -%}
+    {%- if e_video or section.settings.product_image != blank -%}
+      <div class="hero__product{% if e_video %} hero__product--video{% endif %}" data-parallax="0.08">
         {%- if tem_video_editor -%}
           <video
             class="hero__product-video"
@@ -300,8 +360,7 @@
   /* ---------- Produto ---------- */
   .hero__product { position: relative; will-change: transform; }
 
-  .hero__product-image,
-  .hero__product-video {
+  .hero__product-image {
     display: block;
     width: 100%;
     height: auto;
@@ -310,12 +369,35 @@
     animation: hero-float 7s ease-in-out infinite;
   }
 
-  /* O vídeo vem com fundo; o modo `screen` deixa o preto dele fundir-se no
-     fundo escuro da secção, o que dá o efeito de a pipa flutuar sem moldura. */
-  .hero__product-video {
+  /* ---------- A pipa em vídeo ----------
+     O vídeo é filmado sobre preto. O modo `screen` faz o preto desaparecer
+     (preto é o elemento neutro do screen) e só a pipa fica — sem precisar de
+     vídeo com canal alfa, que os browsers mal suportam.
+
+     O blend TEM de estar neste elemento, não no <video>. Este div leva o
+     transform do parallax, e um transform cria contexto de empilhamento: um
+     blend declarado lá dentro só encontraria o próprio div, transparente, e
+     não teria nada com que fundir — era daí que vinha o rectângulo preto.
+     Declarado aqui, funde com o que está pintado por baixo dentro do hero:
+     as linhas de vento e o brilho de fundo. */
+  .hero__product--video {
     mix-blend-mode: screen;
-    border-radius: var(--media-radius);
+    /* Transbordar a coluna: a pipa passa por cima das linhas em vez de ficar
+       arrumada num painel. */
+    width: 128%;
+    margin-left: -14%;
+    margin-block: -8%;
   }
+
+  .hero__product-video {
+    display: block;
+    width: 100%;
+    height: auto;
+    animation: hero-float 9s ease-in-out infinite;
+  }
+
+  /* Sem drop-shadow no vídeo: a sombra desenharia a silhueta do RECTÂNGULO do
+     vídeo, não a da pipa — voltava a aparecer a caixa. */
 
   @keyframes hero-float {
     0%, 100% { transform: translateY(0) rotate(-1deg); }
