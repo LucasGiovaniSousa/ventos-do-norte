@@ -29,7 +29,25 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from catalogo import CATALOGO, corpo_html
 
 LOJA = os.environ.get("SHOPIFY_STORE", "bn3vcf-f1.myshopify.com")
+
+# O token pode vir de duas origens:
+#
+#   1. SHOPIFY_ADMIN_TOKEN — para quem corre isto à mão numa só sessão.
+#   2. .admin-api.token — um ficheiro na raiz do projecto, ignorado pelo git.
+#
+# A segunda existe porque cada comando de shell abre um processo novo: uma
+# variável exportada numa janela não é vista noutra. Com o ficheiro, o token
+# chega ao disco uma vez e qualquer comando o encontra — sem passar por
+# histórico de chat nem por argumento de linha de comandos (que ficaria
+# visível no `ps` a qualquer processo da máquina).
+#
+# APAGAR O FICHEIRO QUANDO O TRABALHO ACABAR.
+FICHEIRO_TOKEN = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
+                              ".admin-api.token")
+
 TOKEN = os.environ.get("SHOPIFY_ADMIN_TOKEN", "")
+if not TOKEN and os.path.exists(FICHEIRO_TOKEN):
+    TOKEN = open(FICHEIRO_TOKEN, encoding="utf-8").read().strip()
 VERSAO = "2026-01"
 URL = f"https://{LOJA}/admin/api/{VERSAO}/graphql.json"
 A_SERIO = "--publicar" in sys.argv
@@ -131,8 +149,11 @@ def main():
     if not TOKEN:
         raise SystemExit(
             "\n  Falta o token.\n\n"
+            "  Escreve-o num ficheiro que o git ignora, na raiz do projecto:\n\n"
+            "    printf '%s' 'shpat_...' > .admin-api.token\n\n"
+            "  ou, para uma sessão só:\n\n"
             "    export SHOPIFY_ADMIN_TOKEN='shpat_...'\n\n"
-            "  Ver POR-FAZER.md, secção «Publicar os produtos».\n")
+            "  Ver POR-FAZER.md §9.\n")
 
     print(f"\n  Loja: {LOJA}")
     print(f"  Modo: {'PUBLICAR (escreve na loja)' if A_SERIO else 'simulação (não escreve nada)'}\n")
@@ -177,6 +198,9 @@ def main():
         print(f"  https://{LOJA}/admin/products?selectedView=all&status=DRAFT\n")
         print("  Falta ainda carregar as imagens (Conteúdo → Ficheiros, ou em cada produto)")
         print("  e criar os metacampos, se ainda não existirem — ver POR-FAZER.md §7.\n")
+        if os.path.exists(FICHEIRO_TOKEN):
+            print("  Quando terminares, apaga o token e revoga a app:")
+            print("    rm .admin-api.token\n")
     else:
         print("  Nada foi escrito. Para publicar mesmo:\n")
         print("    python3 data/publicar.py --publicar\n")

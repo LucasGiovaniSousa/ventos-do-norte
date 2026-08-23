@@ -121,12 +121,20 @@ vias abaixo, para nunca divergirem: se mudares uma descrição, muda nas duas.
 
 **Usar o token**
 
-**Não o coles no chat nem em ficheiro nenhum do projecto.** Escreve-o só no
-terminal, na sessão onde vais correr o script:
+Escreve-o num ficheiro na raiz do projecto. O `.gitignore` cobre-o, por isso
+nunca entra no repositório:
 
 ```bash
-export SHOPIFY_ADMIN_TOKEN='shpat_...'
+printf '%s' 'shpat_cola-aqui' > .admin-api.token
+```
 
+`printf` e não `echo` de propósito: o `echo` acrescenta uma quebra de linha ao
+fim, e há endpoints que a incluem no cabeçalho de autenticação e devolvem 401
+sem explicar porquê.
+
+Depois:
+
+```bash
 python3 data/publicar.py              # simulação — não escreve nada
 python3 data/publicar.py --publicar   # escreve mesmo
 ```
@@ -135,7 +143,19 @@ O script cria os 10 produtos com descrições, preços, SKU, peso, stock,
 etiquetas, SEO e metacampos, **todos em rascunho**. Se um handle já existir,
 actualiza em vez de duplicar — dá para correr outra vez depois de mudar texto.
 
-Fecha o terminal quando acabares: a variável desaparece com ele.
+Porquê ficheiro e não `export`: cada comando de shell abre um processo novo,
+e uma variável exportada numa janela não é vista noutra. Com o ficheiro, o
+token chega ao disco uma vez e qualquer comando o encontra — incluindo os que
+eu corro. Também evita passá-lo como argumento, que ficaria visível no `ps` a
+qualquer processo da máquina.
+
+**Quando o trabalho acabar:**
+
+```bash
+rm .admin-api.token
+```
+
+E revoga a app no admin.
 
 **Quando o trabalho terminar, revoga a app.** Um token vivo que ninguém usa é
 só superfície de ataque à espera.

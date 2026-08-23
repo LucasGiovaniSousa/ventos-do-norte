@@ -12,3 +12,4 @@ data/imagens/*.mp4
 .env
 *.token
 shpat_*
+.admin-api.token
