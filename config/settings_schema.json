@@ -236,6 +236,24 @@
         "id": "card_show_second_image",
         "default": true,
         "label": "t:settings_schema.product_cards.settings.card_show_second_image.label"
+      },
+      {
+        "type": "checkbox",
+        "id": "card_show_stock",
+        "default": true,
+        "label": "t:settings_schema.product_cards.settings.card_show_stock.label",
+        "info": "t:settings_schema.product_cards.settings.card_show_stock.info"
+      },
+      {
+        "type": "range",
+        "id": "stock_low_threshold",
+        "min": 0,
+        "max": 50,
+        "step": 1,
+        "unit": "un",
+        "default": 12,
+        "label": "t:settings_schema.product_cards.settings.stock_low_threshold.label",
+        "info": "t:settings_schema.product_cards.settings.stock_low_threshold.info"
       }
     ]
   },

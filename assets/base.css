@@ -577,6 +577,33 @@ textarea.field__input:focus {
   border-radius: 3px;
 }
 
+/* Aviso de stock no cartão.
+   Âmbar abaixo do limiar, verde acima — a cor faz o trabalho antes de o texto
+   ser lido. */
+.stock {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  margin-top: var(--sp-1);
+  font-family: var(--font-display);
+  font-size: var(--f0);
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.stock::before {
+  content: '';
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.stock--in { color: var(--vdn-verde); }
+.stock--low { color: #8a5f0c; }
+.vdn-section--dark .stock--low { color: var(--vdn-amarelo); }
+
 /* Amostras de cor */
 .swatches {
   display: flex;

@@ -289,6 +289,9 @@
               "label": "Conteúdo"
             }
           }
+        },
+        "ficha": {
+          "name": "Ficha do kit"
         }
       }
     },
@@ -752,6 +755,14 @@
         },
         "card_show_second_image": {
           "label": "Mostrar a segunda imagem ao passar o rato"
+        },
+        "card_show_stock": {
+          "label": "Mostrar aviso de stock",
+          "info": "Só aparece em produtos com inventário gerido pela Shopify."
+        },
+        "stock_low_threshold": {
+          "label": "Limiar de \"últimas unidades\"",
+          "info": "Abaixo deste número o cartão avisa em âmbar. Ajusta ao ritmo de reposição."
         }
       }
     },

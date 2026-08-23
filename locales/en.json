@@ -130,7 +130,10 @@
         "returns_text": "Changed your mind? Send it back, no fuss.",
         "secure_title": "Secure payment",
         "secure_text": "MB WAY, Multibanco, card and PayPal."
-      }
+      },
+      "in_stock_short": "In stock",
+      "whats_inside": "What's inside",
+      "for_whom": "Who it's for"
     },
     "facets": {
       "sort_by_label": "Sort by:",

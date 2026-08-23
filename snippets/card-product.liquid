@@ -176,6 +176,25 @@
       {%- endfor -%}
 
       {% render 'price', product: card_product, use_variant: false, show_compare: true, price_class: 'price--card' %}
+
+      {%- comment -%}
+        Aviso de stock. O número é real, vem do inventário — é por isso que
+        funciona como urgência sem ser mentira.
+
+        Só aparece se o Shopify estiver mesmo a gerir o inventário desta
+        variante: sem `inventory_management`, o inventory_quantity vem a zero e
+        um produto disponível apareceria como esgotado.
+      {%- endcomment -%}
+      {%- if settings.card_show_stock and card_product.available -%}
+        {%- assign v = card_product.selected_or_first_available_variant -%}
+        {%- if v.inventory_management != blank -%}
+          {%- if v.inventory_quantity > 0 and v.inventory_quantity <= settings.stock_low_threshold -%}
+            <span class="stock stock--low">{{ 'products.product.low_stock' | t: count: v.inventory_quantity }}</span>
+          {%- elsif v.inventory_quantity > 0 -%}
+            <span class="stock stock--in">{{ 'products.product.in_stock_short' | t }}</span>
+          {%- endif -%}
+        {%- endif -%}
+      {%- endif -%}
     </div>
   </a>
 

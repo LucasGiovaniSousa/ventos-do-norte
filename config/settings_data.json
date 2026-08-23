@@ -30,7 +30,9 @@
     "social_instagram_link": "https://www.instagram.com/ventosdonorte.pt/",
     "social_facebook_link": "",
     "social_tiktok_link": "",
-    "social_linkedin_link": ""
+    "social_linkedin_link": "",
+    "card_show_stock": true,
+    "stock_low_threshold": 12
   },
   "presets": {
     "Ventos do Norte": {
@@ -59,7 +61,9 @@
       "cart_show_note": true,
       "brand_tagline": "Do Brasil para Portugal, ligados pela mesma paixão",
       "marquee_text": "Pipas · Linhas · Acessórios · Qualidade · Paixão",
-      "free_shipping_threshold": 50
+      "free_shipping_threshold": 50,
+      "card_show_stock": true,
+      "stock_low_threshold": 12
     }
   }
 }

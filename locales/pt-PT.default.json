@@ -130,7 +130,10 @@
         "play_video": "Reproduzir vídeo"
       },
       "choose_options": "Escolher opções",
-      "choose_product_options": "Escolher opções para {{ product_name }}"
+      "choose_product_options": "Escolher opções para {{ product_name }}",
+      "in_stock_short": "Em stock",
+      "whats_inside": "O que vem dentro",
+      "for_whom": "Para quem é"
     },
     "facets": {
       "sort_by_label": "Ordenar por:",

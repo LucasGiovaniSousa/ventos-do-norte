@@ -102,6 +102,14 @@
 
             {%- when 'title' -%}
               <h1 class="product__title" {{ block.shopify_attributes }}>{{ product.title | escape }}</h1>
+              {%- comment -%}
+                Linha técnica: uma frase curta que resume o produto sem obrigar
+                a ler a descrição. Vive num metacampo porque é dado, não prosa.
+              {%- endcomment -%}
+              {%- assign linha_tec = product.metafields.custom.linha_tecnica.value -%}
+              {%- if linha_tec != blank -%}
+                <p class="product__linha-tecnica">{{ linha_tec }}</p>
+              {%- endif -%}
 
             {%- when 'price' -%}
               <div class="product__price" {{ block.shopify_attributes }}>
@@ -261,6 +269,46 @@
                   {%- endif -%}
                 {%- endform -%}
               </div>
+
+            {%- when 'ficha' -%}
+              {%- comment -%}
+                Ficha do kit, alimentada por metacampos.
+
+                Cada linha só existe se o metacampo estiver preenchido — não há
+                linhas vazias nem «N/A». Um kit sem componentes declarados
+                simplesmente não mostra a lista, em vez de mostrar uma lista
+                vazia.
+
+                Porquê metacampos e não descrição: uma parede de texto não se lê.
+                O que vem dentro e para quem é, numa lista curta, lê-se de
+                relance — que é como se compra.
+
+                Definir em Definições → Metacampos personalizados → Produtos,
+                espaço de nomes `custom`. Ver POR-FAZER.md §7.
+              {%- endcomment -%}
+              {%- liquid
+                assign componentes = product.metafields.custom.componentes.value
+                assign para = product.metafields.custom.para.value
+              -%}
+              {%- if componentes != blank or para != blank -%}
+                <div class="ficha" {{ block.shopify_attributes }}>
+                  {%- if para != blank -%}
+                    <p class="ficha__para">
+                      <span class="ficha__rotulo">{{ 'products.product.for_whom' | t }}</span>
+                      {{ para }}
+                    </p>
+                  {%- endif -%}
+
+                  {%- if componentes != blank -%}
+                    <p class="ficha__rotulo">{{ 'products.product.whats_inside' | t }}</p>
+                    <ul class="ficha__lista" role="list">
+                      {%- for item in componentes -%}
+                        <li>{% render 'icon', name: 'check' %}<span>{{ item }}</span></li>
+                      {%- endfor -%}
+                    </ul>
+                  {%- endif -%}
+                </div>
+              {%- endif -%}
 
             {%- when 'trust' -%}
               <ul class="product__trust" role="list" {{ block.shopify_attributes }}>
@@ -521,6 +569,51 @@
   .product__buy { margin-bottom: var(--sp-6); }
   .product__buy .shopify-payment-button__button { border-radius: var(--buttons-radius); min-height: 56px; }
 
+  /* ---------- Ficha do kit ---------- */
+  .product__linha-tecnica {
+    margin: calc(var(--sp-3) * -1) 0 var(--sp-4);
+    font-family: var(--font-display);
+    font-size: var(--f1);
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--vdn-on-sand-mut);
+  }
+
+  .ficha {
+    margin-bottom: var(--sp-6);
+    padding: var(--sp-5);
+    background-color: var(--vdn-surface);
+    border: 1px solid var(--vdn-line);
+    border-radius: var(--media-radius);
+  }
+
+  .ficha__rotulo {
+    display: block;
+    margin: 0 0 var(--sp-2);
+    font-family: var(--font-display);
+    font-size: var(--f0);
+    font-weight: 700;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--vdn-on-sand-mut);
+  }
+
+  .ficha__para { margin: 0 0 var(--sp-4); font-size: var(--f2); }
+  .ficha__lista { display: grid; gap: var(--sp-2); margin: 0; padding: 0; list-style: none; }
+  .ficha__lista li { display: flex; align-items: flex-start; gap: var(--sp-3); font-size: var(--f2); }
+
+  .ficha__lista svg {
+    flex-shrink: 0;
+    width: 18px;
+    height: 18px;
+    margin-top: 3px;
+    padding: 2px;
+    color: #fff;
+    background-color: var(--vdn-verde);
+    border-radius: 50%;
+  }
+
   /* ---------- Confiança ---------- */
   .product__trust {
     display: grid;
@@ -672,6 +765,7 @@
         }
       ]
     },
+    { "type": "ficha", "name": "t:sections.main_product.blocks.ficha.name", "limit": 1 },
     { "type": "trust", "name": "t:sections.main_product.blocks.trust.name", "limit": 1 },
     { "type": "description", "name": "t:sections.main_product.blocks.description.name", "limit": 1 },
     {

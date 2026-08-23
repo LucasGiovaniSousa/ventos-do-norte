@@ -3,17 +3,33 @@
     "main": {
       "type": "main-product",
       "blocks": {
-        "vendor": { "type": "vendor" },
-        "title": { "type": "title" },
-        "price": { "type": "price" },
-        "variant_picker": { "type": "variant_picker" },
-        "quantity": { "type": "quantity" },
+        "vendor": {
+          "type": "vendor"
+        },
+        "title": {
+          "type": "title"
+        },
+        "price": {
+          "type": "price"
+        },
+        "variant_picker": {
+          "type": "variant_picker"
+        },
+        "quantity": {
+          "type": "quantity"
+        },
         "buy_buttons": {
           "type": "buy_buttons",
-          "settings": { "show_dynamic_checkout": true }
+          "settings": {
+            "show_dynamic_checkout": true
+          }
         },
-        "trust": { "type": "trust" },
-        "description": { "type": "description" },
+        "trust": {
+          "type": "trust"
+        },
+        "description": {
+          "type": "description"
+        },
         "envios": {
           "type": "accordion",
           "settings": {
@@ -21,7 +37,12 @@
             "content": "<p>Expedimos de Portugal em 24–48h úteis. Entrega em 1 a 3 dias úteis no continente. Tens 14 dias para devolver, desde que o produto venha por usar e na embalagem original.</p>"
           }
         },
-        "share": { "type": "share" }
+        "share": {
+          "type": "share"
+        },
+        "ficha": {
+          "type": "ficha"
+        }
       },
       "block_order": [
         "vendor",
@@ -30,6 +51,7 @@
         "variant_picker",
         "quantity",
         "buy_buttons",
+        "ficha",
         "trust",
         "description",
         "envios",
@@ -40,5 +62,8 @@
       "type": "related-products"
     }
   },
-  "order": ["main", "related"]
+  "order": [
+    "main",
+    "related"
+  ]
 }

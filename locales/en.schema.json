@@ -289,6 +289,9 @@
               "label": "Content"
             }
           }
+        },
+        "ficha": {
+          "name": "Kit details"
         }
       }
     },
@@ -752,6 +755,14 @@
         },
         "card_show_second_image": {
           "label": "Show second image on hover"
+        },
+        "card_show_stock": {
+          "label": "Show stock warning",
+          "info": "Only shows on products whose inventory Shopify tracks."
+        },
+        "stock_low_threshold": {
+          "label": "\"Only N left\" threshold",
+          "info": "Below this number the card warns in amber. Match it to your restock rhythm."
         }
       }
     },
