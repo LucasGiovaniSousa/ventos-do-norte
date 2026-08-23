@@ -97,9 +97,54 @@ Depois copia o prefixo do URL público e substitui `SUBSTITUIR_PELO_URL_DO_ADMIN
 no CSV. Ou — para 10 produtos é honestamente mais rápido — importa sem imagens e
 arrasta-as em cada produto.
 
-## 9. Produtos — por CSV, em rascunho
+## 9. Produtos — duas vias
+
+O texto dos produtos vive em `data/catalogo.py`, fonte única. Daí saem as duas
+vias abaixo, para nunca divergirem: se mudares uma descrição, muda nas duas.
+
+### Via A — Admin API (publico eu)
+
+**Criar a app**
+
+1. **Definições → Aplicações e canais de vendas → Desenvolver aplicações**
+2. **Criar uma app** → nome: `Catálogo Ventos do Norte`
+3. **Configurar âmbitos da Admin API** → marcar **apenas**:
+   - `read_products`
+   - `write_products`
+
+   Nunca `read_orders`, `write_orders`, `read_customers`, `write_customers`.
+   Construir um catálogo não precisa deles, e o que não é preciso não se pede.
+4. **Guardar** → **Instalar app**
+5. **Revelar token do Admin API uma vez** → copiar (começa por `shpat_`)
+
+> O token só se mostra **uma vez**. Se o perderes, revoga e gera outro.
+
+**Usar o token**
+
+**Não o coles no chat nem em ficheiro nenhum do projecto.** Escreve-o só no
+terminal, na sessão onde vais correr o script:
+
+```bash
+export SHOPIFY_ADMIN_TOKEN='shpat_...'
+
+python3 data/publicar.py              # simulação — não escreve nada
+python3 data/publicar.py --publicar   # escreve mesmo
+```
+
+O script cria os 10 produtos com descrições, preços, SKU, peso, stock,
+etiquetas, SEO e metacampos, **todos em rascunho**. Se um handle já existir,
+actualiza em vez de duplicar — dá para correr outra vez depois de mudar texto.
+
+Fecha o terminal quando acabares: a variável desaparece com ele.
+
+**Quando o trabalho terminar, revoga a app.** Um token vivo que ninguém usa é
+só superfície de ataque à espera.
+
+### Via B — CSV
 
 **Produtos → Importar** → `data/produtos-ventos-do-norte.csv`
+
+Gerado por `python3 data/gerar-csv.py`. Mesma informação da via A.
 
 10 produtos, 20 variantes, todos com `Status = draft`. Rever preço, stock,
 imagem e categoria **antes** de passar a activo.

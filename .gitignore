@@ -6,3 +6,9 @@
 # porque cada versão fica guardada no histórico. As fotos (~3 MB) ficam
 # versionadas, essas compensam.
 data/imagens/*.mp4
+
+# Segredos. O token da Admin API vive só em variável de ambiente, nunca em
+# ficheiro — mas se alguém criar um por engano, não vai para o repositório.
+.env
+*.token
+shpat_*
