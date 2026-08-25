@@ -20,7 +20,22 @@ COLS = ["Handle","Title","Body (HTML)","Vendor","Type","Tags","Published",
         "Metafield: custom.componentes [list.single_line_text_field]",
         "Metafield: custom.para [single_line_text_field]"]
 
-PREFIXO_IMG = "SUBSTITUIR_PELO_URL_DO_ADMIN/"
+# Por omissão o CSV sai SEM imagens. O importador da Shopify precisa de URLs
+# publicamente acessíveis na coluna "Image Src" — um caminho local ou um
+# marcador de texto não servem, e a Shopify recusa o ficheiro inteiro com
+# "O URL da imagem é inválido" em vez de ignorar só essa coluna.
+#
+# Para 10 produtos é mais rápido importar sem imagens e arrastá-las à mão em
+# cada produto (Produtos → abrir → Multimédia) do que carregar tudo em
+# Conteúdo → Ficheiros só para copiar URLs. Se um dia preferires o caminho das
+# imagens no CSV, carrega os ficheiros de data/produto/ em Conteúdo →
+# Ficheiros, copia os URLs públicos e passa-os aqui:
+#
+#   python3 data/gerar-csv.py --prefixo-imagens https://cdn.shopify.com/.../
+PREFIXO_IMG = ""
+if "--prefixo-imagens" in sys.argv:
+    PREFIXO_IMG = sys.argv[sys.argv.index("--prefixo-imagens") + 1]
+
 linhas = []
 
 for p in CATALOGO:
@@ -48,9 +63,9 @@ for p in CATALOGO:
             "Variant Requires Shipping": "TRUE",
             "Variant Taxable": "TRUE",
             "Variant Weight Unit": "g",
-            "Image Src": (PREFIXO_IMG + imgs[0]) if (primeiro and imgs) else "",
-            "Image Position": "1" if (primeiro and imgs) else "",
-            "Image Alt Text": p["alt"] if (primeiro and imgs) else "",
+            "Image Src": (PREFIXO_IMG + imgs[0]) if (primeiro and imgs and PREFIXO_IMG) else "",
+            "Image Position": "1" if (primeiro and imgs and PREFIXO_IMG) else "",
+            "Image Alt Text": p["alt"] if (primeiro and imgs and PREFIXO_IMG) else "",
             "SEO Title": p["seo_titulo"] if primeiro else "",
             "SEO Description": p["seo_desc"] if primeiro else "",
             "Status": "draft" if primeiro else "",
@@ -58,9 +73,10 @@ for p in CATALOGO:
             "Metafield: custom.componentes [list.single_line_text_field]": "|".join(p.get("componentes",[])) if primeiro else "",
             "Metafield: custom.para [single_line_text_field]": p.get("para","") if primeiro else "",
         })
-    for pos, img in enumerate((p.get("imagens") or [])[1:], start=2):
-        linhas.append({c: "" for c in COLS} | {
-            "Handle": p["handle"], "Image Src": PREFIXO_IMG + img, "Image Position": str(pos)})
+    if PREFIXO_IMG:
+        for pos, img in enumerate((p.get("imagens") or [])[1:], start=2):
+            linhas.append({c: "" for c in COLS} | {
+                "Handle": p["handle"], "Image Src": PREFIXO_IMG + img, "Image Position": str(pos)})
 
 destino = os.path.join(os.path.dirname(os.path.abspath(__file__)), "produtos-ventos-do-norte.csv")
 with open(destino, "w", newline="", encoding="utf-8") as f:
