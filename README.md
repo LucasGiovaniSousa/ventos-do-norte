@@ -21,6 +21,56 @@ produtos e as imagens.
 
 ---
 
+## Mexer na loja daqui
+
+Duas metades, e convém não as confundir:
+
+| O quê | Onde vive | Ferramenta |
+|---|---|---|
+| **Tema** — liquid, css, js, traduções | neste repositório | `./deploy.sh` |
+| **Loja** — produtos, preços, stock, colecções, páginas, menus, encomendas | na Shopify | `data/loja.py` |
+
+Enviar o tema não mexe num único preço; mudar um preço não mexe numa linha de
+código. São sistemas separados, com registos separados.
+
+```bash
+python3 data/loja.py info                    # loja, moeda, plano, âmbitos da app
+python3 data/loja.py produtos                # tudo, com preço, sku e stock
+python3 data/loja.py produto pipa-classica   # ficha completa, em JSON
+python3 data/loja.py preco VDN-PIPA-01-M 24.90 --escrever
+python3 data/loja.py stock VDN-PIPA-01-M 12  --escrever
+python3 data/loja.py estado pipa-classica ACTIVE --escrever
+python3 data/loja.py gql pedido.graphql vars.json   # qualquer coisa que a API faça
+```
+
+**Sem `--escrever` nada é escrito.** Os comandos de mudança correm em simulação
+e dizem o que fariam. É de propósito: a Admin API não tem anular, e um comando
+escrito à pressa numa loja aberta é visível a quem lá estiver no momento.
+
+O comando `gql` é a escotilha — aceita qualquer query ou mutação da Admin API,
+lida de ficheiro. Os comandos com nome são só atalhos para o que se faz todos os
+dias; o resto faz-se por ali.
+
+### O token e os âmbitos
+
+O token vive em `.admin-api.token`, na raiz, ignorado pelo git — ver §9 do
+[`POR-FAZER.md`](POR-FAZER.md). Cada comando só funciona se a app tiver o âmbito
+correspondente; `loja.py info` lista os que ela tem, e o que falta devolve 403
+com o nome do que pedir.
+
+| Para | Âmbitos |
+|---|---|
+| produtos, preços, colecções | `read_products`, `write_products` |
+| stock | `read_inventory`, `write_inventory`, `read_locations` |
+| páginas e menus | `read_content`, `write_content` |
+| temas (listar) | `read_themes` |
+| encomendas | `read_orders` — **dados pessoais de clientes** |
+
+Os últimos só se acrescentam quando forem precisos. O que não é preciso não se
+pede: um âmbito a mais é superfície de ataque num token que fica no disco.
+
+---
+
 ## Linguagem visual
 
 O conceito é **o vento como elemento gráfico**: a pipa corta o céu na diagonal, e

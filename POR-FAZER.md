@@ -112,8 +112,20 @@ vias abaixo, para nunca divergirem: se mudares uma descrição, muda nas duas.
    - `read_products`
    - `write_products`
 
-   Nunca `read_orders`, `write_orders`, `read_customers`, `write_customers`.
-   Construir um catálogo não precisa deles, e o que não é preciso não se pede.
+   Construir um catálogo não precisa de mais nada, e o que não é preciso não
+   se pede: cada âmbito a mais é superfície de ataque num token que fica no
+   disco.
+
+   Para o dia-a-dia da loja pelo `data/loja.py` há mais três pares que se
+   acrescentam **quando forem precisos**, não antes:
+
+   - `read_inventory` + `write_inventory` + `read_locations` — mexer em stock
+   - `read_content` + `write_content` — páginas e menus
+   - `read_themes` — listar temas
+
+   `read_orders` e `read_customers` ficam de fora por omissão: trazem dados
+   pessoais de clientes para um token que vive num ficheiro. Só se acrescentam
+   com uma razão concreta, e revogam-se quando ela passar.
 4. **Guardar** → **Instalar app**
 5. **Revelar token do Admin API uma vez** → copiar (começa por `shpat_`)
 
@@ -138,6 +150,10 @@ Depois:
 python3 data/publicar.py              # simulação — não escreve nada
 python3 data/publicar.py --publicar   # escreve mesmo
 ```
+
+(O `publicar.py` faz o carregamento inicial do catálogo. Para mudanças avulsas
+depois disso — um preço, um stock, pôr um produto à venda — é o `data/loja.py`;
+ver README, «Mexer na loja daqui».)
 
 O script cria os 10 produtos com descrições, preços, SKU, peso, stock,
 etiquetas, SEO e metacampos, **todos em rascunho**. Se um handle já existir,
