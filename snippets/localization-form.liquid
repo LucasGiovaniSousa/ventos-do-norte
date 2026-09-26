@@ -21,7 +21,15 @@
 {%- endcomment -%}
 <div class="localization">
   {%- if show_country and localization.available_countries.size > 1 -%}
-    {%- form 'localization', id: 'CountryForm-' | append: section_id, class: 'localization__form' -%}
+    {%- comment -%}
+      O id sai para uma variável porque a tag `form` não aceita filtros nos
+      argumentos: `id: 'CountryForm-' | append: section_id` rebenta com
+      «Expected end_of_string but found pipe». O `theme check` valida a
+      sintaxe do ficheiro e deixa isto passar — só o servidor da Shopify
+      recusa, no momento do envio.
+    {%- endcomment -%}
+    {%- assign id_form_pais = 'CountryForm-' | append: section_id -%}
+    {%- form 'localization', id: id_form_pais, class: 'localization__form' -%}
       <label class="visually-hidden" for="Country-{{ section_id }}">{{ 'localization.country_label' | t }}</label>
       <select
         class="localization__select"
@@ -43,7 +51,8 @@
   {%- endif -%}
 
   {%- if show_language and localization.available_languages.size > 1 -%}
-    {%- form 'localization', id: 'LanguageForm-' | append: section_id, class: 'localization__form' -%}
+    {%- assign id_form_idioma = 'LanguageForm-' | append: section_id -%}
+    {%- form 'localization', id: id_form_idioma, class: 'localization__form' -%}
       <label class="visually-hidden" for="Language-{{ section_id }}">{{ 'localization.language_label' | t }}</label>
       <select
         class="localization__select"

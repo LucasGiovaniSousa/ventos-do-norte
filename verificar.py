@@ -13,6 +13,7 @@ Verifica:
   4. JSON inválido em config/, templates/ e sections/
   5. Blocos usados em templates que a secção não declara
   6. Ficheiros de locale `.default` duplicados por tipo
+  7. Filtros `|` nos argumentos de `form`/`render`  ← falha o envio
 
 Sai com código 1 se houver erro. Avisos não impedem o envio.
 """
@@ -189,6 +190,30 @@ for caminho in sorted(glob.glob('templates/*.json')) + sorted(grupos):
             if bloco.get('type') not in declarados:
                 erros.append(f"{nome}: bloco `{bid}` é do tipo `{bloco.get('type')}`, "
                              f"que a secção `{tipo}` não declara")
+
+
+# ── 7. Filtros nos argumentos de tags ───────────────────────────────
+# A tag `form` (e as irmãs `render`, `include`, `section`, `paginate`) aceita
+# argumentos `chave: valor`, mas não aceita um filtro no valor. Isto:
+#
+#   {% form 'localization', id: 'CountryForm-' | append: section_id %}
+#
+# passa no `theme check` — o ficheiro está sintaticamente bem formado — e é
+# recusado pelo servidor da Shopify no envio, com «Expected end_of_string but
+# found pipe». O erro aponta a linha certa e não diz o que fazer.
+#
+# A correcção é sempre a mesma: passar o valor por um `assign` antes.
+TAGS_SEM_FILTRO = r'form|render|include|section|paginate'
+
+for caminho_liq in sorted(glob.glob('sections/*.liquid') + glob.glob('snippets/*.liquid')
+                          + glob.glob('layout/*.liquid') + glob.glob('templates/*.liquid')):
+    for n, linha in enumerate(open(caminho_liq, encoding='utf-8'), 1):
+        # Só interessam tags com argumentos nomeados: é aí que o filtro entra.
+        m = re.search(r'\{%-?\s*(' + TAGS_SEM_FILTRO + r')\s+[^%]*?\w+:\s*[^%]*?\|', linha)
+        if m:
+            erros.append(f"{caminho_liq}:{n}: filtro `|` nos argumentos de "
+                         f"`{m.group(1)}` — passa no theme check e a Shopify recusa "
+                         f"no envio. Usa um `assign` antes.")
 
 
 # ── Relatório ───────────────────────────────────────────────────────
