@@ -321,6 +321,13 @@
     margin: 0 0 var(--sp-4);
     font-size: clamp(2.5rem, 1.2rem + 3.9vw, 4.75rem);
     color: var(--vdn-on-ink);
+    /* Sem isto o browser enche cada linha até ao limite e sobra uma palavra
+       órfã na última — «Do Brasil / para / Portugal». O balance reparte as
+       palavras pelas linhas todas. Onde não houver suporte, nada muda. */
+    text-wrap: balance;
+    /* Uma palavra longa num ecrã estreito transbordava a coluna em vez de
+       partir. O título nunca é mais largo do que o espaço que tem. */
+    overflow-wrap: break-word;
     /* O contraluz separa o título da imagem quando esta passa por trás. */
     text-shadow: 0 2px 40px rgba(10, 10, 11, 0.6);
   }
@@ -334,6 +341,28 @@
   }
 
   .hero__actions { display: flex; flex-wrap: wrap; gap: var(--sp-3); }
+
+  /* O botão secundário sobre o hero.
+
+     O .button--secondary pinta-se com --sec-fg, que o .vdn-section--dark já
+     devia pôr claro. No ecrã saía escuro sobre preto: legível só pela borda,
+     com o texto quase invisível. Em vez de perseguir a cascata, o hero fixa a
+     sua própria cor — é a única secção onde o botão assenta sobre vídeo em
+     movimento, e aí o contraste não pode depender de herança. */
+  .hero__actions .button--secondary {
+    color: var(--vdn-on-ink);
+    border-color: rgba(255, 255, 255, 0.45);
+    /* O vídeo por trás muda de luminosidade a toda a hora; o fundo translúcido
+       garante contraste no fotograma mais claro sem tapar a imagem. */
+    background-color: rgba(10, 10, 11, 0.35);
+    backdrop-filter: blur(2px);
+  }
+
+  .hero__actions .button--secondary:hover {
+    color: var(--vdn-ink);
+    background-color: var(--vdn-on-ink);
+    border-color: var(--vdn-on-ink);
+  }
 
   /* ---------- Rota Brasil → Portugal ---------- */
   .hero__route {

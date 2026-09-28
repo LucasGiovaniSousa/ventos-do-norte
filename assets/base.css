@@ -509,11 +509,24 @@ textarea.field__input:focus {
   gap: var(--sp-1);
 }
 
+/* Cards centrados.
+
+   Com títulos de comprimentos muito diferentes — «Peteca Altiva Sport» ao lado
+   de «Bola Oficial de Futevôlei Altinha» — o alinhamento à esquerda deixava
+   cada preço a começar numa altura diferente e a grelha lia-se como desalinhada.
+   Centrado, o eixo é o mesmo em todos e a grelha assenta.
+
+   O align-items: center é preciso além do text-align porque os filhos são itens
+   de flex em coluna: o text-align centra as linhas de texto dentro de cada um,
+   mas é o align-items que centra as caixas — as amostras de cor e o aviso de
+   stock, que são inline-flex e não texto. */
 .card-product__info {
   display: flex;
   flex-direction: column;
+  align-items: center;
   gap: var(--sp-1);
   padding: var(--sp-4) var(--sp-1) 0;
+  text-align: center;
 }
 
 .card-product__vendor {
@@ -608,6 +621,7 @@ textarea.field__input:focus {
 .swatches {
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 5px;
   margin: var(--sp-1) 0 0;
   padding: 0;

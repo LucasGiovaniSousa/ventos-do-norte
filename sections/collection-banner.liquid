@@ -47,9 +47,12 @@
       <div class="col-banner__desc rte">{{ collection.description }}</div>
     {%- endif -%}
 
-    <p class="col-banner__count">
-      {{- 'products.facets.product_count_simple' | t: count: collection.products_count -}}
-    </p>
+    {%- comment -%}
+      A contagem NÃO se escreve aqui. A barra de filtros do main-collection já a
+      mostra, e lá é útil: muda quando se aplica um filtro. Escrita nos dois
+      sítios, aparecia duas vezes seguidas no ecrã — «3 PRODUTOS» por baixo de
+      «3 PRODUTOS» — e a de cima ficava desactualizada ao filtrar.
+    {%- endcomment -%}
   </div>
 </section>
 
