@@ -306,10 +306,15 @@
     width: 100%;
   }
 
-  .hero__content { max-width: 42ch; }
+  /* A coluna do texto.
+
+     Era 42ch, e com um título de palavras longas — PORTUGAL — sobrava pouca
+     largura: cada palavra ficava com a sua própria linha e o bloco lia-se
+     apertado. Mais largura dá ao título linhas mais cheias e menos quebras. */
+  .hero__content { max-width: 52ch; }
 
   @media screen and (min-width: 1001px) {
-    .hero__content { max-width: min(48%, 46ch); }
+    .hero__content { max-width: min(56%, 54ch); }
   }
   .hero__eyebrow { color: var(--vdn-amarelo); }
   .hero__eyebrow::before { background: var(--vdn-amarelo); }
@@ -319,15 +324,21 @@
      sem obrigar a deslizar para ver os botões. */
   .hero__title {
     margin: 0 0 var(--sp-4);
-    font-size: clamp(2.5rem, 1.2rem + 3.9vw, 4.75rem);
+    /* A escala acompanha a largura mais de perto do que antes: num ecrã
+       estreito o título encolhe o suficiente para PORTUGAL caber inteiro numa
+       linha, e num ecrã largo cresce até ao tecto dos 5rem. */
+    font-size: clamp(2rem, 1rem + 5.2vw, 5rem);
     color: var(--vdn-on-ink);
     /* Sem isto o browser enche cada linha até ao limite e sobra uma palavra
-       órfã na última — «Do Brasil / para / Portugal». O balance reparte as
-       palavras pelas linhas todas. Onde não houver suporte, nada muda. */
+       órfã na última. O balance reparte as palavras pelas linhas todas. */
     text-wrap: balance;
-    /* Uma palavra longa num ecrã estreito transbordava a coluna em vez de
-       partir. O título nunca é mais largo do que o espaço que tem. */
-    overflow-wrap: break-word;
+    /* Uma palavra NUNCA se parte a meio. A tentativa anterior usava
+       overflow-wrap: break-word para evitar transbordos e o resultado foi
+       «PORTUG / AL» — pior do que o problema que resolvia. O tamanho da letra
+       é que se ajusta à largura; a palavra fica inteira. */
+    overflow-wrap: normal;
+    word-break: keep-all;
+    hyphens: none;
     /* O contraluz separa o título da imagem quando esta passa por trás. */
     text-shadow: 0 2px 40px rgba(10, 10, 11, 0.6);
   }

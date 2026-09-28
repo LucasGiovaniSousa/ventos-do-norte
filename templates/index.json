@@ -28,21 +28,24 @@
           "type": "categoria",
           "settings": {
             "title": "Pipas",
-            "icon": "pipa"
+            "icon": "pipa",
+            "image_asset": "cat-pipas.jpg"
           }
         },
         "petecas": {
           "type": "categoria",
           "settings": {
             "title": "Petecas",
-            "icon": "peteca"
+            "icon": "peteca",
+            "image_asset": "cat-petecas.jpg"
           }
         },
         "futevolei": {
           "type": "categoria",
           "settings": {
             "title": "Futevôlei",
-            "icon": "bola"
+            "icon": "bola",
+            "image_asset": "cat-futevolei.jpg"
           }
         }
       },

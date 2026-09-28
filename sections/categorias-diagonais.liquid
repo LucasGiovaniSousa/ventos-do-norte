@@ -81,6 +81,30 @@
                     sizes: '(min-width: 1001px) 40vw, 90vw',
                     alt: ''
                 }}
+              {%- elsif block.settings.image_asset != blank -%}
+                {%- comment -%}
+                  Última alternativa antes do cartão vazio: uma foto que viaja
+                  no tema, em assets/.
+
+                  Existe porque o image_picker guarda uma referência a um
+                  ficheiro carregado no admin do Shopify — não se pode pôr lá
+                  nada a partir do git, e numa loja ainda por abrir não há lá
+                  nada. Assim a página nasce com fotografias, e no dia em que
+                  alguém escolher uma imagem no editor ela ganha à do tema,
+                  sem tocar em código.
+
+                  É <img> à mão e não image_tag porque o asset_url devolve um
+                  URL, não um objecto de imagem: os filtros de imagem do
+                  Shopify não se aplicam a ficheiros do tema.
+                {%- endcomment -%}
+                <img
+                  src="{{ block.settings.image_asset | asset_url }}"
+                  class="cat__image"
+                  loading="lazy"
+                  width="1400"
+                  height="1400"
+                  alt=""
+                >
               {%- else -%}
                 {{ 'collection-1' | placeholder_svg_tag: 'cat__image cat__image--placeholder' }}
               {%- endif -%}
@@ -290,6 +314,12 @@
           "id": "image",
           "label": "t:sections.categorias_diagonais.blocks.categoria.settings.image.label",
           "info": "t:sections.categorias_diagonais.blocks.categoria.settings.image.info"
+        },
+        {
+          "type": "text",
+          "id": "image_asset",
+          "label": "t:sections.categorias_diagonais.blocks.categoria.settings.image_asset.label",
+          "info": "t:sections.categorias_diagonais.blocks.categoria.settings.image_asset.info"
         },
         {
           "type": "select",

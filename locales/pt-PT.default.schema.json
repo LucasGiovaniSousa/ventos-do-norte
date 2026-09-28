@@ -539,6 +539,10 @@
               "options__5": {
                 "label": "Bola"
               }
+            },
+            "image_asset": {
+              "label": "Foto do tema (ficheiro em assets/)",
+              "info": "Nome do ficheiro, por exemplo cat-pipas.jpg. Só é usada se não escolheres imagem acima. Serve para a página nascer com fotografias antes de haver ficheiros carregados na loja."
             }
           }
         }

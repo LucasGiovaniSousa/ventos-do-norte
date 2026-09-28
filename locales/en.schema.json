@@ -539,6 +539,10 @@
               "options__5": {
                 "label": "Ball"
               }
+            },
+            "image_asset": {
+              "label": "Theme photo (file in assets/)",
+              "info": "File name, e.g. cat-pipas.jpg. Only used if no image is picked above. Lets the page ship with photographs before any files are uploaded to the shop."
             }
           }
         }
