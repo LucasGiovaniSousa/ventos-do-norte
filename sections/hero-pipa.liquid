@@ -314,7 +314,17 @@
   .hero__content { max-width: 52ch; }
 
   @media screen and (min-width: 1001px) {
-    .hero__content { max-width: min(56%, 54ch); }
+    /* Só a percentagem manda aqui.
+
+       Havia também um tecto de 54ch (~430px). Num ecrã de 1500px a coluna
+       ficava nesses 430px enquanto a letra crescia até 5rem, e o título saía
+       uma palavra por linha: DO / BRASIL / PARA / PORTUGAL. Quatro linhas
+       estreitas ao lado de metade do ecrã vazia — foi o "amultuado".
+
+       Sem o tecto, a coluna acompanha o ecrã e o título assenta em duas
+       linhas cheias. O parágrafo não se estica com ela: tem o seu próprio
+       limite de 42ch, que é o que mantém a linha legível. */
+    .hero__content { max-width: 56%; }
   }
   .hero__eyebrow { color: var(--vdn-amarelo); }
   .hero__eyebrow::before { background: var(--vdn-amarelo); }
