@@ -464,12 +464,29 @@ textarea.field__input:focus {
   .product-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--sp-5) var(--sp-3); }
 }
 
-.card-product { position: relative; height: 100%; }
+/* O card é ele próprio uma coluna flex.
+
+   Era só `height: 100%`, e o <a> lá dentro também. O botão de compra é irmão
+   do <a>, não filho — tem de ser, porque um <button> ou <form> dentro de um
+   link é markup inválido e quebra a navegação por teclado. Com o link a
+   ocupar os 100% da altura, o botão não tinha onde caber: era empurrado para
+   BAIXO do card e transbordava a célula da grelha, chegando a aterrar por
+   cima da secção seguinte.
+
+   Agora o card reparte a altura: o link fica com o que sobra (flex: 1) e o
+   botão assenta no fim, dentro das suas fronteiras. */
+.card-product {
+  position: relative;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
 
 .card-product__link {
   display: flex;
   flex-direction: column;
-  height: 100%;
+  flex: 1 1 auto;
+  min-height: 0;
   text-decoration: none;
   color: inherit;
 }
