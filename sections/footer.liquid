@@ -82,10 +82,10 @@
 
             <p class="footer__tagline">{{ settings.brand_tagline }}</p>
 
-            <div class="footer__flags" aria-hidden="true">
-              <span class="footer__flag footer__flag--br"></span>
-              <span class="footer__flag footer__flag--pt"></span>
-              <span class="footer__flag footer__flag--eu"></span>
+            <div class="footer__flags">
+              {% render 'bandeira', pais: 'br', classe: 'footer__flag', decorativa: true %}
+              {% render 'bandeira', pais: 'pt', classe: 'footer__flag', decorativa: true %}
+              {% render 'bandeira', pais: 'eu', classe: 'footer__flag', decorativa: true %}
             </div>
           </div>
 
@@ -304,11 +304,17 @@
     max-width: 22ch;
   }
 
-  .footer__flags { display: flex; gap: 6px; }
-  .footer__flag { width: 28px; height: 18px; border-radius: 2px; }
-  .footer__flag--br { background: linear-gradient(135deg, var(--vdn-verde) 45%, var(--vdn-amarelo) 45%); }
-  .footer__flag--pt { background: linear-gradient(90deg, var(--vdn-verde) 40%, var(--vdn-vermelho) 40%); }
-  .footer__flag--eu { background-color: var(--vdn-azul); }
+  /* As três bandeiras são SVG com as proporções oficiais, por isso a altura
+     sai da largura — fixá-la esticava o Brasil, que é 10:7, para o 2:3 das
+     outras duas. Eram três blocos pintados com as cores da marca, e o da
+     União Europeia era um azul liso sem estrela nenhuma. */
+  .footer__flags { display: flex; align-items: center; gap: 6px; }
+  .footer__flag {
+    width: 28px;
+    height: auto;
+    border-radius: 2px;
+    box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.22);
+  }
 
   .footer__heading {
     margin: 0 0 var(--sp-4);

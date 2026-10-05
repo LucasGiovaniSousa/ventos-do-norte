@@ -36,16 +36,27 @@
   assign classe = classe | default: ''
 -%}
 
+{%- comment -%}
+  decorativa: quando a bandeira é só ornamento e o texto ao lado já diz o
+  mesmo — é o caso das três do rodapé. Aí leva aria-hidden e dispensa o
+  <title>, senão um leitor de ecrã anuncia três países que ninguém pediu.
+{%- endcomment -%}
+{%- if decorativa -%}
+  {%- assign a11y = 'aria-hidden="true"' -%}
+{%- else -%}
+  {%- assign a11y = 'role="img"' -%}
+{%- endif -%}
+
 {%- case pais -%}
   {%- when 'br' -%}
     <svg
       class="{{ classe }}"
       viewBox="0 0 20 14"
-      role="img"
-      aria-label="{{ 'general.flags.br' | t }}"
+      {{ a11y }}
+      {% unless decorativa %}aria-label="{{ 'general.flags.br' | t }}"{% endunless %}
       focusable="false"
     >
-      <title>{{ 'general.flags.br' | t }}</title>
+      {% unless decorativa %}<title>{{ 'general.flags.br' | t }}</title>{% endunless %}
       <rect width="20" height="14" fill="#009b3a" />
       <path d="M10 1.4 18.6 7 10 12.6 1.4 7Z" fill="#fedf00" />
       <circle cx="10" cy="7" r="3.5" fill="#002776" />
@@ -65,11 +76,11 @@
     <svg
       class="{{ classe }}"
       viewBox="0 0 30 20"
-      role="img"
-      aria-label="{{ 'general.flags.pt' | t }}"
+      {{ a11y }}
+      {% unless decorativa %}aria-label="{{ 'general.flags.pt' | t }}"{% endunless %}
       focusable="false"
     >
-      <title>{{ 'general.flags.pt' | t }}</title>
+      {% unless decorativa %}<title>{{ 'general.flags.pt' | t }}</title>{% endunless %}
       <rect width="30" height="20" fill="#da291c" />
       <rect width="12" height="20" fill="#046a38" />
       {%- comment -%}
@@ -82,5 +93,31 @@
       <path d="M8.2 7.4h7.6M8.2 12.6h7.6" stroke="#ffe900" stroke-width="0.7" />
       <path d="M9.9 6.6h4.2v5.1l-2.1 1.7-2.1-1.7Z" fill="#fff" stroke="#da291c" stroke-width="0.8" />
       <path d="M11 7.6h2v3.6l-1 .8-1-.8Z" fill="#da291c" />
+    </svg>
+
+  {%- when 'eu' -%}
+    <svg
+      class="{{ classe }}"
+      viewBox="0 0 30 20"
+      {{ a11y }}
+      {% unless decorativa %}aria-label="{{ 'general.flags.eu' | t }}"{% endunless %}
+      focusable="false"
+    >
+      {% unless decorativa %}<title>{{ 'general.flags.eu' | t }}</title>{% endunless %}
+      <rect width="30" height="20" fill="#003399" />
+      {%- comment -%}
+        Doze estrelas em círculo, raio igual a um terço da altura do pano,
+        uma a cada 30 graus, a primeira ao alto — a construção oficial. O
+        número é fixo e nunca representou o número de países: foi sempre doze.
+
+        São círculos e não estrelas de cinco pontas. A 28px de largura cada
+        estrela ocupa cerca de 2px: as pontas desaparecem e o que fica é uma
+        mancha irregular. Um círculo nítido é mais fiel ao que o olho vê do
+        que uma estrela esborratada.
+      {%- endcomment -%}
+      <g fill="#ffcc00">
+        <circle cx="15.00" cy="3.33" r="0.78"/><circle cx="18.33" cy="4.23" r="0.78"/><circle cx="20.77" cy="6.67" r="0.78"/><circle cx="21.67" cy="10.00" r="0.78"/><circle cx="20.77" cy="13.33" r="0.78"/><circle cx="18.33" cy="15.77" r="0.78"/>
+        <circle cx="15.00" cy="16.67" r="0.78"/><circle cx="11.67" cy="15.77" r="0.78"/><circle cx="9.23" cy="13.33" r="0.78"/><circle cx="8.33" cy="10.00" r="0.78"/><circle cx="9.23" cy="6.67" r="0.78"/><circle cx="11.67" cy="4.23" r="0.78"/>
+      </g>
     </svg>
 {%- endcase -%}

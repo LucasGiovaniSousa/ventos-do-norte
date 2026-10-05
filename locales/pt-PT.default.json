@@ -44,7 +44,8 @@
     },
     "flags": {
       "br": "Bandeira do Brasil",
-      "pt": "Bandeira de Portugal"
+      "pt": "Bandeira de Portugal",
+      "eu": "Bandeira da União Europeia"
     }
   },
   "accessibility": {
