@@ -235,9 +235,9 @@
 
       {%- if section.settings.show_flags -%}
         <div class="hero__route" data-reveal>
-          <span class="hero__route-flag hero__route-flag--br"></span>
+          {% render 'bandeira', pais: 'br', classe: 'hero__route-flag' %}
           <span class="hero__route-line"></span>
-          <span class="hero__route-flag hero__route-flag--pt"></span>
+          {% render 'bandeira', pais: 'pt', classe: 'hero__route-flag' %}
           <span class="hero__route-text">{{ settings.brand_tagline }}</span>
         </div>
       {%- endif -%}
@@ -401,9 +401,19 @@
     border-top: 1px solid rgba(255, 255, 255, 0.12);
   }
 
-  .hero__route-flag { width: 26px; height: 17px; border-radius: 2px; flex-shrink: 0; }
-  .hero__route-flag--br { background: linear-gradient(135deg, var(--vdn-verde) 45%, var(--vdn-amarelo) 45%); }
-  .hero__route-flag--pt { background: linear-gradient(90deg, var(--vdn-verde) 40%, var(--vdn-vermelho) 40%); }
+  /* As bandeiras são SVG com as proporções oficiais — 10:7 o Brasil, 2:3
+     Portugal — por isso a altura sai da largura e não se fixa aqui: fixá-la
+     esticaria uma das duas. Antes eram dois gradientes CSS com as cores da
+     marca, que não são as cores das bandeiras. */
+  .hero__route-flag {
+    width: 26px;
+    height: auto;
+    border-radius: 2px;
+    flex-shrink: 0;
+    /* O contorno separa o verde da bandeira do preto do hero, que de outro
+       modo comem um ao outro na borda. */
+    box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.25);
+  }
 
   .hero__route-line {
     width: 42px;

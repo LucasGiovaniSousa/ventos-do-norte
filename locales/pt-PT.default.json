@@ -41,6 +41,10 @@
     },
     "whatsapp": {
       "aria_label": "Falar connosco pelo WhatsApp"
+    },
+    "flags": {
+      "br": "Bandeira do Brasil",
+      "pt": "Bandeira de Portugal"
     }
   },
   "accessibility": {

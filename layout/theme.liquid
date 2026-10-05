@@ -43,9 +43,26 @@
     {{ 'archivo-latin.woff2' | asset_url | preload_tag: as: 'font', type: 'font/woff2', crossorigin: 'anonymous' }}
     {{ 'archivo-italic-latin.woff2' | asset_url | preload_tag: as: 'font', type: 'font/woff2', crossorigin: 'anonymous' }}
 
+    {%- comment -%}
+      Ícone do separador do browser.
+
+      Um ficheiro escolhido no admin ganha sempre. Na falta dele usa-se a marca
+      que viaja no tema, para o separador nunca ficar com a folha em branco
+      genérica — que é o que estava a acontecer, porque settings.favicon nunca
+      foi preenchido.
+
+      O SVG vem primeiro: é nítido em qualquer densidade e redimensiona-se para
+      os 16px do separador e para os 180px do atalho no ecrã do telemóvel sem
+      perder nada. O PNG fica para quem não o aceite, e é o que o iOS usa no
+      apple-touch-icon, que não lê SVG.
+    {%- endcomment -%}
     {%- if settings.favicon != blank -%}
       <link rel="icon" type="image/png" href="{{ settings.favicon | image_url: width: 32, height: 32 }}">
       <link rel="apple-touch-icon" href="{{ settings.favicon | image_url: width: 180, height: 180 }}">
+    {%- else -%}
+      <link rel="icon" type="image/svg+xml" href="{{ 'favicon.svg' | asset_url }}">
+      <link rel="icon" type="image/png" sizes="180x180" href="{{ 'favicon.png' | asset_url }}">
+      <link rel="apple-touch-icon" href="{{ 'favicon.png' | asset_url }}">
     {%- endif -%}
 
     <title>

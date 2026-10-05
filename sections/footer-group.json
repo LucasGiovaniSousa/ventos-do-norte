@@ -11,13 +11,6 @@
             "text": "<p>Pipas, linhas, rabiolas, petecas e bolas de futevôlei. Trazemos do Brasil o que faz uma tarde passar depressa, e entregamos em todo o país.</p>"
           }
         },
-        "loja": {
-          "type": "menu",
-          "settings": {
-            "heading": "Loja",
-            "menu": "footer"
-          }
-        },
         "ajuda": {
           "type": "text",
           "settings": {
@@ -34,7 +27,6 @@
       },
       "block_order": [
         "marca",
-        "loja",
         "ajuda",
         "newsletter"
       ],

@@ -41,6 +41,10 @@
     },
     "whatsapp": {
       "aria_label": "Chat with us on WhatsApp"
+    },
+    "flags": {
+      "br": "Flag of Brazil",
+      "pt": "Flag of Portugal"
     }
   },
   "accessibility": {
