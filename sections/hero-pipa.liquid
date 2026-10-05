@@ -219,7 +219,13 @@
               {% render 'icon', name: 'arrow-right' %}
             </a>
           {%- endif -%}
-          {%- if section.settings.button_label_2 != blank -%}
+          {%- comment -%}
+            Exige rótulo E destino. Antes bastava o rótulo: com o link por
+            preencher saía <a href="">, que recarrega a própria página. Um
+            botão que não leva a lado nenhum é pior do que botão nenhum — o
+            visitante carrega, nada acontece, e conclui que o site está partido.
+          {%- endcomment -%}
+          {%- if section.settings.button_label_2 != blank and section.settings.button_link_2 != blank -%}
             <a href="{{ section.settings.button_link_2 }}" class="button button--secondary button--large">
               {{ section.settings.button_label_2 | escape }}
             </a>

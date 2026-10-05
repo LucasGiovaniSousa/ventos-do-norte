@@ -28,8 +28,12 @@
         {%- when 'text' -%}
           <div class="rich-text__text rte" {{ block.shopify_attributes }}>{{ block.settings.text }}</div>
         {%- when 'button' -%}
-          {%- if block.settings.button_label != blank -%}
-            <a href="{{ block.settings.button_link | default: '#' }}" class="button rich-text__button" {{ block.shopify_attributes }}>
+          {%- comment -%}
+            O `default: '#'` escondia o problema: sem destino, o botão saía
+            com href="#" e parecia funcional. Passa a exigir os dois.
+          {%- endcomment -%}
+          {%- if block.settings.button_label != blank and block.settings.button_link != blank -%}
+            <a href="{{ block.settings.button_link }}" class="button rich-text__button" {{ block.shopify_attributes }}>
               {{ block.settings.button_label | escape }}
             </a>
           {%- endif -%}

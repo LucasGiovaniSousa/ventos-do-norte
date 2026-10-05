@@ -3,8 +3,45 @@
   "name": "t:section_groups.footer.name",
   "sections": {
     "footer": {
-      "type": "footer"
+      "type": "footer",
+      "blocks": {
+        "marca": {
+          "type": "brand",
+          "settings": {
+            "text": "<p>Pipas, linhas, rabiolas, petecas e bolas de futevôlei. Trazemos do Brasil o que faz uma tarde passar depressa, e entregamos em todo o país.</p>"
+          }
+        },
+        "loja": {
+          "type": "menu",
+          "settings": {
+            "heading": "Loja",
+            "menu": "footer"
+          }
+        },
+        "ajuda": {
+          "type": "text",
+          "settings": {
+            "heading": "Ajuda",
+            "text": "<p>Dúvidas antes de comprar? Fala connosco pelo <a href=\"/pages/contact\">formulário de contacto</a>.</p><p>Expedimos de Portugal em 24–48h úteis.</p>"
+          }
+        },
+        "newsletter": {
+          "type": "newsletter",
+          "settings": {
+            "heading": "Apanha o vento primeiro"
+          }
+        }
+      },
+      "block_order": [
+        "marca",
+        "loja",
+        "ajuda",
+        "newsletter"
+      ],
+      "settings": {}
     }
   },
-  "order": ["footer"]
+  "order": [
+    "footer"
+  ]
 }
