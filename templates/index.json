@@ -3,9 +3,9 @@
     "hero": {
       "type": "hero-pipa",
       "settings": {
-        "eyebrow": "Pipas · Linhas · Acessórios",
+        "eyebrow": "Petecas · Futevôlei · Direto do Brasil",
         "heading": "Do Brasil para Portugal",
-        "subheading": "Pipas, linhas, rabiolas, petecas e futevôlei. Tudo o que precisas para viver o vento, entregue em todo o país.",
+        "subheading": "Peteca de pena natural e bola oficial de futevôlei, escolhidas uma a uma. Entregamos em todo o país.",
         "button_label": "Ver catálogo",
         "button_label_2": "A nossa história",
         "height": "large",
@@ -19,58 +19,6 @@
         "speed": 40,
         "reverse": false,
         "diagonal": false
-      }
-    },
-    "categorias": {
-      "type": "categorias-diagonais",
-      "blocks": {
-        "pipas": {
-          "type": "categoria",
-          "settings": {
-            "title": "Pipas",
-            "icon": "pipa",
-            "image_asset": "cat-pipas.jpg"
-          }
-        },
-        "petecas": {
-          "type": "categoria",
-          "settings": {
-            "title": "Petecas",
-            "icon": "peteca",
-            "image_asset": "cat-petecas.jpg"
-          }
-        },
-        "futevolei": {
-          "type": "categoria",
-          "settings": {
-            "title": "Futevôlei",
-            "icon": "bola",
-            "image_asset": "cat-futevolei.jpg"
-          }
-        }
-      },
-      "block_order": [
-        "pipas",
-        "petecas",
-        "futevolei"
-      ],
-      "settings": {
-        "eyebrow": "O catálogo",
-        "heading": "Três ventos",
-        "lead": "Começámos pequenos e escolhidos: uma pipa, uma peteca e uma bola. Cada um testado antes de entrar no catálogo.",
-        "link_label": "Ver tudo"
-      }
-    },
-    "mais_vendidos": {
-      "type": "featured-collection",
-      "settings": {
-        "eyebrow": "O catálogo completo",
-        "heading": "Três para começar",
-        "products_to_show": 3,
-        "columns_desktop": 3,
-        "color_scheme": "light",
-        "show_view_all": false,
-        "collection": "all"
       }
     },
     "lancamento": {
@@ -108,13 +56,14 @@
         "f4"
       ],
       "settings": {
-        "eyebrow": "O carro-chefe",
-        "heading": "Bola oficial de Futevôlei Altinha",
+        "eyebrow": "Um de dois",
+        "heading": "Bola Oficial de Futevôlei Altinha",
         "text": "<p>Desenvolvida para quem gosta de diversão, praia, amigos e desporto. Toque macio, costura reforçada e o equilíbrio certo para o altinha.</p>",
-        "badge": "Em destaque",
+        "badge": "Mais vendida",
         "button_label": "Avisa-me",
         "product": "bola-futevolei-altinha",
-        "image_asset": "bola-futevolei-redonda.jpg"
+        "image_asset": "bola-futevolei-redonda.jpg",
+        "reverse": false
       }
     },
     "faixa_fundo": {
@@ -197,15 +146,81 @@
         "p4"
       ],
       "settings": {}
+    },
+    "destaque_peteca": {
+      "type": "produto-lancamento",
+      "blocks": {
+        "f1": {
+          "type": "feature",
+          "settings": {
+            "text": "Penas naturais, uma a uma à mão"
+          }
+        },
+        "f2": {
+          "type": "feature",
+          "settings": {
+            "text": "Base de borracha que não desfaz no toque"
+          }
+        },
+        "f3": {
+          "type": "feature",
+          "settings": {
+            "text": "Voo alto e previsível, como deve ser"
+          }
+        },
+        "f4": {
+          "type": "feature",
+          "settings": {
+            "text": "Para a praia, o jardim ou o corredor lá de casa"
+          }
+        }
+      },
+      "block_order": [
+        "f1",
+        "f2",
+        "f3",
+        "f4"
+      ],
+      "settings": {
+        "product": "peteca-altiva-sport",
+        "eyebrow": "O outro",
+        "heading": "Peteca Altiva Sport",
+        "text": "<p>A peteca não precisa de rede, de campo nem de equipa. Precisa de duas mãos e de alguém à frente. É o jogo mais fácil de começar e o mais difícil de largar.</p>",
+        "badge": "Três cores",
+        "image_asset": "peteca-recorte.png",
+        "reverse": true
+      }
+    },
+    "pipas": {
+      "type": "rich-text",
+      "blocks": {
+        "h": {
+          "type": "heading",
+          "settings": {
+            "heading": "E as pipas?"
+          }
+        },
+        "t": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Estão a caminho. Somos uma loja de vento e o vento começou nelas — papel de seda, linha encerada, rabiola a desenhar no céu. Queremos trazê-las como deve ser, e isso leva o tempo que leva.</p><p>Até lá, há a peteca e a bola. Também se jogam ao ar livre, também fazem a tarde passar depressa.</p>"
+          }
+        }
+      },
+      "block_order": [
+        "h",
+        "t"
+      ],
+      "settings": {}
     }
   },
   "order": [
     "hero",
     "faixa_topo",
-    "categorias",
-    "mais_vendidos",
     "lancamento",
+    "destaque_peteca",
     "faixa_fundo",
+    "pipas",
     "historia",
     "pilares"
   ]

@@ -38,7 +38,7 @@
   endif
 -%}
 
-<section class="lancamento vdn-section vdn-section--dark has-grain glow-bg">
+<section class="lancamento vdn-section vdn-section--dark has-grain glow-bg{% if section.settings.reverse %} lancamento--reverse{% endif %}">
   <div class="lancamento__inner page-width">
     <div class="lancamento__media" data-reveal="scale">
       {%- if image != blank -%}
@@ -158,6 +158,13 @@
     align-items: center;
     gap: var(--sp-8);
   }
+
+  /* Com duas destas secções seguidas, a foto sempre do mesmo lado faz a
+     página bater sempre no mesmo sítio. A inversão é só de ordem visual: no
+     código a imagem continua a vir primeiro, por isso num ecrã estreito —
+     onde a grelha passa a uma coluna — ela fica em cima nas duas, que é a
+     ordem de leitura certa. */
+  .lancamento--reverse .lancamento__media { order: 2; }
 
   /* ---------- Média ---------- */
   .lancamento__media { position: relative; }
@@ -316,6 +323,13 @@
       "id": "badge",
       "default": "Em breve",
       "label": "t:sections.produto_lancamento.settings.badge.label"
+    },
+    {
+      "type": "checkbox",
+      "id": "reverse",
+      "default": false,
+      "label": "t:sections.produto_lancamento.settings.reverse.label",
+      "info": "t:sections.produto_lancamento.settings.reverse.info"
     },
     {
       "type": "text",

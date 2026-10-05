@@ -584,6 +584,10 @@
         "image_asset": {
           "label": "Foto do tema (ficheiro em assets/)",
           "info": "Nome do ficheiro, por exemplo bola-futevolei-recorte.webp. Ganha à imagem do produto. Serve para usar uma versão recortada, sem fundo, que assente sobre o escuro da secção."
+        },
+        "reverse": {
+          "label": "Imagem à direita",
+          "info": "Troca os lados. Útil quando há duas destas secções seguidas."
         }
       },
       "blocks": {
