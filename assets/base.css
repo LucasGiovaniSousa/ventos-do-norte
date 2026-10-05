@@ -723,7 +723,19 @@ textarea.field__input:focus {
   animation: marquee-scroll var(--marquee-duration, 40s) linear infinite;
 }
 
-.marquee:hover .marquee__track { animation-play-state: paused; }
+/* A pausa ao passar o rato só existe onde há rato.
+
+   Num ecrã tátil o :hover não é um estado passageiro: o browser aplica-o ao
+   primeiro toque e só o larga quando se toca noutro sítio. Bastava roçar a
+   faixa ao deslizar a página para ela parar — e ficar parada. O que se via
+   então eram as duas cópias do texto imóveis lado a lado, que lê como texto
+   duplicado e mal formatado, não como uma animação em pausa.
+
+   (hover: hover) exclui os ecrãs táteis; (pointer: fine) exclui os híbridos
+   a serem usados com o dedo. */
+@media (hover: hover) and (pointer: fine) {
+  .marquee:hover .marquee__track { animation-play-state: paused; }
+}
 .marquee--reverse .marquee__track { animation-direction: reverse; }
 
 @keyframes marquee-scroll {
