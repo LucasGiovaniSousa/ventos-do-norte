@@ -13,7 +13,7 @@
     meta description, URL canonica.
   - Favicon e apple-touch-icon (config settings.favicon).
   - Open Graph / JSON-LD e demais tags via {% render 'meta-tags' %}.
-  - CSS: index.css (ponto de entrada) + css-variables (variaveis
+  - CSS: normalizar.css + base.css (um asset_url cada) + css-variables (variaveis
     do tema geradas pelas settings).
   - Scripts: troca no-js -> js e carrega carrinho.js (defer).
   - {{ content_for_header }}: scripts obrigatorios do Shopify.
@@ -61,7 +61,30 @@
 
     {% render 'meta-tags' %}
 
-    {{ 'index.css' | asset_url | stylesheet_tag }}
+    {%- comment -%}
+      As folhas de estilo são carregadas UMA A UMA, e nunca por @import.
+
+      PORQUÊ, com cicatriz:
+      Havia um index.css que fazia @import url('./base.css'). O layout pedia o
+      index.css por asset_url, que lhe acrescenta ?v=<hash> — o Shopify muda
+      esse hash sempre que o ficheiro muda, e é isso que faz a cache soltar a
+      versão velha. Mas o @import lá dentro pedia ./base.css SEM hash nenhum.
+
+      O CDN serve esse pedido com cache-control: max-age=31557600, um ano.
+      Resultado: o base.css ficou congelado numa versão de há uma semana e
+      nenhuma alteração ao CSS chegava a quem já tinha visitado o site. O
+      ficheiro no tema estava certo, o servido estava velho — por isso todas
+      as verificações ao tema passavam e o site continuava errado.
+
+      Cada ficheiro pedido pelo seu próprio asset_url tem o seu próprio hash.
+      Muda um, solta esse. De caminho, deixam de descarregar em cadeia: o
+      @import obriga o browser a ler o primeiro antes de saber que existe o
+      segundo.
+
+      A ORDEM IMPORTA: normalizar antes de base.
+    {%- endcomment -%}
+    {{ 'normalizar.css' | asset_url | stylesheet_tag }}
+    {{ 'base.css' | asset_url | stylesheet_tag }}
     {% render 'css-variables' %}
 
     <script>
