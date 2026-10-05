@@ -28,7 +28,10 @@
 
 {%- liquid
   assign product = section.settings.product
-  assign image = section.settings.image | default: product.featured_image
+  assign image = section.settings.image
+  if image == blank and section.settings.image_asset == blank
+    assign image = product.featured_image
+  endif
   assign can_buy = false
   if product != blank and product.available and product.variants.size == 1
     assign can_buy = true
@@ -49,6 +52,24 @@
             sizes: '(min-width: 1001px) 46vw, 86vw',
             alt: image.alt | default: product.title | default: '' | escape
         }}
+      {%- elsif section.settings.image_asset != blank -%}
+        {%- comment -%}
+          Foto do tema, em assets/. Existe pela mesma razão que na secção das
+          categorias: o image_picker guarda uma referência a um ficheiro
+          carregado no admin, e do git não se põe lá nada.
+
+          Aqui serve um segundo propósito. A imagem do produto na loja é o
+          mockup do fornecedor, com fundo e com o aviso impresso de que a
+          imagem é ilustrativa. Esta é a mesma bola recortada, sem fundo, para
+          assentar sobre o escuro da secção.
+        {%- endcomment -%}
+        <img
+          src="{{ section.settings.image_asset | asset_url }}"
+          class="lancamento__image"
+          width="900"
+          height="900"
+          alt="{{ product.title | default: section.settings.heading | escape }}"
+        >
       {%- else -%}
         {{ 'product-1' | placeholder_svg_tag: 'lancamento__image' }}
       {%- endif -%}
@@ -146,14 +167,9 @@
     width: 100%;
     height: auto;
     filter: drop-shadow(0 40px 70px rgba(0, 0, 0, 0.5));
-    animation: lancamento-spin 26s linear infinite;
   }
 
   /* Rotação muito lenta: a bola parece suspensa, não a girar. */
-  @keyframes lancamento-spin {
-    from { transform: rotate(0deg); }
-    to { transform: rotate(360deg); }
-  }
 
   .lancamento__badge {
     position: absolute;
@@ -284,6 +300,12 @@
       "id": "badge",
       "default": "Em breve",
       "label": "t:sections.produto_lancamento.settings.badge.label"
+    },
+    {
+      "type": "text",
+      "id": "image_asset",
+      "label": "t:sections.produto_lancamento.settings.image_asset.label",
+      "info": "t:sections.produto_lancamento.settings.image_asset.info"
     },
     {
       "type": "image_picker",

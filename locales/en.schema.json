@@ -580,6 +580,10 @@
         },
         "button_link": {
           "label": "Button link"
+        },
+        "image_asset": {
+          "label": "Theme photo (file in assets/)",
+          "info": "File name, e.g. bola-futevolei-recorte.webp. Takes precedence over the product image. Use it for a cut-out version that sits on the section's dark ground."
         }
       },
       "blocks": {
