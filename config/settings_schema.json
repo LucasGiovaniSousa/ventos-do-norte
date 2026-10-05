@@ -321,6 +321,13 @@
         "id": "whatsapp_number",
         "label": "t:settings_schema.marca.settings.whatsapp_number.label",
         "info": "t:settings_schema.marca.settings.whatsapp_number.info"
+      },
+      {
+        "type": "text",
+        "id": "whatsapp_message",
+        "default": "Olá! Vi a loja e queria saber mais.",
+        "label": "t:settings_schema.marca.settings.whatsapp_message.label",
+        "info": "t:settings_schema.marca.settings.whatsapp_message.info"
       }
     ]
   },

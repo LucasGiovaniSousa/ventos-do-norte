@@ -38,6 +38,9 @@
       "email_placeholder": "Your email",
       "confirmation": "Thanks! You're on board.",
       "button_label": "Subscribe"
+    },
+    "whatsapp": {
+      "aria_label": "Chat with us on WhatsApp"
     }
   },
   "accessibility": {

@@ -1,0 +1,126 @@
+{%- comment -%}
+  ============================================================
+  whatsapp-flutuante — botão de contacto no canto inferior direito
+  ============================================================
+
+  O QUE FAZ:
+  Um botão fixo que abre uma conversa de WhatsApp com a loja, já com uma
+  mensagem escrita. Aparece em todas as páginas.
+
+  COMO USAR:
+  {% render 'whatsapp-flutuante' %}  — uma vez, no fim do <body>.
+
+  SÓ APARECE SE HOUVER NÚMERO:
+  Sem settings.whatsapp_number preenchido não se renderiza nada. Um botão de
+  contacto que abre o WhatsApp sem destino é pior do que não ter botão: a
+  pessoa carrega para falar connosco e o telemóvel abre uma conversa vazia.
+
+  O NÚMERO:
+  Definições do tema → Marca → Número de WhatsApp. Escreve-se com indicativo
+  do país e sem o +, mas aqui limpamos na mesma espaços, traços, parênteses e
+  o + — o wa.me só aceita dígitos e devolve uma página de erro se receber
+  outra coisa.
+
+  ONDE SE ENCAIXA NAS CAMADAS:
+  z-index 90, de propósito abaixo das gavetas (carrinho e filtros estão em
+  130). Quando uma gaveta abre, o botão fica por baixo do véu escuro em vez de
+  flutuar por cima dela.
+
+  A BARRA DE COMPRA:
+  Nas fichas de produto, abaixo de 1000px, há uma barra fixa em baixo com o
+  preço e o "adicionar ao carrinho". O botão sobe para não aterrar em cima
+  dela — ver a regra no fim do <style>.
+{%- endcomment -%}
+
+{%- liquid
+  assign numero = settings.whatsapp_number | remove: '+' | remove: ' ' | remove: '-' | remove: '(' | remove: ')' | remove: '.' | strip
+-%}
+
+{%- if numero != blank -%}
+  {%- liquid
+    assign msg = settings.whatsapp_message | default: 'Olá! Vi a loja e queria saber mais.'
+  -%}
+
+  <a
+    class="zap"
+    href="https://wa.me/{{ numero }}?text={{ msg | url_encode }}"
+    target="_blank"
+    rel="noopener"
+    aria-label="{{ 'general.whatsapp.aria_label' | t }}"
+  >
+    {% render 'icon', name: 'whatsapp' %}
+  </a>
+
+  <style>
+    .zap {
+      position: fixed;
+      right: var(--sp-5);
+      /* O inset de segurança afasta o botão da barra de gestos do iPhone, que
+         de outro modo rouba os toques na borda de baixo. */
+      bottom: calc(var(--sp-5) + env(safe-area-inset-bottom, 0px));
+      z-index: 90;
+
+      display: grid;
+      place-items: center;
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+
+      /* Verde do WhatsApp, não o verde da marca.
+
+         O verde da loja (--vdn-verde) é o da acção de comprar. Dois verdes
+         iguais em ecrã punham o contacto a competir com o botão que vende, e
+         tiravam ao ícone o que ele tem de melhor: ser reconhecido antes de
+         ser lido. */
+      color: #fff;
+      background-color: #25d366;
+      box-shadow: 0 6px 20px rgba(10, 10, 11, 0.28);
+
+      transition:
+        transform var(--dur-2) var(--ease-out-quart),
+        box-shadow var(--dur-2) var(--ease-out-quart);
+    }
+
+    .zap svg {
+      width: 28px;
+      height: 28px;
+    }
+
+    .zap:hover,
+    .zap:focus-visible {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 26px rgba(10, 10, 11, 0.36);
+    }
+
+    .zap:focus-visible {
+      outline: 2px solid var(--vdn-on-ink);
+      outline-offset: 3px;
+    }
+
+    @media screen and (min-width: 1001px) {
+      .zap {
+        right: var(--sp-6);
+        bottom: var(--sp-6);
+        width: 60px;
+        height: 60px;
+      }
+      .zap svg { width: 30px; height: 30px; }
+    }
+
+    /* Nas fichas de produto, abaixo de 1000px, a barra de compra ocupa o fundo
+       do ecrã. O botão sobe acima dela para os dois continuarem a ser
+       alcançáveis. */
+    .template-product .zap {
+      bottom: calc(var(--sp-5) + 68px + env(safe-area-inset-bottom, 0px));
+    }
+
+    @media screen and (min-width: 1001px) {
+      .template-product .zap { bottom: var(--sp-6); }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .zap { transition: none; }
+      .zap:hover, .zap:focus-visible { transform: none; }
+    }
+  </style>
+{%- endif -%}

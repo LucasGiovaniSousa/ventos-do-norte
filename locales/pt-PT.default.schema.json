@@ -819,6 +819,10 @@
         "whatsapp_number": {
           "label": "Número de WhatsApp",
           "info": "Formato internacional sem + nem espaços, ex.: 351912345678"
+        },
+        "whatsapp_message": {
+          "label": "Mensagem já escrita",
+          "info": "Aparece escrita na conversa quando a pessoa carrega no botão. Deixa em branco para abrir vazia."
         }
       }
     },

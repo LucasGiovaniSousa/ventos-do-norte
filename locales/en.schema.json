@@ -819,6 +819,10 @@
         "whatsapp_number": {
           "label": "WhatsApp number",
           "info": "International format without + or spaces, e.g. 351912345678"
+        },
+        "whatsapp_message": {
+          "label": "Prefilled message",
+          "info": "Appears already typed in the chat when someone taps the button. Leave blank to open an empty one."
         }
       }
     },

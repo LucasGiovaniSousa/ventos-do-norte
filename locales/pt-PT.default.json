@@ -38,6 +38,9 @@
       "email_placeholder": "O teu e-mail",
       "confirmation": "Obrigado! Já estás a bordo.",
       "button_label": "Subscrever"
+    },
+    "whatsapp": {
+      "aria_label": "Falar connosco pelo WhatsApp"
     }
   },
   "accessibility": {

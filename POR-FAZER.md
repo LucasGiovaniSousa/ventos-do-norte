@@ -239,6 +239,7 @@ três bandeiras e a Archivo, e isso mantém-se.
 - [ ] Secção **kits** com poupança calculada a partir do preço de comparação
 - [ ] Ficha técnica na página de produto a ler os metacampos
 - [ ] Aviso «últimas N unidades» no cartão (`stock_low_threshold`)
-- [ ] Botão flutuante de **WhatsApp**
+- [x] Botão flutuante de **WhatsApp** — feito. Só aparece quando o número
+      estiver em Definições do tema → Marca → Número de WhatsApp
 - [ ] Definições de morada/telefone/horário → JSON-LD de loja local
 - [ ] Levantamento em loja — só se houver morada física
