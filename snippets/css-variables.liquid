@@ -182,9 +182,18 @@
     --sp-4: 16px;
     --sp-5: 24px;
     --sp-6: 32px;
-    --sp-7: 48px;
-    --sp-8: 64px;
-    --sp-9: 96px;
+    /* Os três maiores são fluidos.
+
+     A escala tipográfica já encolhia sozinha em ecrãs pequenos; o espaçamento
+     não. Uma secção com padding-block de 64px fixos ocupa 33% da altura de um
+     telemóvel só em ar — o conteúdo aparecia em ilhas separadas por vazio, que
+     é o que faz uma página parecer desarrumada sem nenhum elemento estar mal.
+
+     Os valores batem certo com os antigos a partir de 1000px de largura: no
+     desktop nada muda. Abaixo disso apertam até caber. */
+    --sp-7: clamp(28px, 20px + 2.8vw, 48px);
+    --sp-8: clamp(36px, 25px + 3.9vw, 64px);
+    --sp-9: clamp(52px, 35px + 6.1vw, 96px);
     --sp-10: 128px;
 
     /* ========================================================

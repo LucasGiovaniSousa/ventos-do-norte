@@ -92,10 +92,16 @@
     font-size: var(--f7);
   }
 
+  /* auto-fit em vez de três colunas fixas.
+
+     Eram repeat(3, 1fr) sem nenhuma regra para ecrãs pequenos: num telemóvel
+     de 390px davam três colunas de ~105px, com os títulos dos artigos a cair
+     numa letra por linha. Agora a grelha decide quantas cabem — três no
+     desktop, duas em tablet, uma no telemóvel — sem precisar de breakpoints. */
   .blog__grid {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 32px;
+    grid-template-columns: repeat(auto-fit, minmax(min(260px, 100%), 1fr));
+    gap: var(--sp-6);
   }
 
   .blog-card__media {
