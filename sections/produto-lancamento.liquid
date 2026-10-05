@@ -65,7 +65,7 @@
         {%- endcomment -%}
         <img
           src="{{ section.settings.image_asset | asset_url }}"
-          class="lancamento__image"
+          class="lancamento__image lancamento__image--redonda"
           width="900"
           height="900"
           alt="{{ product.title | default: section.settings.heading | escape }}"
@@ -161,6 +161,22 @@
 
   /* ---------- Média ---------- */
   .lancamento__media { position: relative; }
+
+  /* O recorte é feito aqui, não no ficheiro.
+
+     A primeira versão foi um WebP com canal alfa: 74 KB contra os 811 KB do
+     mesmo PNG. Só que o Shopify transcodifica os WebP de assets/ para PNG ao
+     servi-los — o ficheiro chegava ao browser com 735 KB e content-type
+     image/png. A poupança não sobrevivia à viagem.
+
+     A bola é uma esfera fotografada ao centro: a sua silhueta É um círculo.
+     Então o ficheiro é um JPEG quadrado, colado à bola — 96 KB — e quem
+     recorta é o clip-path. Mesmo resultado no ecrã, oito vezes menos peso, e
+     a orla fica suavizada pelo browser.
+
+     A classe é só para a foto do tema: uma imagem escolhida no editor pode
+     não ser redonda, e um clip circular estragaria-a. */
+  .lancamento__image--redonda { clip-path: circle(49.6% at 50% 50%); }
 
   .lancamento__image {
     display: block;
