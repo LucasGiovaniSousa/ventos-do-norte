@@ -37,6 +37,20 @@
 
     <ul class="pilares__grid" role="list" data-reveal-stagger="80">
       {%- for block in section.blocks -%}
+        {%- comment -%}
+          Um pilar que promete WhatsApp só se mostra se houver número.
+
+          Mesma regra do botão flutuante, e pela mesma razão: a loja estava a
+          dizer "tira dúvidas por WhatsApp" com o campo do número por
+          preencher. Quem lê isto procura o contacto e não encontra nada — uma
+          promessa por cumprir custa mais do que a ausência dela.
+
+          Assim que o número entrar em Definições do tema → Marca, o pilar
+          volta sozinho. Sem ninguém se lembrar de o repor.
+        {%- endcomment -%}
+        {%- if block.settings.icon == 'whatsapp' and settings.whatsapp_number == blank -%}
+          {%- continue -%}
+        {%- endif -%}
         <li class="pilar" data-reveal {{ block.shopify_attributes }}>
           <span class="pilar__icon pilar__icon--{{ forloop.index0 | modulo: 4 }}">
             {% render 'icon', name: block.settings.icon %}
