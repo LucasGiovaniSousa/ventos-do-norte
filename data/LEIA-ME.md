@@ -74,8 +74,16 @@ Pré-visualização), compostas sobre branco puro e enquadradas em 2000×2000 co
 faz a grelha do catálogo parecer alinhada em vez de cada produto flutuar num
 sítio diferente do card.
 
-O utilitário está em `/private/tmp/.../bgtool/` (temporário). Se for preciso
-repetir, o código está no histórico desta conversa — são ~80 linhas de Swift.
+O utilitário de recorte estava em `/private/tmp/.../bgtool/` (temporário) e
+perdeu-se com a pasta. O enquadramento — fundo a branco puro, 2000×2000, 8 % de
+margem — ficou em [`enquadrar.py`](enquadrar.py), que já vive no repositório:
+
+```bash
+python3 -m pip install pillow          # uma vez
+python3 data/enquadrar.py origem.png data/produto/destino.jpg
+```
+
+Não recorta fundos: parte de uma foto que já tem fundo claro e limpo.
 
 ## Prontas a usar (10)
 
@@ -100,3 +108,45 @@ Não é limitação da ferramenta, é da fotografia. A solução é rápida:
 > `pipa-personagem-heroi` saiu perfeita — e essa foi tirada na mesma loja.
 
 Depois é só voltar a passar pelo recorte.
+
+---
+
+# Fotos geradas por IA — Novembro de 2026
+
+Oito fotos de `produto/` não são fotografias: foram geradas por IA (Dreamina,
+modelo GPT Image 2.5) a partir de fotos tiradas na loja e de capturas de ecrã,
+e depois passadas pelo `enquadrar.py`.
+
+| Ficheiro | Produto | Feita a partir de |
+|---|---|---|
+| `carretel-madeira-catrina.jpg` · `-chamas.jpg` · `-tamanhos.jpg` | Carretel de Madeira Estampado | foto da bancada com os carretéis |
+| `pipa-cruz-rosa.jpg` | Pipa Cruz Rosa | fotograma de vídeo, pipa dentro do saco |
+| `pipa-mosaico-tricolor.jpg` | Pipa Mosaico Tricolor | foto do pacote na loja |
+| `linha-10-vera-cruz-cores.jpg` | Linha 10 Vera Cruz | foto dos cones na loja |
+| `vareta-fibra-feixe.jpg` · `-detalhe.jpg` | Vareta de Fibra de Vidro | captura de um anúncio de outra loja |
+
+**O que isto quer dizer na prática**
+
+- Mostram o produto certo, com o desenho e as cores certas, mas não são a peça
+  que o cliente recebe. As descrições dizem «a fotografia é ilustrativa» onde
+  isso importa (pipas coladas à mão, estampa sortida do carretel). Não tirar
+  essa frase enquanto as fotos forem estas.
+- **A da Linha 10 Vera Cruz é a mais frágil.** O rótulo foi reconstruído a
+  partir de uma foto de 309 px: o «10», o nome e «2012 metros» estão lá, o
+  resto do desenho é aproximado. É a primeira a trocar por uma fotografia a
+  sério — é o rótulo de uma marca que não é nossa.
+- A das varetas foi refeita com outro enquadramento de propósito, para não
+  ser uma cópia da fotografia do anúncio de onde partiu.
+- Trocar qualquer uma por uma fotografia real é sempre melhor. O conselho de
+  cima continua a valer: parede lisa, luz de janela, de frente.
+
+**O que ficou de fora, e porquê**
+
+Na foto dos carretéis, a maior parte tem personagens de cinema, banda desenhada
+e videojogos, e no vídeo das pipas há uma com o símbolo de um super-herói. Não
+gerei fotos dessas: é o mesmo problema das pipas de personagens descrito acima,
+e uma foto de catálogo com a personagem em grande é o que mais expõe a loja. As
+fotos mostram só as estampas sem personagens (a catrina e o padrão de chamas).
+Se o lote que há para vender for sobretudo de personagens, a descrição
+«estampa sortida» não resolve a questão de fundo — confirma o licenciamento
+com o fornecedor antes de pôr o carretel activo.

@@ -43,6 +43,10 @@ python3 data/loja.py estado pipa-classica ACTIVE --escrever
 python3 data/loja.py gql pedido.graphql vars.json   # qualquer coisa que a API faça
 ```
 
+Produtos novos entram pelo `data/catalogo.py` e sobem com o `data/publicar.py`
+(com fotos, em rascunho, sem tocar no que já está à venda) — ver §9 do
+[`POR-FAZER.md`](POR-FAZER.md). Fotos de produto: `data/enquadrar.py`.
+
 **Sem `--escrever` nada é escrito.** Os comandos de mudança correm em simulação
 e dizem o que fariam. É de propósito: a Admin API não tem anular, e um comando
 escrito à pressa numa loja aberta é visível a quem lá estiver no momento.
@@ -159,6 +163,7 @@ mais rápida.
 | `faixa-marca` | Faixa deslizante infinita com o slogan e as bandeiras |
 | `categorias-diagonais` | Categorias em cartões com corte diagonal; o primeiro é destaque 2×2 |
 | `featured-collection` | Grelha de produtos de uma coleção (claro ou escuro) |
+| `chegadas` | Grelha dos produtos à venda de certos tipos; sem nenhum à venda, mostra um texto de espera. Troca sozinha — ver o comentário no ficheiro |
 | `produto-lancamento` | Montra escura de um produto, com compra direta |
 | `pilares` | Promessas de serviço (envios, devoluções, pagamento) |
 | `rich-text` | Texto livre |

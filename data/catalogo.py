@@ -24,6 +24,22 @@ Português europeu. Atenção ao vocabulário que entra pelas fichas brasileiras
 # ─────────────────────────────────────────────────────────────────────────
 # Cada produto: handle, título, categoria, etiquetas, descrição, variantes.
 # Variantes: (valor da opção, preço, preço de comparação, stock, sufixo SKU)
+#
+# PRODUTO SEM OPÇÕES
+# opcao="Title" com o valor "Default Title" é a forma como a Shopify guarda um
+# produto de variante única. Com esse par a ficha não mostra selector nenhum e
+# o card ganha o botão de adição rápida — em vez de um «Tamanho: Único» que
+# obriga a um clique sem escolha.
+#
+# STOCK A ZERO
+# Os produtos acrescentados em Novembro de 2026 entram com stock 0: não se
+# sabia quantas unidades havia, e um número inventado vende o que não existe.
+# Ficam esgotados até se pôr a contagem real:
+#     python3 data/loja.py stock <sku> <quantidade> --escrever
+#
+# IMAGENS
+# Os nomes em `imagens` são ficheiros de data/produto/, já no padrão
+# 2000×2000. A primeira é a de capa. O publicar.py carrega-as sozinho.
 # ─────────────────────────────────────────────────────────────────────────
 
 CATALOGO = [
@@ -102,6 +118,52 @@ CATALOGO = [
   ),
 
   dict(
+    handle="pipa-mosaico-tricolor",
+    titulo="Pipa Mosaico Tricolor",
+    marca="Ventos do Norte",
+    tipo="Pipas",
+    etiquetas=["Pipas", "Papel de seda", "Mosaico"],
+    opcao="Title",
+    variantes=[("Default Title", "5.90", "", 0, "UN")],
+    sku="VDN-PIPA-MOS", gramas=90,
+    linha_tecnica="Papel de seda · recortes colados à mão",
+    imagens=["pipa-mosaico-tricolor.jpg"],
+    alt="Pipa quadrada de papel de seda em mosaico azul, vermelho, amarelo e branco, fundo branco",
+    seo_titulo="Pipa Mosaico Tricolor em papel de seda | Ventos do Norte",
+    seo_desc="Pipa de papel de seda em mosaico azul, vermelho e amarelo, colada à mão. Leve, sobe com pouco vento. Envio de Portugal.",
+    descricao=[
+      "Pipa quadrada de papel de seda feita em mosaico: quadrados e rectângulos azuis, vermelhos, amarelos e brancos colados um a um, simétricos em torno de uma cruz central.",
+      "O papel de seda é o material mais leve em que se faz uma pipa, e por isso levanta com um vento que mal se sente na cara. O mosaico não é só bonito de perto: a trinta metros de altura, uma estampa fina já é uma mancha, e um desenho de blocos grandes em cores primárias continua a ler-se. É uma pipa que se reconhece no céu sem ser preciso seguir a linha com os olhos.",
+      "Para quem gosta de pipa como ela sempre foi — papel, cola e vareta — e para quem vai empinar com mais gente e quer saber qual é a sua. Em vento forte não é a melhor escolha: o papel de seda rasga.",
+      "<strong>Material:</strong> papel de seda<br><strong>Formato:</strong> quadrado<br><strong>Cores:</strong> azul, vermelho, amarelo e branco<br><strong>Vento ideal:</strong> fraco a moderado",
+      "Cada pipa é colada à mão, por isso os recortes variam um pouco de uma para a outra — a fotografia é ilustrativa. A linha de voo e a rabiola vendem-se à parte.",
+    ],
+  ),
+
+  dict(
+    handle="pipa-cruz-rosa",
+    titulo="Pipa Cruz Rosa",
+    marca="Ventos do Norte",
+    tipo="Pipas",
+    etiquetas=["Pipas", "Papel de seda", "Clássica"],
+    opcao="Title",
+    variantes=[("Default Title", "5.90", "", 0, "UN")],
+    sku="VDN-PIPA-CRZ", gramas=90,
+    linha_tecnica="Papel de seda · formato clássico",
+    imagens=["pipa-cruz-rosa.jpg"],
+    alt="Pipa de papel de seda amarela com cruz rosa em X e losango azul-escuro ao centro, fundo branco",
+    seo_titulo="Pipa Cruz Rosa em papel de seda | Ventos do Norte",
+    seo_desc="Pipa de papel de seda no formato clássico brasileiro, amarela com cruz rosa. Leve e fácil de ver no céu. Envio de Portugal.",
+    descricao=[
+      "Pipa de papel de seda no formato clássico — topo direito, lados curtos e a metade de baixo a fechar em bico — amarela, com uma cruz rosa em X e um losango azul-escuro no centro.",
+      "É o formato a que no Brasil se chama simplesmente «pipa»: quando alguém desenha uma de memória, é esta que sai. Em papel de seda levanta com pouco vento e responde depressa à linha. O rosa sobre amarelo é das combinações que melhor se vêem lá em cima, tanto contra céu azul como contra céu nublado.",
+      "Para quem cresceu com elas e as quer voltar a ter na mão, e para quem vai conhecer agora a pipa brasileira pela forma mais reconhecível. Em vento forte compensa uma pipa laminada — o papel de seda rasga.",
+      "<strong>Material:</strong> papel de seda<br><strong>Formato:</strong> clássico, com bico em baixo<br><strong>Cores:</strong> amarelo, rosa e azul-escuro<br><strong>Vento ideal:</strong> fraco a moderado",
+      "Cada pipa é colada à mão, por isso os recortes variam um pouco de uma para a outra — a fotografia é ilustrativa. A linha de voo e a rabiola vendem-se à parte.",
+    ],
+  ),
+
+  dict(
     handle="linha-encerada",
     titulo="Linha Encerada para Pipa",
     marca="Ventos do Norte",
@@ -127,6 +189,35 @@ CATALOGO = [
   ),
 
   dict(
+    handle="linha-10-vera-cruz",
+    titulo="Linha 10 Vera Cruz — Algodão 2012 m",
+    marca="Vera Cruz",
+    tipo="Linhas",
+    etiquetas=["Linhas", "Algodão", "Vera Cruz", "Acessórios"],
+    opcao="Cor",
+    variantes=[("Verde-água", "9.90", "", 0, "VAG"),
+               ("Rosa", "9.90", "", 0, "ROS"),
+               ("Laranja", "9.90", "", 0, "LAR"),
+               ("Preto", "9.90", "", 0, "PRE"),
+               ("Azul-claro", "9.90", "", 0, "AZC"),
+               ("Lilás", "9.90", "", 0, "LIL"),
+               ("Vermelho", "9.90", "", 0, "VER")],
+    sku="VCZ-LINHA-10", gramas=200,
+    linha_tecnica="Algodão puro · Tex 85 · 2012 m",
+    imagens=["linha-10-vera-cruz-cores.jpg"],
+    alt="Sete cones de linha de algodão 10 Vera Cruz para pipa, em cores sortidas, fundo branco",
+    seo_titulo="Linha 10 Vera Cruz algodão 2012 m | Ventos do Norte",
+    seo_desc="Linha de algodão puro n.º 10 Vera Cruz, cone de 2012 m (2200 jardas). Sete cores. Sem cerol. Envio de Portugal em 24–48h.",
+    descricao=[
+      "Linha de algodão puro n.º 10 da Vera Cruz, em cone de 2012 metros (2200 jardas), feita para pipa.",
+      "É a linha de algodão clássica das pipas no Brasil. O algodão quase não estica, e por isso o que a pipa faz chega à mão sem atraso: sente-se o puxão, a folga e a mudança de vento no momento em que acontecem. Tex 85 quer dizer que mil metros pesam 85 gramas — fina o bastante para não pesar na pipa, com corpo para não cortar o dedo quando ela puxa.",
+      "Um cone leva 2012 metros, o que enche quatro carretéis de 500 m e ainda sobra. Compra-se uma vez e dura a época, ou divide-se por quem empina junto. A cor não muda o desempenho: serve para distinguir a tua linha da do lado.",
+      "<strong>Material:</strong> 100 % algodão<br><strong>Título:</strong> n.º 10 · Tex 85<br><strong>Comprimento:</strong> 2012 m (2200 jardas)<br><strong>Marca:</strong> Vera Cruz",
+      "<strong>Linha pura quer dizer só algodão.</strong> Não vendemos linha com cerol nem linha chilena: o vidro moído corta pessoas em motos e bicicletas e é crime. Aqui não entra.",
+    ],
+  ),
+
+  dict(
     handle="carretel-madeira",
     titulo="Carretel de Madeira Estampado",
     marca="Ventos do Norte",
@@ -137,16 +228,40 @@ CATALOGO = [
                ("Grande — 24 cm", "19.90", "", 10, "24")],
     sku="VDN-CARR-MAD", gramas=380,
     linha_tecnica="Madeira compensada · até 500 m",
-    imagens=[],
-    alt="Carretel de madeira estampado para linha de pipa, fundo branco",
+    imagens=["carretel-madeira-catrina.jpg", "carretel-madeira-chamas.jpg",
+             "carretel-madeira-tamanhos.jpg"],
+    alt="Carretel de madeira para linha de pipa, com a face estampada e furos de alívio, fundo branco",
     seo_titulo="Carretel de Madeira Estampado para Pipa | Ventos do Norte",
-    seo_desc="Carretel de madeira com furos de alívio e estampa pintada à mão. Comporta até 500 m de linha.",
+    seo_desc="Carretel de madeira com furos de alívio e face estampada a cores. Dois tamanhos, até 500 m de linha.",
     descricao=[
-      "Carretel em madeira compensada, com furos de alívio nas faces e estampa pintada à mão, uma a uma.",
+      "Carretel em madeira compensada, com furos de alívio nas faces e estampa a cores impressa na face de cima.",
       "Numa tarde inteira é o carretel que faz a diferença, não a pipa. Um que rode solto poupa o pulso e evita o pior problema de todos: a linha a prender a meio de uma soltada, com a pipa a puxar do outro lado. Os furos não são decoração — tiram peso e deixam a mão agarrar melhor quando a linha está toda fora.",
       "O de 18 cm chega para 250 metros e é mais fácil de segurar por quem tem mãos pequenas. O de 24 cm leva 500 metros e é o que se usa quando se quer mesmo mandar a pipa longe.",
-      "<strong>Material:</strong> madeira compensada<br><strong>Capacidade:</strong> até 250 m (18 cm) ou 500 m (24 cm)<br><strong>Acabamento:</strong> pintado à mão",
-      "Cada carretel é pintado à mão — a estampa que recebes não é exactamente igual à da fotografia. É a mesma técnica, não é a mesma pintura.",
+      "<strong>Material:</strong> madeira compensada<br><strong>Capacidade:</strong> até 250 m (18 cm) ou 500 m (24 cm)<br><strong>Acabamento:</strong> face estampada a cores, corpo pintado",
+      "A estampa é sortida: chegam em lotes pequenos e cada lote traz desenhos diferentes, por isso a que recebes pode não ser a da fotografia. As fotografias são ilustrativas — o carretel, os furos e os tamanhos são estes.",
+    ],
+  ),
+
+  dict(
+    handle="vareta-fibra-vidro-66cm",
+    titulo="Vareta de Fibra de Vidro 1,8 mm × 66 cm — Feixe 1 kg",
+    marca="Ventos do Norte",
+    tipo="Varetas",
+    etiquetas=["Varetas", "Fibra de vidro", "Acessórios", "Montagem"],
+    opcao="Title",
+    variantes=[("Default Title", "34.90", "", 0, "1KG")],
+    sku="VDN-VARETA-18-66", gramas=1000,
+    linha_tecnica="Fibra de vidro · 1,8 mm × 66 cm",
+    imagens=["vareta-fibra-feixe.jpg", "vareta-fibra-detalhe.jpg"],
+    alt="Feixe de varetas de fibra de vidro de 1,8 mm por 66 cm para pipas, fundo branco",
+    seo_titulo="Vareta de Fibra 1,8 mm × 66 cm, 1 kg | Ventos do Norte",
+    seo_desc="Varetas de fibra de vidro maciça de 1,8 mm × 66 cm para armar pipas e raias. Feixe de 1 kg. Envio de Portugal em 24–48h.",
+    descricao=[
+      "Varetas de fibra de vidro maciça, redondas, com 1,8 mm de espessura e 66 cm de comprimento, vendidas em feixe de 1 kg.",
+      "A fibra de vidro faz o que o bambu faz, sem as surpresas do bambu. Todas as varetas do feixe têm a mesma espessura e a mesma flexibilidade de ponta a ponta: não há nós, não há lado mais grosso, não é preciso aparar nem escolher. Verga sem partir e volta à forma, o que numa armação quer dizer uma pipa que cai, se apanha do chão e continua direita. E não empena nem apodrece com a humidade.",
+      "É material para quem faz as suas pipas ou as arranja. Serve de vara central e de travessa em arco, em pipas e raias de papel de seda ou de plástico. Os 66 cm cortam-se à medida com um alicate de corte.",
+      "<strong>Material:</strong> fibra de vidro maciça<br><strong>Diâmetro:</strong> 1,8 mm<br><strong>Comprimento:</strong> 66 cm<br><strong>Quantidade:</strong> feixe de 1 kg, cerca de 300 varetas",
+      "Vende-se ao peso, por isso o número de varetas varia um pouco de feixe para feixe. Ao cortar ou lixar, a fibra larga farpas e pó fino que irritam a pele e os olhos: usa luvas e óculos e corta ao ar livre. O corte é trabalho de adulto.",
     ],
   ),
 

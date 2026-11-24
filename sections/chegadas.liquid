@@ -1,0 +1,195 @@
+{%- comment -%}
+  ============================================================
+  chegadas — a secção que só anuncia o que a loja já tem
+  ============================================================
+
+  O QUE FAZ:
+  Procura no catálogo os produtos à venda de certos tipos (por omissão Pipas,
+  Linhas, Carretéis e Varetas). Se encontrar algum, mostra-os numa grelha com
+  o título «chegaram». Se não encontrar nenhum, mostra no mesmo sítio o texto
+  de espera («estão a caminho»).
+
+  PORQUÊ ASSIM:
+  A home dizia «as pipas estão a caminho». No dia em que elas passam a activo
+  essa frase fica errada, e o contrário também: anunciar «chegaram» antes de
+  haver stock é prometer o que a loja não tem. Em vez de depender de alguém se
+  lembrar de trocar o texto no dia certo, a secção lê o catálogo e escolhe
+  sozinha. Pôr um produto à venda no admin é o que muda a home.
+
+  O QUE CONTA COMO «À VENDA»:
+  Produto activo, publicado na loja online E com stock (product.available).
+  Rascunhos não aparecem em collections.all; um produto activo mas esgotado é
+  saltado de propósito — uma grelha de «Esgotado» por baixo de «chegaram» é a
+  mesma promessa falhada por outro caminho.
+
+  LIMITE:
+  collections.all.products, sem paginação, devolve os primeiros 50 produtos.
+  Chega para este catálogo. Se um dia passar dos 50, o certo é criar uma
+  coleção automática e usar a secção featured-collection.
+
+  ONDE É USADA:
+  templates/index.json, no lugar do antigo bloco de texto «E as pipas?».
+{%- endcomment -%}
+
+{%- liquid
+  assign tipos = section.settings.types | downcase | split: ','
+  assign limite = section.settings.products_to_show
+  assign encontrados = 0
+-%}
+
+{%- capture grelha -%}
+  {%- for product in collections.all.products -%}
+    {%- if encontrados >= limite -%}
+      {%- break -%}
+    {%- endif -%}
+
+    {%- liquid
+      assign serve = false
+      if product.available
+        assign tipo_do_produto = product.type | downcase | strip
+        for tipo in tipos
+          assign alvo = tipo | strip
+          if alvo != blank and alvo == tipo_do_produto
+            assign serve = true
+            break
+          endif
+        endfor
+      endif
+    -%}
+
+    {%- if serve -%}
+      {%- assign encontrados = encontrados | plus: 1 -%}
+      <li data-reveal>
+        {% render 'card-product', card_product: product %}
+      </li>
+    {%- endif -%}
+  {%- endfor -%}
+{%- endcapture -%}
+
+{%- if encontrados > 0 -%}
+  <section class="chegadas vdn-section vdn-section--light">
+    <div class="page-width">
+      <div class="section-head" data-reveal>
+        <div>
+          {%- if section.settings.eyebrow != blank -%}
+            <p class="eyebrow">{{ section.settings.eyebrow | escape }}</p>
+          {%- endif -%}
+          {%- if section.settings.heading != blank -%}
+            <h2 class="section-head__title">{{ section.settings.heading | escape }}</h2>
+          {%- endif -%}
+        </div>
+
+        {%- if section.settings.show_view_all -%}
+          <a
+            href="{{ routes.all_products_collection_url }}"
+            class="link-underline"
+            aria-label="{{ 'sections.featured_collection.view_all_label' | t: collection_name: collections.all.title }}"
+          >
+            {{ 'sections.featured_collection.view_all' | t }}
+          </a>
+        {%- endif -%}
+      </div>
+
+      <ul
+        class="product-grid"
+        role="list"
+        style="--grid-columns: {{ section.settings.columns_desktop }};"
+        data-reveal-stagger="70"
+      >
+        {{ grelha }}
+      </ul>
+    </div>
+  </section>
+{%- elsif section.settings.fallback_heading != blank or section.settings.fallback_text != blank -%}
+  {%- comment -%} Nada à venda ainda: o texto de espera, com o aspecto do rich-text. {%- endcomment -%}
+  <div class="chegadas-espera page-width">
+    <div class="chegadas-espera__wrapper">
+      {%- if section.settings.fallback_heading != blank -%}
+        <h2 class="chegadas-espera__heading">{{ section.settings.fallback_heading | escape }}</h2>
+      {%- endif -%}
+      {%- if section.settings.fallback_text != blank -%}
+        <div class="chegadas-espera__text rte">{{ section.settings.fallback_text }}</div>
+      {%- endif -%}
+    </div>
+  </div>
+{%- endif -%}
+
+<style>
+  .chegadas-espera { padding-top: var(--spacing-sections); padding-bottom: var(--spacing-sections); }
+  .chegadas-espera__wrapper { max-width: 640px; margin: 0 auto; text-align: center; }
+  .chegadas-espera__heading { font-size: var(--f6); margin-bottom: 16px; }
+  .chegadas-espera__text { font-size: var(--f3); line-height: 1.6; margin-bottom: 20px; }
+</style>
+
+{% schema %}
+{
+  "name": "t:sections.chegadas.name",
+  "tag": "section",
+  "settings": [
+    {
+      "type": "header",
+      "content": "t:sections.chegadas.settings.header__stock.content"
+    },
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "t:sections.chegadas.settings.eyebrow.label"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "default": "As pipas chegaram",
+      "label": "t:sections.chegadas.settings.heading.label"
+    },
+    {
+      "type": "text",
+      "id": "types",
+      "default": "Pipas, Linhas, Carretéis, Varetas",
+      "label": "t:sections.chegadas.settings.types.label",
+      "info": "t:sections.chegadas.settings.types.info"
+    },
+    {
+      "type": "range",
+      "id": "products_to_show",
+      "min": 2,
+      "max": 12,
+      "step": 1,
+      "default": 8,
+      "label": "t:sections.chegadas.settings.products_to_show.label"
+    },
+    {
+      "type": "range",
+      "id": "columns_desktop",
+      "min": 2,
+      "max": 5,
+      "step": 1,
+      "default": 4,
+      "label": "t:sections.chegadas.settings.columns_desktop.label"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_view_all",
+      "default": true,
+      "label": "t:sections.chegadas.settings.show_view_all.label"
+    },
+    {
+      "type": "header",
+      "content": "t:sections.chegadas.settings.header__fallback.content"
+    },
+    {
+      "type": "text",
+      "id": "fallback_heading",
+      "default": "E as pipas?",
+      "label": "t:sections.chegadas.settings.fallback_heading.label"
+    },
+    {
+      "type": "richtext",
+      "id": "fallback_text",
+      "default": "<p>Estão a caminho.</p>",
+      "label": "t:sections.chegadas.settings.fallback_text.label",
+      "info": "t:sections.chegadas.settings.fallback_text.info"
+    }
+  ],
+  "presets": [{ "name": "t:sections.chegadas.name" }]
+}
+{% endschema %}
