@@ -192,26 +192,72 @@
       }
     },
     "pipas": {
-      "type": "rich-text",
+      "type": "ceu",
       "blocks": {
-        "h": {
-          "type": "heading",
+        "mosaico": {
+          "type": "pipa",
           "settings": {
-            "heading": "E as pipas?"
+            "product": "pipa-mosaico-tricolor",
+            "title": "Pipa Mosaico Tricolor",
+            "image_asset": "ceu-pipa-mosaico.jpg",
+            "formato": "losango"
           }
         },
-        "t": {
-          "type": "text",
+        "cruz": {
+          "type": "pipa",
           "settings": {
-            "text": "<p>Estão a caminho. Somos uma loja de vento e o vento começou nelas — papel de seda, linha encerada, rabiola a desenhar no céu. Queremos trazê-las como deve ser, e isso leva o tempo que leva.</p><p>Até lá, há a peteca e a bola. Também se jogam ao ar livre, também fazem a tarde passar depressa.</p>"
+            "product": "pipa-cruz-rosa",
+            "title": "Pipa Cruz Rosa",
+            "image_asset": "ceu-pipa-cruz.jpg",
+            "formato": "classica"
+          }
+        },
+        "linha": {
+          "type": "apoio",
+          "settings": {
+            "product": "linha-10-vera-cruz",
+            "title": "Linha 10 Vera Cruz",
+            "kicker": "Linha",
+            "note": "Algodão puro, 2012 m por cone. Sete cores.",
+            "image_asset": "ceu-linha.jpg"
+          }
+        },
+        "carretel": {
+          "type": "apoio",
+          "settings": {
+            "product": "carretel-madeira",
+            "title": "Carretel de Madeira",
+            "kicker": "Carretel",
+            "note": "Roda solto e poupa o pulso. Dois tamanhos.",
+            "image_asset": "ceu-carretel.jpg"
+          }
+        },
+        "vareta": {
+          "type": "apoio",
+          "settings": {
+            "product": "vareta-fibra-vidro-66cm",
+            "title": "Vareta de Fibra de Vidro",
+            "kicker": "Vareta",
+            "note": "1,8 mm × 66 cm. Verga sem partir.",
+            "image_asset": "ceu-vareta.jpg"
           }
         }
       },
       "block_order": [
-        "h",
-        "t"
+        "mosaico",
+        "cruz",
+        "linha",
+        "carretel",
+        "vareta"
       ],
-      "settings": {}
+      "settings": {
+        "eyebrow_live": "Acabadas de chegar",
+        "eyebrow_soon": "A chegar",
+        "heading": "O que voa, e o que o segura",
+        "lead": "Duas pipas de papel de seda coladas à mão. E, cá em baixo, tudo o que as leva lá acima: linha de algodão, carretel de madeira e vareta de fibra.",
+        "label_sky": "O que voa",
+        "label_ground": "O que as segura"
+      }
     }
   },
   "order": [

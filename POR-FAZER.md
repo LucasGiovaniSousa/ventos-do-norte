@@ -155,9 +155,30 @@ python3 data/publicar.py --publicar   # escreve mesmo
 depois disso — um preço, um stock, pôr um produto à venda — é o `data/loja.py`;
 ver README, «Mexer na loja daqui».)
 
-O script cria os 10 produtos com descrições, preços, SKU, peso, stock,
-etiquetas, SEO e metacampos, **todos em rascunho**. Se um handle já existir,
-actualiza em vez de duplicar — dá para correr outra vez depois de mudar texto.
+O script cria os produtos do catálogo com descrições, preços, SKU, peso,
+etiquetas, SEO, metacampos e **imagens** (de `data/produto/`), **todos em
+rascunho**. Se um handle já existir, actualiza em vez de duplicar — dá para
+correr outra vez depois de mudar texto.
+
+Três protecções, porque a loja já está aberta:
+
+- **Um produto à venda (ACTIVE) é saltado.** O catálogo pode estar atrás da
+  loja — em Novembro de 2026 a peteca estava a 7,90 € na loja e a 9,90 € no
+  `catalogo.py`, a bola a 28,90 € e a 24,90 €. Sem isto, correr o script
+  repunha os preços antigos. `--forcar` escreve por cima, depois de acertares
+  o catálogo.
+- **O estado de um produto que já existe não é tocado.** Só o que é novo
+  entra em rascunho.
+- **As imagens só entram em produtos que não têm nenhuma.**
+
+Para publicar só alguns:
+
+```bash
+python3 data/publicar.py --apenas pipa-cruz-rosa,pipa-mosaico-tricolor
+python3 data/publicar.py --apenas pipa-cruz-rosa,pipa-mosaico-tricolor --publicar
+```
+
+O stock não é escrito por aqui: fica a zero e põe-se com o `loja.py`.
 
 Porquê ficheiro e não `export`: cada comando de shell abre um processo novo,
 e uma variável exportada numa janela não é vista noutra. Com o ficheiro, o
@@ -243,3 +264,60 @@ três bandeiras e a Archivo, e isso mantém-se.
       estiver em Definições do tema → Marca → Número de WhatsApp
 - [ ] Definições de morada/telefone/horário → JSON-LD de loja local
 - [ ] Levantamento em loja — só se houver morada física
+
+---
+
+## Produtos de Novembro de 2026 — o que falta para estarem à venda
+
+Estão no `catalogo.py`, com fotos em `data/produto/`, e **ainda não estão na
+loja**: no dia em que foram preparados não havia token da Admin API no disco.
+
+| Handle | Preço posto | O que confirmar |
+|---|---|---|
+| `pipa-mosaico-tricolor` | 5,90 € | preço · tamanho (não está na ficha) · vende-se à unidade ou em pacote? |
+| `pipa-cruz-rosa` | 5,90 € | o mesmo |
+| `linha-10-vera-cruz` | 9,90 € | preço · as 7 cores existem todas em stock? · «Tex 85» e «2012 m» lidos do rótulo |
+| `vareta-fibra-vidro-66cm` | 34,90 € | preço · «cerca de 300 varetas» é conta feita pelo peso, não contagem |
+| `carretel-madeira` | 14,90 / 19,90 € | já existia; ganhou fotos. Tamanhos 18 e 24 cm nunca foram medidos |
+
+**Os preços são estimativas**, como os do resto do catálogo. Nenhum saiu de
+custo de fornecedor.
+
+Por ordem:
+
+- [ ] Rever preços e os dados da tabela no `catalogo.py`
+- [ ] Token em `.admin-api.token` (§9) e publicar em rascunho:
+      `python3 data/publicar.py --apenas pipa-mosaico-tricolor,pipa-cruz-rosa,linha-10-vera-cruz,vareta-fibra-vidro-66cm,carretel-madeira --publicar`
+- [ ] Ver cada um no admin — fotos, variantes, texto
+- [ ] Stock real, SKU a SKU: `python3 data/loja.py stock <sku> <n> --escrever`
+- [ ] Passar a activo: `python3 data/loja.py estado <handle> ACTIVE --escrever`
+- [ ] Enviar o tema (`./deploy.sh ao-vivo`) — traz a secção **chegadas** e as
+      amostras de cor novas. Pode ir antes ou depois: a secção só anuncia
+      «As pipas chegaram» quando houver um produto destes activo e com stock;
+      até lá mostra o texto de sempre, «estão a caminho»
+- [ ] Coleção «Varetas» (§6), se quiseres a categoria no menu — hoje são sete
+- [ ] O hero e a faixa ainda só falam de peteca e futevôlei: rever o texto
+      quando as pipas estiverem mesmo à venda
+
+**A home já os mostra — secção `ceu` (24 Nov).** No lugar da grelha `chegadas`
+ficou uma secção desenhada para estes cinco: as duas pipas a voar, com linha e
+rabiola, e por baixo a linha, o carretel e a vareta. Cada bloco lê o seu
+produto: enquanto for rascunho ou não tiver stock mostra «A chegar», sem preço
+e sem ligação; no momento em que passar a activo, publicado e com stock, ganha
+preço e ligação sozinho, e a sobrelinha passa de «A chegar» a «Acabadas de
+chegar». Não há nada para trocar à mão na home no dia do lançamento.
+
+As fotos da secção viajam no tema (`assets/ceu-*.jpg`), porque um rascunho não
+se lê do tema. A `chegadas.liquid` continua no tema, disponível no editor, mas
+já não está na home — as duas fariam o mesmo trabalho.
+
+Os produtos já estão criados na loja, em rascunho (importados por CSV a 24 Nov
+— `data/importar-novembro.csv` — com as fotos carregadas à mão). O passo do
+token e do `publicar.py` na lista acima deixou de ser preciso para estes cinco.
+Faltam: stock, canal de vendas «Loja virtual», e passar a activo.
+
+**`./deploy.sh` não corre neste momento.** O `shopify` do Homebrew falha ao
+arrancar (`libsimdjson.33.dylib` em falta — o Node do Homebrew ficou partido
+depois de uma actualização). `brew reinstall node` deve resolver. O tema foi
+verificado na mesma, com `verificar.py` e com a biblioteca do theme check
+corrida à parte: 0 problemas.

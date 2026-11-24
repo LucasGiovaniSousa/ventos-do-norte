@@ -645,6 +645,123 @@
           }
         }
       }
+    },
+    "chegadas": {
+      "name": "Catalogue arrivals",
+      "settings": {
+        "header__stock": {
+          "content": "When products are on sale"
+        },
+        "eyebrow": {
+          "label": "Eyebrow"
+        },
+        "heading": {
+          "label": "Heading"
+        },
+        "types": {
+          "label": "Product types to show",
+          "info": "Comma-separated, exactly as in the product's Type field. Only active, in-stock products are shown."
+        },
+        "products_to_show": {
+          "label": "Maximum products to show"
+        },
+        "columns_desktop": {
+          "label": "Number of columns on desktop"
+        },
+        "show_view_all": {
+          "label": "Show view all button"
+        },
+        "header__fallback": {
+          "content": "While none is on sale"
+        },
+        "fallback_heading": {
+          "label": "Waiting heading"
+        },
+        "fallback_text": {
+          "label": "Waiting text",
+          "info": "Shown in place of the grid while no product of these types is on sale. It disappears on its own."
+        }
+      }
+    },
+    "ceu": {
+      "name": "Product sky",
+      "settings": {
+        "eyebrow_live": {
+          "label": "Eyebrow — products on sale",
+          "info": "Shown as soon as at least one product in the section is active and in stock."
+        },
+        "eyebrow_soon": {
+          "label": "Eyebrow — before they arrive",
+          "info": "Shown while none of the section's products is on sale."
+        },
+        "heading": {
+          "label": "Heading"
+        },
+        "lead": {
+          "label": "Text"
+        },
+        "label_sky": {
+          "label": "Kites label"
+        },
+        "label_ground": {
+          "label": "Accessories label"
+        }
+      },
+      "blocks": {
+        "pipa": {
+          "name": "Kite",
+          "settings": {
+            "product": {
+              "label": "Product",
+              "info": "If active and in stock, the kite becomes a link and shows the price. Otherwise it shows “Coming soon”."
+            },
+            "title": {
+              "label": "Name",
+              "info": "Used while the product is not on sale: the theme cannot read a draft's title."
+            },
+            "image_asset": {
+              "label": "Theme photo (file in assets/)",
+              "info": "For example ceu-pipa-mosaico.jpg. Must be cropped to the paper, with no white margin."
+            },
+            "formato": {
+              "label": "Shape",
+              "info": "The classic shape uses an outline measured on the Pipa Cruz Rosa photo.",
+              "options__1": {
+                "label": "Square, flown as a diamond"
+              },
+              "options__2": {
+                "label": "Classic, point down"
+              }
+            }
+          }
+        },
+        "apoio": {
+          "name": "Accessory",
+          "settings": {
+            "product": {
+              "label": "Product",
+              "info": "If active and in stock, the tile becomes a link and shows the price. Otherwise it shows “Coming soon”."
+            },
+            "title": {
+              "label": "Name",
+              "info": "Used while the product is not on sale, and to shorten long titles."
+            },
+            "kicker": {
+              "label": "Type (small line above)"
+            },
+            "note": {
+              "label": "Short note"
+            },
+            "image_asset": {
+              "label": "Theme photo (file in assets/)",
+              "info": "A photo on a white background: it blends into the tile colour."
+            }
+          }
+        }
+      },
+      "presets": {
+        "name": "Product sky"
+      }
     }
   },
   "settings_schema": {

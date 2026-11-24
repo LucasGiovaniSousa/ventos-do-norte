@@ -1,0 +1,864 @@
+{%- comment -%}
+  ============================================================
+  ceu — os produtos novos a voar na página inicial
+  ============================================================
+
+  O QUE FAZ:
+  Uma secção escura em duas metades. Em cima, o céu: as pipas voam soltas,
+  cada uma com a sua linha e a sua rabiola, a pairar e a reagir ao ponteiro.
+  Em baixo, o chão: os acessórios que as levam lá acima — linha, carretel,
+  vareta — em azulejos claros.
+
+  PORQUÊ ASSIM:
+  A bola e a peteca têm cada uma a sua secção inteira. Fazer o mesmo a cinco
+  produtos dava cinco ecrãs seguidos iguais. E pô-los numa grelha de cartões
+  era tratá-los como linhas de uma lista, que é o que a home deixou de fazer.
+  Estes cinco contam uma história só — o que voa, e o que o segura — e a
+  secção desenha essa frase.
+
+  CADA PRODUTO DIZ A VERDADE SOBRE SI:
+  Um bloco aponta a um produto. Se o produto está activo, publicado e com
+  stock, o bloco é uma ligação e mostra o preço. Se não está — rascunho, sem
+  stock, por publicar — mostra «A chegar», sem preço e sem ligação, porque
+  ligar a uma ficha que não existe dá erro 404.
+
+  Ninguém tem de mudar a home no dia em que um produto passa a activo: é
+  passá-lo a activo que muda a home. A sobrelinha faz o mesmo — troca sozinha
+  assim que o primeiro estiver à venda.
+
+  AS IMAGENS VIAJAM NO TEMA:
+  Um rascunho não se lê do tema: nem título, nem fotografia. Para a secção
+  poder mostrar um produto que ainda não está à venda, o nome e a imagem vêm
+  do bloco (o nome escrito, a imagem em assets/). As pipas precisam disso de
+  qualquer maneira: a fotografia da loja traz margem branca, e estas foram
+  cortadas rente ao papel para voarem sem caixa à volta.
+
+  O MOVIMENTO:
+  Três camadas, da mais longe para a mais perto: o vento, a segunda pipa, a
+  primeira. O ponteiro desloca cada uma numa medida diferente, e é essa
+  diferença que dá profundidade. Onde não há ponteiro — telemóvel — as pipas
+  pairam na mesma, em ciclo. Com prefers-reduced-motion fica tudo parado (a
+  regra global em base.css trata das animações; o script nem chega a ligar).
+
+  ONDE É USADA:
+  templates/index.json, depois da faixa de baixo.
+{%- endcomment -%}
+
+{%- liquid
+  assign algum_a_venda = false
+  assign n_pipas = 0
+  assign n_apoios = 0
+
+  for block in section.blocks
+    if block.type == 'pipa'
+      assign n_pipas = n_pipas | plus: 1
+    else
+      assign n_apoios = n_apoios | plus: 1
+    endif
+
+    if block.settings.product != blank and block.settings.product.available
+      assign algum_a_venda = true
+    endif
+  endfor
+
+  assign sobrelinha = section.settings.eyebrow_soon
+  if algum_a_venda
+    assign sobrelinha = section.settings.eyebrow_live
+  endif
+-%}
+
+<section class="ceu vdn-section--dark has-grain glow-bg" data-ceu>
+  {%- comment -%}
+    O vento. Mesmo desenho do hero — fios com um filtro de turbulência que os
+    faz ondular — com os ids dos filtros presos ao id da secção, para duas
+    secções na mesma página não partilharem o filtro uma da outra.
+  {%- endcomment -%}
+  <svg class="ceu__wind" viewBox="0 0 1440 900" preserveAspectRatio="none" aria-hidden="true" focusable="false">
+    <defs>
+      {%- for i in (1..2) -%}
+        <filter id="ceu-vento-{{ section.id }}-{{ i }}" x="-20%" y="-40%" width="140%" height="180%">
+          <feTurbulence type="fractalNoise" baseFrequency="0.004 0.011" numOctaves="2" seed="{{ i | times: 8 | minus: 3 }}" result="ruido">
+            <animate
+              attributeName="baseFrequency"
+              dur="{{ i | times: 6 | plus: 11 }}s"
+              values="0.004 0.011; 0.007 0.019; 0.003 0.009; 0.004 0.011"
+              repeatCount="indefinite"
+            />
+          </feTurbulence>
+          <feDisplacementMap in="SourceGraphic" in2="ruido" scale="{{ i | times: 8 | plus: 16 }}" xChannelSelector="R" yChannelSelector="G" />
+        </filter>
+      {%- endfor -%}
+    </defs>
+
+    <g filter="url(#ceu-vento-{{ section.id }}-1)">
+      <path class="wind-line" style="--wind-len: 2000; --wind-delay: 200ms; --flow: 32s" d="M-150 240 C 240 300, 520 150, 900 215 S 1320 110, 1620 150" stroke="rgba(255,200,0,.36)" stroke-width="1.2"/>
+      <path class="wind-line" style="--wind-len: 2000; --wind-delay: 600ms; --flow: 40s" d="M-150 470 C 300 400, 600 540, 980 430 S 1380 470, 1620 380" stroke="rgba(91,140,255,.5)" stroke-width="1.6"/>
+    </g>
+
+    <g filter="url(#ceu-vento-{{ section.id }}-2)">
+      <path class="wind-line" style="--wind-len: 2000; --wind-delay: 350ms; --flow: 36s" d="M-150 640 C 260 700, 560 560, 940 640 S 1340 560, 1620 600" stroke="rgba(0,165,68,.46)" stroke-width="1.6"/>
+      <path class="wind-line" style="--wind-len: 2000; --wind-delay: 900ms; --flow: 44s" d="M-150 800 C 320 740, 640 860, 1020 770 S 1400 800, 1620 730" stroke="rgba(230,51,41,.3)" stroke-width="1.2"/>
+      <path class="wind-line" style="--wind-len: 2000; --wind-delay: 1100ms; --flow: 48s" d="M-150 90 C 220 130, 460 40, 820 80 S 1260 20, 1620 50" stroke="rgba(255,255,255,.13)" stroke-width="1"/>
+    </g>
+  </svg>
+
+  <div class="ceu__inner page-width">
+    <header class="ceu__head" data-reveal-stagger="100">
+      {%- if sobrelinha != blank -%}
+        <p class="eyebrow ceu__eyebrow" data-reveal>{{ sobrelinha | escape }}</p>
+      {%- endif -%}
+
+      {%- if section.settings.heading != blank -%}
+        <h2 class="ceu__title display-italic" data-reveal>{{ section.settings.heading | escape }}</h2>
+      {%- endif -%}
+
+      {%- if section.settings.lead != blank -%}
+        <p class="ceu__lead" data-reveal>{{ section.settings.lead | escape }}</p>
+      {%- endif -%}
+
+      {%- if n_pipas > 0 and section.settings.label_sky != blank -%}
+        <p class="ceu__rotulo" data-reveal>{{ section.settings.label_sky | escape }}</p>
+      {%- endif -%}
+    </header>
+
+    {%- if n_pipas > 0 -%}
+      {%- comment -%}
+        O data-reveal fica no céu e não em cada pipa: o reveal escreve no
+        `transform` do elemento, e o da pipa é do ponteiro.
+      {%- endcomment -%}
+      <div class="ceu__sky" data-reveal>
+        {%- assign lugar = 0 -%}
+        {%- for block in section.blocks -%}
+          {%- if block.type != 'pipa' -%}
+            {%- continue -%}
+          {%- endif -%}
+
+          {%- liquid
+            assign lugar = lugar | plus: 1
+            assign produto = block.settings.product
+            assign a_venda = false
+            if produto != blank and produto.available
+              assign a_venda = true
+            endif
+            assign nome = block.settings.title | default: produto.title
+            assign preco_min = produto.price_min | money
+          -%}
+
+          <article class="pipa pipa--{{ lugar }} pipa--{{ block.settings.formato }}" {{ block.shopify_attributes }}>
+            <span class="pipa__fio" aria-hidden="true"></span>
+
+            {%- if a_venda -%}
+              <a class="pipa__alvo" href="{{ produto.url }}">
+            {%- else -%}
+              <div class="pipa__alvo">
+            {%- endif -%}
+
+              <span class="pipa__corpo">
+                <span class="pipa__caixa">
+                  <span class="pipa__papel">
+                    {%- comment -%}
+                      alt vazio de propósito: o nome está escrito na etiqueta,
+                      dentro da mesma ligação. Com alt, um leitor de ecrã lia
+                      o nome duas vezes seguidas.
+                    {%- endcomment -%}
+                    {%- if block.settings.image_asset != blank -%}
+                      <img src="{{ block.settings.image_asset | asset_url }}" alt="" loading="lazy" width="760" height="760">
+                    {%- elsif produto.featured_image != blank -%}
+                      {{ produto.featured_image | image_url: width: 800 | image_tag: loading: 'lazy', alt: '' }}
+                    {%- endif -%}
+                  </span>
+                </span>
+
+                <svg class="pipa__rabiola" viewBox="0 0 64 190" preserveAspectRatio="none" aria-hidden="true" focusable="false">
+                  <path d="M32 0 C 12 30, 52 62, 32 96 S 14 152, 34 190" fill="none" stroke="rgba(245,244,240,.55)" stroke-width="1.5" vector-effect="non-scaling-stroke"/>
+                  <path d="M-8 -5 0 0 -8 5ZM8 -5 0 0 8 5Z" transform="translate(26 38) rotate(-18)" fill="#ffc800"/>
+                  <path d="M-8 -5 0 0 -8 5ZM8 -5 0 0 8 5Z" transform="translate(39 80) rotate(14)" fill="#00a544"/>
+                  <path d="M-8 -5 0 0 -8 5ZM8 -5 0 0 8 5Z" transform="translate(27 124) rotate(-16)" fill="#e63329"/>
+                  <path d="M-8 -5 0 0 -8 5ZM8 -5 0 0 8 5Z" transform="translate(24 164) rotate(10)" fill="#5b8cff"/>
+                </svg>
+              </span>
+
+              <span class="pipa__etiqueta">
+                <span class="pipa__nome">{{ nome | escape }}</span>
+                {%- if a_venda -%}
+                  <span class="ceu-estado ceu-estado--preco">
+                    {%- if produto.price_varies -%}
+                      {{ 'products.product.price.from_price_html' | t: price: preco_min }}
+                    {%- else -%}
+                      {{ produto.price | money }}
+                    {%- endif -%}
+                  </span>
+                  <span class="ceu-ver">{{ 'sections.ceu.view' | t }} →</span>
+                {%- else -%}
+                  <span class="ceu-estado ceu-estado--breve">{{ 'sections.ceu.soon' | t }}</span>
+                {%- endif -%}
+              </span>
+
+            {%- if a_venda -%}
+              </a>
+            {%- else -%}
+              </div>
+            {%- endif -%}
+          </article>
+        {%- endfor -%}
+      </div>
+    {%- endif -%}
+
+    {%- if n_apoios > 0 -%}
+      <div class="ceu__chao">
+        {%- if section.settings.label_ground != blank -%}
+          <p class="ceu__rotulo">{{ section.settings.label_ground | escape }}</p>
+        {%- endif -%}
+
+        <ul class="ceu__apoios" role="list" data-reveal-stagger="90">
+          {%- for block in section.blocks -%}
+            {%- if block.type != 'apoio' -%}
+              {%- continue -%}
+            {%- endif -%}
+
+            {%- liquid
+              assign produto = block.settings.product
+              assign a_venda = false
+              if produto != blank and produto.available
+                assign a_venda = true
+              endif
+              assign nome = block.settings.title | default: produto.title
+              assign preco_min = produto.price_min | money
+            -%}
+
+            {%- comment -%}
+              O data-reveal vai no <li> e o azulejo é o filho: o reveal fixa
+              `transform: none` no elemento revelado, e isso anulava o
+              levantar do azulejo ao passar o rato.
+            {%- endcomment -%}
+            <li data-reveal {{ block.shopify_attributes }}>
+              {%- if a_venda -%}
+                <a class="apoio" href="{{ produto.url }}">
+              {%- else -%}
+                <div class="apoio">
+              {%- endif -%}
+
+                <div class="apoio__media">
+                  {%- if block.settings.image_asset != blank -%}
+                    <img src="{{ block.settings.image_asset | asset_url }}" alt="" loading="lazy" width="640" height="640">
+                  {%- elsif produto.featured_image != blank -%}
+                    {{ produto.featured_image | image_url: width: 640 | image_tag: loading: 'lazy', alt: '' }}
+                  {%- endif -%}
+                </div>
+
+                <div class="apoio__corpo">
+                  {%- if block.settings.kicker != blank -%}
+                    <span class="apoio__tipo">{{ block.settings.kicker | escape }}</span>
+                  {%- endif -%}
+                  <h3 class="apoio__nome">{{ nome | escape }}</h3>
+                  {%- if block.settings.note != blank -%}
+                    <p class="apoio__nota">{{ block.settings.note | escape }}</p>
+                  {%- endif -%}
+
+                  <span class="apoio__linha">
+                    {%- if a_venda -%}
+                      <span class="ceu-estado ceu-estado--preco">
+                        {%- if produto.price_varies -%}
+                          {{ 'products.product.price.from_price_html' | t: price: preco_min }}
+                        {%- else -%}
+                          {{ produto.price | money }}
+                        {%- endif -%}
+                      </span>
+                      <span class="ceu-ver">{{ 'sections.ceu.view' | t }} →</span>
+                    {%- else -%}
+                      <span class="ceu-estado ceu-estado--breve">{{ 'sections.ceu.soon' | t }}</span>
+                    {%- endif -%}
+                  </span>
+                </div>
+
+              {%- if a_venda -%}
+                </a>
+              {%- else -%}
+                </div>
+              {%- endif -%}
+            </li>
+          {%- endfor -%}
+        </ul>
+      </div>
+    {%- endif -%}
+  </div>
+</section>
+
+<style>
+  /* ---------- O céu ---------- */
+  .ceu {
+    position: relative;
+    overflow: clip;
+    padding-block: var(--sp-9);
+    background-color: var(--vdn-ink);
+    color: var(--vdn-on-ink);
+    /* Posição do ponteiro, de -0,5 a 0,5 em cada eixo. Quem a escreve é o
+       script no fim do ficheiro; sem ele ficam a zero e nada se desloca. */
+    --px: 0;
+    --py: 0;
+  }
+
+  .ceu.glow-bg::before { z-index: -1; }
+
+  .ceu__wind {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    /* O vento é o plano mais distante: mexe pouco, e no sentido do ponteiro. */
+    transform: translate3d(calc(var(--px) * 22px), calc(var(--py) * 14px), 0);
+  }
+
+  .ceu__inner {
+    display: grid;
+    grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+    column-gap: var(--sp-7);
+    align-items: start;
+  }
+
+  /* ---------- Texto ---------- */
+  .ceu__head { padding-top: var(--sp-7); max-width: 44ch; }
+  .ceu__eyebrow { color: var(--vdn-amarelo); }
+  .ceu__eyebrow::before { background: var(--vdn-amarelo); }
+
+  .ceu__title {
+    margin: 0 0 var(--sp-4);
+    font-size: var(--f7);
+    color: var(--vdn-on-ink);
+    text-wrap: balance;
+  }
+
+  .ceu__lead {
+    margin: 0;
+    font-size: var(--f3);
+    line-height: 1.55;
+    color: var(--vdn-on-ink-mut);
+  }
+
+  .ceu__rotulo {
+    display: flex;
+    align-items: center;
+    gap: var(--sp-3);
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: var(--f0);
+    font-weight: 700;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--vdn-on-ink-mut);
+  }
+
+  .ceu__rotulo::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: rgba(255, 255, 255, 0.14);
+  }
+
+  .ceu__head .ceu__rotulo { margin-top: var(--sp-7); }
+
+  /* ---------- As pipas ---------- */
+  .ceu__sky {
+    position: relative;
+    height: clamp(540px, 50vw, 680px);
+  }
+
+  /* Três elementos encaixados, cada um com o seu movimento, porque um
+     elemento só tem um `transform`:
+       .pipa          desloca-se e inclina-se com o ponteiro
+       .pipa__corpo   paira sozinho, em ciclo
+       .pipa__papel   tem a rotação fixa de cada formato
+     Misturados no mesmo elemento, a animação apagava o que o ponteiro
+     escrevia a cada fotograma. */
+  .pipa {
+    position: absolute;
+    z-index: 1;
+    transform:
+      translate3d(calc(var(--px) * var(--d, 1) * -64px), calc(var(--py) * var(--d, 1) * -40px), 0)
+      rotate(calc(var(--px) * var(--d, 1) * 5deg));
+    will-change: transform;
+  }
+
+  /* O lugar no céu vem da ordem dos blocos (--1, --2); o feitio vem do
+     formato escolhido (--losango, --classica). São coisas separadas: trocar a
+     ordem das pipas no editor troca-lhes o lugar sem lhes mudar a forma.
+
+     --d é a profundidade: a pipa da frente mexe mais do que a de trás, e é
+     essa diferença que o olho lê como distância. */
+  .pipa--1 { top: 0; right: 0; width: 58%; --d: 1; }
+  .pipa--2 { top: 36%; left: 0; width: 32%; --d: 0.5; }
+
+  /* A linha. Sai do meio da pipa — onde fica o cabresto — e desce para a
+     esquerda, a desvanecer antes de chegar a algum lado, como se vê do chão.
+
+     As duas descem para o mesmo lado, quase paralelas: quem as segura está
+     do lado do texto, que é onde está quem lê. Uma para cada lado cruzava-as
+     em X no meio do céu, e duas linhas cruzadas são duas pipas enroladas. */
+  .pipa__fio {
+    position: absolute;
+    left: 50%;
+    top: 46%;
+    width: 1px;
+    height: 125%;
+    transform-origin: top center;
+    transform: rotate(54deg);
+    background: linear-gradient(to bottom, rgba(245, 244, 240, 0.6), rgba(245, 244, 240, 0) 88%);
+    pointer-events: none;
+  }
+
+  .pipa--2 .pipa__fio { height: 150%; transform: rotate(46deg); }
+
+  .pipa__alvo {
+    position: relative;
+    display: block;
+    color: inherit;
+    text-decoration: none;
+  }
+
+  .pipa__corpo {
+    position: relative;
+    display: block;
+    animation: pipa-paira var(--paira, 7s) ease-in-out infinite;
+  }
+
+  .pipa--2 .pipa__corpo { --paira: 8.6s; animation-delay: -3.2s; }
+
+  @keyframes pipa-paira {
+    0%, 100% { transform: translate3d(0, 0, 0) rotate(-1.6deg); }
+    50% { transform: translate3d(7px, -16px, 0) rotate(2deg); }
+  }
+
+  .pipa__caixa {
+    position: relative;
+    display: block;
+    aspect-ratio: 1;
+    /* A sombra vai no pai: o papel é recortado com clip-path, e um
+       box-shadow no próprio elemento seria recortado com ele. */
+    filter: drop-shadow(0 22px 34px rgba(0, 0, 0, 0.5));
+    transition: scale var(--dur-3) var(--ease-out-expo);
+  }
+
+  .pipa__papel { position: absolute; display: block; }
+  .pipa__papel img { display: block; width: 100%; height: 100%; object-fit: cover; }
+
+  /* Pipa quadrada: voa de bico para cima. O papel ocupa 70,7 % da caixa
+     (1/√2) e roda 45° ao centro, por isso os quatro bicos tocam exactamente
+     no meio de cada lado — e o de baixo é onde se ata a rabiola. */
+  .pipa--losango .pipa__papel { inset: 14.65%; transform: rotate(45deg); }
+
+  /* Pipa clássica: bico em baixo. A silhueta foi medida na fotografia —
+     lados direitos até 51 % da altura, depois duas rectas até ao bico. Roda
+     em torno desse bico, que assim não sai do sítio onde a rabiola está
+     presa. */
+  .pipa--classica .pipa__caixa { aspect-ratio: 760 / 834; }
+
+  .pipa--classica .pipa__papel {
+    inset: 0;
+    transform: rotate(-7deg);
+    transform-origin: 50% 100%;
+    clip-path: polygon(0.4% 2%, 99.6% 2%, 99.6% 51.2%, 49.7% 99.6%, 0.4% 51.2%);
+  }
+
+  /* A rabiola: presa ao bico de baixo, balança em torno dele. */
+  .pipa__rabiola {
+    position: absolute;
+    top: calc(100% - 3px);
+    left: 50%;
+    width: 64px;
+    height: 190px;
+    margin-left: -32px;
+    overflow: visible;
+    transform-origin: 50% 0;
+    animation: pipa-rabiola 5.4s ease-in-out infinite;
+    pointer-events: none;
+  }
+
+  .pipa--classica .pipa__rabiola { height: 150px; animation-duration: 4.6s; animation-delay: -1.5s; }
+
+  @keyframes pipa-rabiola {
+    0%, 100% { transform: rotate(-10deg); }
+    50% { transform: rotate(8deg); }
+  }
+
+  /* A etiqueta: nome e estado, atados à pipa. */
+  .pipa__etiqueta {
+    position: absolute;
+    display: grid;
+    gap: var(--sp-1);
+    width: max-content;
+    max-width: 200px;
+  }
+
+  /* Cada etiqueta fica no canto que a sua pipa deixa livre: por baixo da
+     aresta esquerda do losango, por cima do ombro da clássica. Lado a lado
+     sobrepunham-se, porque as duas pipas estão perto uma da outra. */
+  .pipa--1 .pipa__etiqueta { right: 76%; top: 79%; text-align: right; justify-items: end; }
+  .pipa--2 .pipa__etiqueta { left: 2%; bottom: 104%; }
+
+  .pipa__nome {
+    font-family: var(--font-display);
+    font-size: var(--f4);
+    font-weight: 800;
+    font-variation-settings: 'wdth' 112;
+    line-height: 1.1;
+    letter-spacing: -0.01em;
+    color: var(--vdn-on-ink);
+  }
+
+  a.pipa__alvo:hover .pipa__caixa { scale: 1.05; }
+  a.pipa__alvo:focus-visible { outline: none; }
+  a.pipa__alvo:focus-visible .pipa__etiqueta { outline: 2px solid var(--vdn-amarelo); outline-offset: 6px; border-radius: 2px; }
+
+  /* ---------- Estado: preço ou «a chegar» ---------- */
+  .ceu-estado {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-family: var(--font-display);
+    font-size: var(--f0);
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+
+  .ceu-estado--breve { color: var(--vdn-amarelo); }
+  .ceu-estado--breve::before {
+    content: '';
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: currentColor;
+  }
+
+  .ceu-estado--preco {
+    font-size: var(--f3);
+    font-weight: 800;
+    letter-spacing: 0;
+    text-transform: none;
+  }
+
+  .ceu-ver {
+    font-family: var(--font-display);
+    font-size: var(--f0);
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--vdn-verde);
+  }
+
+  /* ---------- O que as segura ---------- */
+  .ceu__chao { grid-column: 1 / -1; margin-top: var(--sp-7); }
+
+  .ceu__apoios {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--sp-5);
+    margin: var(--sp-5) 0 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  /* Azulejos claros sobre o escuro. A fotografia vem sobre branco e funde-se
+     no areia com multiply: dispensa recorte, que na vareta — branca sobre
+     branco — nunca sairia limpo. */
+  .apoio {
+    display: grid;
+    grid-template-columns: 40% minmax(0, 1fr);
+    align-items: center;
+    gap: var(--sp-4);
+    height: 100%;
+    padding: var(--sp-4);
+    background-color: var(--vdn-sand);
+    color: var(--vdn-ink);
+    text-decoration: none;
+    border-radius: var(--media-radius);
+    /* O canto cortado é o gesto da marca: a pipa a cortar o céu. */
+    clip-path: polygon(0 0, 100% 0, 100% calc(100% - 26px), calc(100% - 26px) 100%, 0 100%);
+    transition: translate var(--dur-3) var(--ease-out-expo);
+  }
+
+  a.apoio:hover { translate: 0 -5px; }
+  a.apoio:focus-visible { outline: 2px solid var(--vdn-amarelo); outline-offset: 3px; }
+
+  .apoio__media { aspect-ratio: 1; }
+
+  .apoio__media img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    mix-blend-mode: multiply;
+  }
+
+  .apoio__corpo { display: grid; gap: var(--sp-1); min-width: 0; }
+
+  .apoio__tipo {
+    font-family: var(--font-display);
+    font-size: var(--f0);
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--vdn-on-sand-mut);
+  }
+
+  .apoio__nome {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: var(--f4);
+    font-weight: 800;
+    font-variation-settings: 'wdth' 110;
+    line-height: 1.12;
+    letter-spacing: -0.01em;
+  }
+
+  .apoio__nota {
+    margin: 0 0 var(--sp-2);
+    font-size: var(--f2);
+    line-height: 1.45;
+    color: var(--vdn-on-sand-mut);
+  }
+
+  .apoio__linha { display: flex; flex-wrap: wrap; align-items: baseline; gap: var(--sp-3); }
+
+  /* No areia, o amarelo não tem contraste: o «a chegar» passa a âmbar escuro,
+     o mesmo do aviso de pouco stock nos cartões. */
+  .apoio .ceu-estado--breve { color: #8a5f0c; }
+  .apoio .ceu-ver { color: var(--vdn-verde-esc); }
+
+  /* ---------- Ecrãs estreitos ----------
+     O ponteiro deixa de existir e as posições absolutas deixam de caber. As
+     pipas passam a lado a lado, a pairar na mesma, com a etiqueta por cima —
+     por baixo está a rabiola. */
+  @media screen and (max-width: 1000px) {
+    .ceu__inner { grid-template-columns: minmax(0, 1fr); row-gap: var(--sp-6); }
+    .ceu__head { padding-top: 0; }
+    .ceu__head .ceu__rotulo { margin-top: var(--sp-6); }
+
+    .ceu__sky {
+      display: grid;
+      grid-template-columns: minmax(0, 6fr) minmax(0, 4fr);
+      align-items: start;
+      gap: var(--sp-3);
+      /* Sem tecto, num tablet as duas pipas enchiam 800px de largura. */
+      width: 100%;
+      max-width: 520px;
+      margin-inline: auto;
+      height: auto;
+      padding-bottom: 150px;
+    }
+
+    .pipa { position: relative; top: auto; right: auto; left: auto; width: auto; transform: none; }
+    .pipa--2 { margin-top: 64px; }
+    .pipa__fio { display: none; }
+
+    .pipa__alvo { display: flex; flex-direction: column-reverse; gap: var(--sp-3); }
+
+    .pipa__etiqueta,
+    .pipa--1 .pipa__etiqueta,
+    .pipa--2 .pipa__etiqueta {
+      position: static;
+      width: auto;
+      max-width: none;
+      text-align: center;
+      justify-items: center;
+    }
+
+    .pipa__nome { font-size: var(--f3); }
+    .pipa__rabiola { height: 130px; }
+    .pipa--classica .pipa__rabiola { height: 104px; }
+
+    .ceu__chao { margin-top: 0; }
+    .ceu__apoios { grid-template-columns: minmax(0, 1fr); gap: var(--sp-3); }
+    .apoio { grid-template-columns: 104px minmax(0, 1fr); }
+  }
+</style>
+
+{%- comment -%}
+  O ponteiro. O script só escreve duas variáveis CSS na secção (--px e --py);
+  quem decide quanto cada camada se desloca é o CSS. Assim acrescentar uma
+  camada nova é uma linha de CSS e não mexe aqui.
+
+  Não liga onde não há rato — num ecrã tátil não existe ponteiro a seguir —
+  nem com prefers-reduced-motion. E pára o requestAnimationFrame quando chega
+  ao destino: sem isso ficava a correr sessenta vezes por segundo com o rato
+  parado.
+
+  O shopify:section:load é o editor de temas a redesenhar a secção: o HTML é
+  novo, por isso tem de ser ligado outra vez.
+{%- endcomment -%}
+<script>
+  (function () {
+    function liga() {
+      var comRato = window.matchMedia('(hover: hover) and (pointer: fine)');
+      var calmo = window.matchMedia('(prefers-reduced-motion: reduce)');
+
+      document.querySelectorAll('[data-ceu]:not([data-ceu-pronto])').forEach(function (ceu) {
+        ceu.setAttribute('data-ceu-pronto', '');
+        if (!comRato.matches || calmo.matches) return;
+
+        var alvoX = 0, alvoY = 0, x = 0, y = 0, quadro = 0;
+
+        function passo() {
+          x += (alvoX - x) * 0.07;
+          y += (alvoY - y) * 0.07;
+          ceu.style.setProperty('--px', x.toFixed(4));
+          ceu.style.setProperty('--py', y.toFixed(4));
+          var parado = Math.abs(alvoX - x) < 0.0008 && Math.abs(alvoY - y) < 0.0008;
+          quadro = parado ? 0 : requestAnimationFrame(passo);
+        }
+
+        function acorda() {
+          if (!quadro) quadro = requestAnimationFrame(passo);
+        }
+
+        ceu.addEventListener('pointermove', function (e) {
+          var r = ceu.getBoundingClientRect();
+          alvoX = (e.clientX - r.left) / r.width - 0.5;
+          alvoY = (e.clientY - r.top) / r.height - 0.5;
+          acorda();
+        });
+
+        ceu.addEventListener('pointerleave', function () {
+          alvoX = 0;
+          alvoY = 0;
+          acorda();
+        });
+      });
+    }
+
+    liga();
+    document.addEventListener('shopify:section:load', liga);
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "t:sections.ceu.name",
+  "tag": "div",
+  "settings": [
+    {
+      "type": "text",
+      "id": "eyebrow_live",
+      "default": "Acabadas de chegar",
+      "label": "t:sections.ceu.settings.eyebrow_live.label",
+      "info": "t:sections.ceu.settings.eyebrow_live.info"
+    },
+    {
+      "type": "text",
+      "id": "eyebrow_soon",
+      "default": "A chegar",
+      "label": "t:sections.ceu.settings.eyebrow_soon.label",
+      "info": "t:sections.ceu.settings.eyebrow_soon.info"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "default": "O que voa, e o que o segura",
+      "label": "t:sections.ceu.settings.heading.label"
+    },
+    {
+      "type": "textarea",
+      "id": "lead",
+      "label": "t:sections.ceu.settings.lead.label"
+    },
+    {
+      "type": "text",
+      "id": "label_sky",
+      "default": "O que voa",
+      "label": "t:sections.ceu.settings.label_sky.label"
+    },
+    {
+      "type": "text",
+      "id": "label_ground",
+      "default": "O que as segura",
+      "label": "t:sections.ceu.settings.label_ground.label"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "pipa",
+      "name": "t:sections.ceu.blocks.pipa.name",
+      "limit": 2,
+      "settings": [
+        {
+          "type": "product",
+          "id": "product",
+          "label": "t:sections.ceu.blocks.pipa.settings.product.label",
+          "info": "t:sections.ceu.blocks.pipa.settings.product.info"
+        },
+        {
+          "type": "text",
+          "id": "title",
+          "label": "t:sections.ceu.blocks.pipa.settings.title.label",
+          "info": "t:sections.ceu.blocks.pipa.settings.title.info"
+        },
+        {
+          "type": "text",
+          "id": "image_asset",
+          "label": "t:sections.ceu.blocks.pipa.settings.image_asset.label",
+          "info": "t:sections.ceu.blocks.pipa.settings.image_asset.info"
+        },
+        {
+          "type": "select",
+          "id": "formato",
+          "default": "losango",
+          "label": "t:sections.ceu.blocks.pipa.settings.formato.label",
+          "info": "t:sections.ceu.blocks.pipa.settings.formato.info",
+          "options": [
+            {
+              "value": "losango",
+              "label": "t:sections.ceu.blocks.pipa.settings.formato.options__1.label"
+            },
+            {
+              "value": "classica",
+              "label": "t:sections.ceu.blocks.pipa.settings.formato.options__2.label"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "apoio",
+      "name": "t:sections.ceu.blocks.apoio.name",
+      "limit": 6,
+      "settings": [
+        {
+          "type": "product",
+          "id": "product",
+          "label": "t:sections.ceu.blocks.apoio.settings.product.label",
+          "info": "t:sections.ceu.blocks.apoio.settings.product.info"
+        },
+        {
+          "type": "text",
+          "id": "title",
+          "label": "t:sections.ceu.blocks.apoio.settings.title.label",
+          "info": "t:sections.ceu.blocks.apoio.settings.title.info"
+        },
+        {
+          "type": "text",
+          "id": "kicker",
+          "label": "t:sections.ceu.blocks.apoio.settings.kicker.label"
+        },
+        {
+          "type": "text",
+          "id": "note",
+          "label": "t:sections.ceu.blocks.apoio.settings.note.label"
+        },
+        {
+          "type": "text",
+          "id": "image_asset",
+          "label": "t:sections.ceu.blocks.apoio.settings.image_asset.label",
+          "info": "t:sections.ceu.blocks.apoio.settings.image_asset.info"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "t:sections.ceu.presets.name"
+    }
+  ]
+}
+{% endschema %}

@@ -645,6 +645,123 @@
           }
         }
       }
+    },
+    "chegadas": {
+      "name": "Chegadas ao catálogo",
+      "settings": {
+        "header__stock": {
+          "content": "Quando há produtos à venda"
+        },
+        "eyebrow": {
+          "label": "Sobrelinha"
+        },
+        "heading": {
+          "label": "Título"
+        },
+        "types": {
+          "label": "Tipos de produto a mostrar",
+          "info": "Separados por vírgula, tal como estão no campo «Tipo» do produto. Só entram produtos activos e com stock."
+        },
+        "products_to_show": {
+          "label": "Número máximo de produtos"
+        },
+        "columns_desktop": {
+          "label": "Colunas no computador"
+        },
+        "show_view_all": {
+          "label": "Mostrar botão \"ver tudo\""
+        },
+        "header__fallback": {
+          "content": "Enquanto não há nenhum à venda"
+        },
+        "fallback_heading": {
+          "label": "Título de espera"
+        },
+        "fallback_text": {
+          "label": "Texto de espera",
+          "info": "Aparece no lugar da grelha enquanto nenhum produto destes tipos estiver à venda. Deixa de aparecer sozinho."
+        }
+      }
+    },
+    "ceu": {
+      "name": "Céu de produtos",
+      "settings": {
+        "eyebrow_live": {
+          "label": "Sobrelinha — com produtos à venda",
+          "info": "Aparece assim que pelo menos um dos produtos da secção estiver activo e com stock."
+        },
+        "eyebrow_soon": {
+          "label": "Sobrelinha — antes de chegarem",
+          "info": "Aparece enquanto nenhum dos produtos da secção estiver à venda."
+        },
+        "heading": {
+          "label": "Título"
+        },
+        "lead": {
+          "label": "Texto"
+        },
+        "label_sky": {
+          "label": "Rótulo das pipas"
+        },
+        "label_ground": {
+          "label": "Rótulo dos acessórios"
+        }
+      },
+      "blocks": {
+        "pipa": {
+          "name": "Pipa",
+          "settings": {
+            "product": {
+              "label": "Produto",
+              "info": "Se estiver activo e com stock, a pipa passa a ligação e mostra o preço. Se não, mostra «A chegar»."
+            },
+            "title": {
+              "label": "Nome",
+              "info": "Usado enquanto o produto não está à venda: o tema não consegue ler o título de um rascunho."
+            },
+            "image_asset": {
+              "label": "Foto do tema (ficheiro em assets/)",
+              "info": "Por exemplo ceu-pipa-mosaico.jpg. Tem de estar cortada rente ao papel, sem margem branca."
+            },
+            "formato": {
+              "label": "Formato",
+              "info": "A clássica usa um recorte medido na fotografia da Pipa Cruz Rosa.",
+              "options__1": {
+                "label": "Quadrada, em losango"
+              },
+              "options__2": {
+                "label": "Clássica, com bico em baixo"
+              }
+            }
+          }
+        },
+        "apoio": {
+          "name": "Acessório",
+          "settings": {
+            "product": {
+              "label": "Produto",
+              "info": "Se estiver activo e com stock, o azulejo passa a ligação e mostra o preço. Se não, mostra «A chegar»."
+            },
+            "title": {
+              "label": "Nome",
+              "info": "Usado enquanto o produto não está à venda, e para encurtar títulos compridos."
+            },
+            "kicker": {
+              "label": "Tipo (linha pequena por cima)"
+            },
+            "note": {
+              "label": "Nota curta"
+            },
+            "image_asset": {
+              "label": "Foto do tema (ficheiro em assets/)",
+              "info": "Fotografia sobre fundo branco: funde-se com a cor do azulejo."
+            }
+          }
+        }
+      },
+      "presets": {
+        "name": "Céu de produtos"
+      }
     }
   },
   "settings_schema": {
